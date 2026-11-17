@@ -1,0 +1,196 @@
+/* ============================================================
+   NÚCLEO — estado, salvamento, utilidades de interface
+   ============================================================ */
+'use strict';
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const pick = a => a[Math.floor(Math.random() * a.length)];
+
+const ICON = {
+  home: '<svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path d="M3 11 12 3l9 8v10h-6v-6H9v6H3z" fill="currentColor"/></svg>',
+  gear: '<svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path fill="currentColor" d="M10 2h4l.6 3 2.3 1 2.6-1.7 2.8 2.8L20.6 9.7l1 2.3 2.4.6v4l-3 .6-1 2.3 1.7 2.6-2.8 2.8-2.6-1.7-2.3 1-.6 2.8h-4l-.6-3-2.3-1-2.6 1.7-2.8-2.8 1.7-2.6-1-2.3L0 14v-4l3-.6 1-2.3L2.3 4.5 5.1 1.7l2.6 1.7 2.3-1zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" transform="scale(.92) translate(1 0)"/></svg>',
+  book: '<svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path fill="currentColor" d="M2 5c3-1.5 6-1.5 9 .5V20c-3-2-6-2-9-.5zm20 0c-3-1.5-6-1.5-9 .5V20c3-2 6-2 9-.5z"/></svg>',
+  voice: '<svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path fill="currentColor" d="M3 9h4l5-4v14l-5-4H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>',
+  hint: '<svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-4 12.7V18h8v-3.3A7 7 0 0 0 12 2zM9 20h6v2H9z"/></svg>',
+  back: '<svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path fill="currentColor" d="M15 4 7 12l8 8 2-2-6-6 6-6z"/></svg>',
+  next: '<svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path fill="currentColor" d="m9 4 8 8-8 8-2-2 6-6-6-6z"/></svg>',
+  pause: '<svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path fill="currentColor" d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>',
+  repeat: '<svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path fill="currentColor" d="M12 4V1L7 5l5 4V6a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z"/></svg>',
+  close: '<svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path fill="currentColor" d="m6 4 6 6 6-6 2 2-6 6 6 6-2 2-6-6-6 6-2-2 6-6-6-6z"/></svg>',
+  undo: '<svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path fill="currentColor" d="M9 5 3 10l6 5v-3.5c5 0 8 1.5 10 5.5-1-5-4-9-10-9.5z"/></svg>',
+  map: '<svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path fill="currentColor" d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2zm6 0v13l6 2V7z"/></svg>'
+};
+
+const PLAYER_COLORS = ['#f4c542', '#e98bb0', '#8fd6cf', '#a5d97f', '#c3a3e0', '#f08a3c'];
+const PLAYER_DEFAULT = ['Lanterna Amarela', 'Lanterna Rosa', 'Lanterna Azul', 'Lanterna Verde', 'Lanterna Lilás', 'Lanterna Laranja'];
+
+/* ---------- armazenamento local (protegido) ---------- */
+const Store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sem armazenamento: segue em memória */ } },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+const KEY_SET = 'cidade-esqueceu:config', KEY_GAME = 'cidade-esqueceu:partida';
+
+const prefersRM = (() => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
+let S = Object.assign({ music: .5, sfx: .7, voice: true, autoRead: false, mute: false, contrast: false, bigText: false, reduceMotion: prefersRM }, Store.get(KEY_SET, {}));
+let G = Store.get(KEY_GAME, null);
+if (G && G.v !== 1) G = null;
+
+function saveSettings() { Store.set(KEY_SET, S); applySettings(); }
+function saveGame() { if (G) Store.set(KEY_GAME, G); }
+function applySettings() {
+  const H = document.documentElement;
+  H.classList.toggle('hc', !!S.contrast);
+  H.classList.toggle('bt', !!S.bigText);
+  H.classList.toggle('rm', !!S.reduceMotion);
+  H.classList.toggle('sala', !!(G && G.mode === 'sala'));
+  H.classList.toggle('easy', !!(G && G.diff === 'exp'));
+  Audio8.setVolumes({ music: S.music, sfx: S.sfx, mute: S.mute });
+  Voice.enabled = !!S.voice && !S.mute;
+}
+
+/* ---------- partida ---------- */
+const PLANS = {
+  short: { label: 'Curta', time: '10 a 15 min', regions: { casas: ['jorge'], vila: ['ze'], parque: ['marina'] } },
+  medium: { label: 'Média', time: '20 a 30 min', regions: { casas: ['cida'], vila: ['katia'], saude: ['lucia'], mercado: ['rafa'], parque: ['joaquim'], caminhos: ['pedro'] } },
+  full: { label: 'Completa', time: '35 a 50 min', regions: Object.fromEntries(REGIONS.map(r => [r.id, r.missions.slice()])) }
+};
+const DIFFS = {
+  exp: { label: 'Explorador', desc: 'Para começar (7 a 8 anos): pistas claras, menos itens e a Faísca ajuda quando alguém trava.', options: 3, clues: 4, decoys: 0, pairs: 4, star: 4 },
+  inv: { label: 'Investigador', desc: 'O nível padrão (9 a 10 anos): mais itens, opções que confundem, entregas urgentes e dica só quando pedir.', options: 5, clues: 4, decoys: 1, pairs: 6, star: 2 },
+  det: { label: 'Detetive', desc: 'Para quem gosta de desafio (11 a 12 anos): mais suspeitos, menos pistas, sequências sem ajuda e dica só depois de tentar.', options: 6, clues: 3, decoys: 2, pairs: 8, star: 1 }
+};
+const MODES = {
+  solo: { label: 'Aventureiro', desc: 'Uma pessoa joga no próprio ritmo, com dicas aos poucos.' },
+  juntos: { label: 'Juntos na aventura', desc: 'De 2 a 6 pessoas no mesmo aparelho, revezando a vez e dividindo pistas secretas.' },
+  sala: { label: 'Sala de aula', desc: 'Para projetor: letras grandes, a turma conversa e vota, o professor conduz.' }
+};
+
+function newGame(cfg) {
+  G = { v: 1, mode: cfg.mode, players: cfg.players, diff: cfg.diff, length: cfg.length, clueMode: cfg.clueMode || 'pass', stars: {}, bonus: {}, lastRegion: null, done: {}, album: [], medals: { colaboracao: 0, curiosidade: 0, criatividade: 0, gentileza: 0 }, earned: {}, seen: {}, challenges: [], surprise: 0, surpriseAt: [], turn: 0, current: null, finished: false, mirror: null, thanks: [], prologue: false, started: Date.now() };
+  saveGame(); applySettings();
+}
+function planRegions() { const p = PLANS[G.length].regions; return REGIONS.filter(r => p[r.id]).map(r => ({ ...r, plan: p[r.id] })); }
+function planMissions() { return planRegions().flatMap(r => r.plan); }
+function doneCount() { return planMissions().filter(m => G.done[m]).length; }
+function progress() { const all = planMissions(); return all.length ? doneCount() / all.length : 0; }
+function regionOf(mid) { return REGIONS.find(r => r.missions.includes(mid)); }
+function regionState(rid) {
+  const rs = planRegions(), i = rs.findIndex(r => r.id === rid), r = rs[i];
+  if (!r) return 'off';
+  if (r.plan.every(m => G.done[m])) return 'done';
+  if (i === 0 || rs[i - 1].plan.every(m => G.done[m])) return 'open';
+  return 'locked';
+}
+function lvlOk(it) { if (!it || !it.level) return true; if (it.level === 'inv') return G.diff !== 'exp'; if (it.level === 'det') return G.diff === 'det'; return true; }
+function player() { return G.players[G.turn % G.players.length]; }
+function isJuntos() { return G && G.mode === 'juntos' && G.players.length > 1; }
+function avatarOf(p) { return avatarId((p || player()).avatar); }
+function starsHTML(n, max = 3) { return `<span class="stars" aria-label="${n || 0} de ${max} estrelas">${Array.from({ length: max }, (_, i) => `<i class="${i < (n || 0) ? 'on' : ''}">★</i>`).join('')}</span>`; }
+const MISSION_ORDER = ['cida', 'jorge', 'ze', 'katia', 'lucia', 'benedito', 'zefa', 'rafa', 'marina', 'joaquim', 'denise', 'pedro'];
+/* código das pistas para celulares: missão(2) + jogadores(1) + pistas(1) + verificador(1) */
+function clueCode(mid, n, c) { const d = String(MISSION_ORDER.indexOf(mid) + 1).padStart(2, '0') + n + c; const chk = [...d].reduce((a, x, i) => a + (+x) * (i + 3), 0) % 10; return d + chk; }
+function readClueCode(code) {
+  code = String(code).replace(/\D/g, ''); if (code.length !== 5) return null;
+  const d = code.slice(0, 4), chk = [...d].reduce((a, x, i) => a + (+x) * (i + 3), 0) % 10;
+  if (chk !== +code[4]) return null;
+  const mid = MISSION_ORDER[+d.slice(0, 2) - 1], n = +d[2], c = +d[3];
+  if (!mid || n < 2 || n > 6 || c < 1) return null;
+  return { mid, n, c };
+}
+function clueAssign(n, c) { const a = Array.from({ length: n }, () => []); for (let i = 0; i < c; i++) a[i % n].push(i); return a; }
+
+/* ---------- medalhas ---------- */
+function addMedal(key, n = 1, once) {
+  if (once) { if (G.seen[once]) return; G.seen[once] = 1; }
+  G.medals[key] = (G.medals[key] || 0) + n;
+  const M = MEDALS[key];
+  if (!G.earned[key] && G.medals[key] >= M.need) {
+    G.earned[key] = true; Audio8.sfx('medal');
+    toast(`Medalha conquistada: <b>${M.name}</b>!`, M.prop);
+  }
+  saveGame();
+}
+
+/* ---------- interface ---------- */
+const app = () => $('#app');
+let cleanupFns = [];
+function onCleanup(fn) { cleanupFns.push(fn); }
+function go(fn, ...args) {
+  Voice.stop(); cleanupFns.forEach(f => { try { f(); } catch (e) {} }); cleanupFns = [];
+  closeModal(); setFoot('');
+  const a = app(); a.innerHTML = ''; a.className = '';
+  fn(...args);
+  window.scrollTo({ top: 0, behavior: 'auto' });
+  const h = a.querySelector('h1, h2'); if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+}
+function setFoot(html) {
+  let f = $('#foot');
+  if (!html) { if (f) f.remove(); return; }
+  if (!f) { f = document.createElement('div'); f.id = 'foot'; f.className = 'footbar'; document.body.appendChild(f); }
+  f.innerHTML = `<div class="in">${html}</div>`;
+}
+function toast(html, prop) {
+  let t = $('#toasts'); if (!t) { t = document.createElement('div'); t.id = 'toasts'; t.setAttribute('aria-live', 'polite'); document.body.appendChild(t); }
+  const d = document.createElement('div'); d.className = 'toast';
+  d.innerHTML = (prop ? SPR.img(prop) : '') + `<span>${html}</span>`;
+  t.appendChild(d); setTimeout(() => d.remove(), 3500);
+}
+function modal(html, { onClose, label = 'Janela' } = {}) {
+  closeModal();
+  const bg = document.createElement('div'); bg.className = 'modal-bg'; bg.id = 'modal';
+  bg.innerHTML = `<div class="modal panel" role="dialog" aria-modal="true" aria-label="${esc(label)}"><button class="ibtn x" data-close aria-label="Fechar">${ICON.close}</button>${html}</div>`;
+  document.body.appendChild(bg);
+  bg._onClose = onClose;
+  bg.addEventListener('click', e => { if (e.target === bg || e.target.closest('[data-close]')) closeModal(); });
+  const f = bg.querySelector('button:not(.x), input, select'); (f || bg.querySelector('.x')).focus();
+  return bg;
+}
+function closeModal() { const m = $('#modal'); if (m) { const cb = m._onClose; m.remove(); if (cb) cb(); } }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if ($('#modal')) closeModal(); else if ($('.pause')) $('.pause').click(); } });
+
+function sparkle(el, n = 10) {
+  if (S.reduceMotion || !el) return;
+  const r = el.getBoundingClientRect();
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('i'); s.className = 'sparkle';
+    s.style.left = (r.left + r.width / 2 + scrollX) + 'px'; s.style.top = (r.top + r.height / 2 + scrollY) + 'px'; s.style.position = 'absolute';
+    const a = Math.random() * Math.PI * 2, d = 30 + Math.random() * 50;
+    s.style.setProperty('--dx', Math.cos(a) * d + 'px'); s.style.setProperty('--dy', Math.sin(a) * d + 'px');
+    document.body.appendChild(s); setTimeout(() => s.remove(), 900);
+  }
+}
+function confetti(n = 60) {
+  if (S.reduceMotion) return;
+  const cs = ['#f4c542', '#e98bb0', '#8fd6cf', '#a5d97f', '#c3a3e0', '#f08a3c', '#fff1a8'];
+  for (let i = 0; i < n; i++) {
+    const c = document.createElement('i'); c.className = 'confetti';
+    c.style.left = Math.random() * 100 + 'vw'; c.style.background = pick(cs);
+    c.style.animationDuration = (2 + Math.random() * 2.5) + 's'; c.style.animationDelay = Math.random() * .8 + 's';
+    document.body.appendChild(c); setTimeout(() => c.remove(), 5500);
+  }
+}
+function speakerInfo(who) {
+  if (who === 'faisca') return { img: SPR.url('faisca'), name: NAMES.faisca };
+  if (who === 'nevoa') return { img: SPR.url('nevoa'), name: NAMES.nevoa };
+  if (who === 'nevoaFeliz') return { img: SPR.url('nevoaFeliz'), name: 'Nuvem das Lembranças' };
+  if (who[0] === '?') { const id = who.slice(1); return G.album.includes(id) ? { img: SPR.url(id), name: CHARACTERS[id].name } : { img: SPR.url(id, 'sil'), name: '???' }; }
+  return { img: SPR.url(who), name: (CHARACTERS[who] && CHARACTERS[who].name) || NAMES[who] || who };
+}
+function bubbleHTML(who, text) {
+  const s = speakerInfo(who);
+  return `<div class="bubble"><div class="who"><div class="face"><img class="px" src="${s.img}" alt=""></div><b>${esc(s.name)}</b></div><div class="text" aria-live="polite"><p>${esc(text)}</p></div></div>`;
+}
+function sceneHTML(key, { items = [], cast = [], faded = true, alt = '', extra = '', cap = false } = {}) {
+  const url = composeScene(key, items, cast).toDataURL();
+  return `<div class="scene ${faded ? 'faded' : ''} ${cap ? 'cap' : ''}"><img class="bg px" src="${url}" alt="${esc(alt)}"><div class="fogl"></div>${extra}</div>`;
+}
+const pct = (v, total) => (v / total * 100).toFixed(3) + '%';
+function hotStyle(it) {
+  const w = it.w || 18, h = it.h || 18, pad = 2;
+  return `left:${pct(it.x - pad, SW)};top:${pct(it.y - pad, SH)};width:${pct(w + pad * 2, SW)};height:${pct(h + pad * 2, SH)}`;
+}

@@ -1,0 +1,13 @@
+<!DOCTYPE html><html><body style="background:#eee;margin:8px;font:10px sans-serif">
+<script src="../src/sprites.js"></script><script src="../src/scenes.js"></script>
+<div id="o"></div>
+<script>
+const o=document.getElementById('o');
+function add(c,s,label){const d=document.createElement('div');d.style.cssText='display:inline-block;margin:3px;text-align:center';const i=new Image();i.src=c.toDataURL();i.style.cssText=`width:${c.width*s}px;image-rendering:pixelated`;d.appendChild(i);d.appendChild(document.createElement('br'));d.append(label);o.appendChild(d);}
+for(const k in LOOKS){add(SPR.canvas(k),4,k)}
+add(SPR.canvas('faisca'),4,'faisca');add(SPR.canvas('nevoa'),4,'nevoa');add(SPR.canvas('nevoaFeliz'),4,'feliz');add(SPR.canvas('cida','sil'),4,'sil');
+o.appendChild(document.createElement('hr'));
+for(const k in PROPS){add(SPR.canvas(k),3,k)}
+o.appendChild(document.createElement('hr'));
+for(const k in SCENES){add(composeScene(k),2,k)}
+</script></body></html>
