@@ -20,7 +20,7 @@ AUTO = r"""
     const m = q('.mitem[data-m]:not(.done)'); if (m) { m.click(); return 'region'; }
     q('#bk').click(); return 'region-back';
   }
-  if (q('#skip') && !q('#stage')) { q('#nx').click(); return 'prologue'; }
+  if (q('#cut')) { q('#nx').click(); return 'cutscene'; }
   if (!q('#stage')) return 'unknown';
   const prim = q('#prim');
   const t = MISSIONS[RUN.id].steps[RUN.idx].t;
@@ -61,6 +61,7 @@ AUTO = r"""
     case 'thanks': { click(q('[data-w]')); click(q('[data-m="' + (window.__tries[k] % 6) + '"]')); click(q('#send')); return 'thanks'; }
     case 'mirror': { const i = q('#mn'); if (i) i.value = 'Vó Fátima'; click(q('[data-t="0"]')); click(q('#put')); return 'mirror'; }
     case 'dialog': return 'dialog-wait';
+    case 'days': { if (q('[data-g]')) { q('[data-g="' + (window.__tries[k] % 3) + '"]').click(); return 'predict'; } if (q('#back')) { q('#back').click(); return 'days-back'; } if (q('#pass')) { q('#pass').click(); window.__tries[k]--; return 'day'; } window.__tries[k]--; return 'days-wait'; }
     case 'memory': {
       if (q('.mem.up:not(.done)')) { window.__tries[k]--; return 'mem-wait'; }
       const left = qa('.mem:not(.done):not(.up)'); if (!left.length) return 'mem-wait';
@@ -101,7 +102,7 @@ async def run(mode, count, diff, length, w, h, shots_prefix=None, shot_every=())
         await pg.reload()
         await setup(pg, mode, count, diff, length)
         log = []; n = 0; shot_i = 0
-        while n < 3000:
+        while n < 12000:
             r = await pg.evaluate(AUTO)
             n += 1
             log.append(r)

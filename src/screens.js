@@ -124,6 +124,7 @@ function screenSetup() {
       const players = cfg.mode === 'juntos' ? Array.from({ length: cfg.count }, (_, i) => ({ name: (cfg.names[i] || '').trim() || PLAYER_DEFAULT[i], color: PLAYER_COLORS[i], avatar: cfg.avatars[i] }))
         : cfg.mode === 'sala' ? [{ name: 'Turma', color: PLAYER_COLORS[0], avatar: cfg.avatars[0] }] : [{ name: 'Você', color: PLAYER_COLORS[0], avatar: cfg.avatars[0] }];
       if (cfg.mode === 'sala' && !S._salaSet) { S.contrast = true; S._salaSet = true; saveSettings(); }
+      if (cfg.diff === 'exp' && !S._autoReadSet && cfg.mode !== 'sala') { S.autoRead = true; saveSettings(); }
       newGame({ mode: cfg.mode, players, diff: cfg.diff, length: cfg.length, clueMode: cfg.mode === 'juntos' ? cfg.clueMode : 'pass' });
       go(screenPrologue, 0);
     };
@@ -156,22 +157,10 @@ function screenPhoneClue(prefill) {
   $('#bk').onclick = () => go(screenTitle);
 }
 
-/* ---------------- PRÓLOGO ---------------- */
-function screenPrologue(i) {
-  const p = PROLOGUE[i];
-  Audio8.music({ root: 57, scale: p.color ? 'maj' : 'min', tempo: 80, wave: 'sine' }, p.color ? 1 : 0);
-  app().innerHTML = `<div class="screen stage">
-    <div class="mhead"><div><div class="where">Prólogo · ${i + 1} de ${PROLOGUE.length}</div><h2>Lumiara</h2></div></div>
-    <div class="scene cap ${p.color ? '' : 'faded'}"><img class="bg px" src="${composeScene(p.scene).toDataURL()}" alt="A cidade de Lumiara"><div class="fogl"></div>
-      ${p.nevoa ? `<img class="px map-nevoa" style="top:4%;left:40%;width:30%" src="${SPR.url('nevoa')}" alt="A Névoa">` : ''}
-      ${i === PROLOGUE.length - 1 ? `<img class="px map-faisca" style="left:50%;top:60%;width:14%" src="${SPR.url('faisca')}" alt="Faísca">` : ''}</div>
-    ${bubbleHTML(p.who, p.text)}</div>`;
-  if (S.autoRead) Voice.speak(p.text);
-  setFoot(`<button class="btn" id="say" aria-label="Ouvir">${ICON.voice}<span class="lbl">Ouvir</span></button><span class="grow"></span><button class="btn ghost" id="skip" style="color:#fff">Pular história</button><button class="btn primary big" id="nx">${i < PROLOGUE.length - 1 ? 'Continuar' : 'Vamos ajudar!'} ${ICON.next}</button>`);
-  $('#say').onclick = () => Voice.speak(p.text);
-  const end = () => { G.prologue = true; saveGame(); go(screenMap); };
-  $('#skip').onclick = end;
-  $('#nx').onclick = () => { Audio8.sfx('page'); if (i < PROLOGUE.length - 1) go(screenPrologue, i + 1); else end(); };
+/* ---------------- PRÓLOGO (animado, ver cinema.js) ---------------- */
+function screenPrologue() {
+  Audio8.music({ root: 57, scale: 'min', tempo: 80, wave: 'sine' }, 0);
+  playCutscene(PROLOGUE_FRAMES, { title: 'Lumiara', where: 'Prólogo', onDone: () => { G.prologue = true; saveGame(); go(screenMap); } });
 }
 
 /* ---------------- MAPA ---------------- */
@@ -352,7 +341,7 @@ function renderMission(id, idx) {
   Audio8.music(r.music, progress());
   const revealIdx = M.steps.findIndex(s => s.t === 'reveal');
   const known = G.album.includes(M.char);
-  const label = { dialog: 'História', investigate: 'Investigação', spot: 'Antes e depois', match: 'Associação', sequence: 'Sequência', sort: 'Separação', route: 'Rota', whoami: 'Quem sou eu?', reveal: 'Descoberta', choice: 'Decisão', reflect: 'Reflexão', thanks: 'Mural do Obrigado', mirror: 'A última carta', memory: 'Desafio extra · Memória', logic: 'Desafio extra · Lógica' }[step.t];
+  const label = { dialog: 'História', investigate: 'Investigação', spot: 'Antes e depois', match: 'Associação', sequence: 'Sequência', sort: 'Separação', route: 'Rota', whoami: 'Quem sou eu?', reveal: 'Descoberta', choice: 'Decisão', reflect: 'Reflexão', thanks: 'Mural do Obrigado', mirror: 'A última carta', memory: 'Desafio extra · Memória', days: 'E se ninguém fizesse?', logic: 'Desafio extra · Lógica' }[step.t];
   app().innerHTML = `<div class="screen">${hudHTML()}
     <div class="mhead"><div><div class="where">${esc(r.name)} · ${label}</div><h2>${esc(M.title)}</h2></div>
     <div class="dots" aria-label="Etapa ${idx + 1} de ${M.steps.length}">${M.steps.map((_, i) => `<i class="${i < idx ? 'done' : i === idx ? 'now' : ''}"></i>`).join('')}</div></div>
@@ -445,8 +434,11 @@ function screenReward(id, first, stars = 1, info = {}) {
       <div style="display:grid;gap:10px;max-width:420px;text-align:left">
         <div class="fact" style="color:var(--ink)"><h4>Missão concluída</h4><p>Vocês conheceram <b>${esc(c.name)}</b> (${esc(c.job.toLowerCase())}) e descobriram por que esse trabalho é tão importante.</p></div>
         <div class="medal-row">${medalsHTML()}</div></div></div>
-    <div class="row center"><button class="btn primary big" id="go">${progress() >= 1 ? 'Ir para o grande final' : 'Voltar ao mapa'} ${ICON.next}</button></div></div>`;
-  $('#go').onclick = () => { if (progress() >= 1) { G.current = { mission: '_finale' }; saveGame(); go(screenFinale); } else go(screenMap); };
+    <div class="row center"><button class="btn primary big" id="go">${regionDone && first ? 'Continuar a história' : progress() >= 1 ? 'Ir para o grande final' : 'Voltar ao mapa'} ${ICON.next}</button></div></div>`;
+  $('#go').onclick = () => {
+    if (regionDone && first) { const rs = planRegions(); go(screenInterlude, r.id, rs.filter(x => regionState(x.id) === 'done').length, rs.length); }
+    else if (progress() >= 1) { G.current = { mission: '_finale' }; saveGame(); go(screenFinale); } else go(screenMap);
+  };
 }
 function medalsHTML() {
   return Object.entries(MEDALS).map(([k, m]) => {
@@ -509,7 +501,7 @@ function openSettings() {
       <div class="set-row"><label for="diffSel">Nível de desafio</label><select class="sel" id="diffSel">${Object.entries(DIFFS).map(([k, d]) => `<option value="${k}" ${G.diff === k ? 'selected' : ''}>${d.label}</option>`).join('')}</select></div>
       <div class="set-row"><label>Modo: <b>${MODES[G.mode].label}</b> · Duração: <b>${PLANS[G.length].label}</b></label><button class="btn small" id="reset">Apagar progresso</button></div>` : ''}
     <p class="muted" style="font-weight:700;font-size:.85rem">Tudo fica salvo só neste aparelho. Nenhum dado é enviado para a internet.</p>`, { label: 'Configurações' });
-  $$('#modal [data-k]').forEach(b => b.onclick = () => { const k = b.dataset.k; S[k] = !S[k]; b.setAttribute('aria-checked', S[k]); saveSettings(); Audio8.init(); Audio8.sfx('click'); if (k === 'voice' && S.voice) Voice.speak('Leitura em voz alta ligada.'); });
+  $$('#modal [data-k]').forEach(b => b.onclick = () => { const k = b.dataset.k; S[k] = !S[k]; if (k === 'autoRead') S._autoReadSet = true; b.setAttribute('aria-checked', S[k]); saveSettings(); Audio8.init(); Audio8.sfx('click'); if (k === 'voice' && S.voice) Voice.speak('Leitura em voz alta ligada.'); });
   $$('#modal [data-r]').forEach(r => r.oninput = () => { S[r.dataset.r] = +r.value; saveSettings(); });
   $$('#modal [data-r]').forEach(r => r.onchange = () => { Audio8.init(); Audio8.sfx('select'); });
   if (G) {

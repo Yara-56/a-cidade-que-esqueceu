@@ -118,5 +118,5 @@ finishMission = function (id) {
     go(screenRegion, rid); return;
   }
   if (id !== '_finale') return _finish(id);
-  G.finished = true; G.current = null; saveGame(); go(screenEnding);
+  G.finished = true; G.current = null; saveGame(); go(screenOutro);
 };

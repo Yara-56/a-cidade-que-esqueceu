@@ -622,3 +622,107 @@ const BONUS = {
     people: ['Denise', 'Pedro', 'Seu Jorge', 'Lúcia'], options: ['Na rua, de madrugada', 'Na rua, à noite', 'Na portaria do prédio', 'De casa em casa, de dia'], answer: [0, 1, 2, 3],
     clues: ['Pedro conserta os postes quando já está escuro.', 'Denise começa antes de o sol nascer.', 'Seu Jorge não trabalha na rua.', 'Quem visita as famílias não trabalha de noite nem na portaria.'] }
 };
+
+/* ---------------- "E SE NINGUÉM FIZESSE?" — a passagem dos dias ----------------
+   A criança faz uma previsão, passa os dias e vê as consequências crescerem.
+   Depois quem trabalha volta e a cena se recupera.                                     */
+const DAYS = {
+  cida: { scene: 'sala', unit: 'Dia', title: 'Uma semana sem ninguém cuidar da casa', meter: 'Bagunça', tint: '#5a3d1a',
+    predict: { q: 'Se ninguém cuidar da casa por uma semana, o que você acha que acontece?', options: ['Nada muda, a casa se arruma sozinha', 'Fica bagunçada e falta comida e roupa limpa', 'A casa fica mais bonita'], answer: 1 },
+    stages: [
+      { n: 1, text: 'A louça do jantar ficou na pia e a roupa suja ficou no chão.', add: [['louca', 118, 24], ['roupasuja', 30, 68]] },
+      { n: 3, text: 'Acabou a roupa limpa para ir à escola. Ninguém cozinhou: só tem biscoito.', add: [['louca', 136, 24], ['roupasuja', 98, 70], ['brinquedos', 74, 68], ['mosca', 128, 8]] },
+      { n: 7, text: 'A planta secou, apareceram formigas na cozinha e ninguém acha mais nada!', add: [['murcha', 22, 46], ['roupasuja', 56, 38], ['mosca', 40, 20], ['vazia', 140, 66]] }],
+    back: 'Dona Cida voltou. E a família entendeu: cuidar da casa é trabalho de verdade, e todo mundo pode ajudar um pouco.' },
+  jorge: { scene: 'portaria', unit: 'Dia', title: 'Uma semana sem porteiro', meter: 'Confusão', tint: '#2b2233',
+    predict: { q: 'E se o prédio ficasse uma semana sem porteiro?', options: ['Ninguém ia perceber', 'As encomendas se perdem e ninguém sabe quem entra', 'O prédio fica mais seguro'], answer: 1 },
+    stages: [
+      { n: 1, text: 'As encomendas ficaram empilhadas na entrada, sem ninguém para avisar os moradores.', add: [['caixa', 58, 66], ['caixa', 74, 68]] },
+      { n: 3, text: 'Um pacote sumiu. Ninguém sabe quem entrou e quem saiu do prédio.', add: [['caixa', 66, 54], ['racao', 92, 66], ['papel', 30, 70]] },
+      { n: 7, text: 'Visitas esperando no portão, moradores sem chave e ninguém para chamar ajuda quando alguém precisou.', add: [['chaves', 12, 70], ['caixa', 120, 66], ['fraldas', 136, 68], ['papel', 104, 72]] }],
+    back: 'Seu Jorge voltou para a portaria, e o prédio voltou a ser um lugar seguro e organizado.' },
+  ze: { scene: 'cozinha', unit: 'Dia', title: 'Uma semana sem merenda na escola', meter: 'Fome', tint: '#3a2f2a',
+    predict: { q: 'O que acontece se a escola ficar uma semana sem merenda?', options: ['Tudo fica igual', 'As crianças ficam com fome e é difícil prestar atenção', 'As aulas ficam mais divertidas'], answer: 1 },
+    stages: [
+      { n: 1, text: 'O fogão ficou desligado. No intervalo, os pratos ficaram vazios.', add: [['prato', 40, 34], ['prato', 60, 34]] },
+      { n: 3, text: 'Os legumes estragaram na caixa. Com a barriga roncando, ficou difícil prestar atenção na aula.', add: [['legumes', 80, 34], ['mosca', 86, 18], ['vazia', 20, 68]] },
+      { n: 7, text: 'Muita gente sem energia para estudar e brincar. Para várias crianças, a merenda é a refeição mais importante do dia.', add: [['vazia', 60, 70], ['vazia', 100, 70], ['mosca', 110, 10]] }],
+    back: 'Seu Zé acendeu o fogão de novo. O cheirinho de comida voltou, e com ele a energia para aprender!' },
+  katia: { scene: 'salaaula', unit: 'Dia', title: 'Uma semana sem limpeza na escola', meter: 'Sujeira', tint: '#5a3d1a',
+    predict: { q: 'E se ninguém limpasse a sala por uma semana?', options: ['Ela continua limpinha', 'Fica suja, com cheiro ruim e poeira', 'Fica só um pouco diferente'], answer: 1 },
+    stages: [
+      { n: 1, text: 'Papéis e restos de lanche ficaram espalhados pelo chão.', add: [['papel', 30, 70], ['banana', 80, 72]] },
+      { n: 3, text: 'O lixo transbordou e começou um cheiro ruim. As carteiras ficaram grudentas.', add: [['lixeiracheia', 140, 62], ['chiclete', 74, 56], ['papel', 110, 74], ['mosca', 120, 30]] },
+      { n: 7, text: 'Muita poeira, gente espirrando e banheiro sem condições de usar. Ninguém quer ficar na escola!', add: [['papel', 50, 76], ['garrafa', 96, 70], ['mosca', 50, 20], ['casaco', 12, 72]] }],
+    back: 'A Kátia voltou com a vassoura e o balde, e a escola voltou a ser um lugar gostoso de estar.' },
+  lucia: { scene: 'ruacasas', unit: 'Semana', title: 'Um mês sem visitas de saúde no bairro', meter: 'Risco à saúde', tint: '#2b2233',
+    predict: { q: 'E se ninguém visitasse as famílias para cuidar da saúde por um mês?', options: ['Nada acontece', 'Problemas de saúde crescem sem ninguém perceber', 'Todo mundo fica mais saudável'], answer: 1 },
+    stages: [
+      { n: 1, text: 'A água parada no quintal ficou lá, e ninguém avisou a família.', add: [['pneuagua', 20, 46]] },
+      { n: 2, text: 'Os mosquitos se espalharam pela rua. A vacina do Davi continua atrasada.', add: [['mosquito', 30, 30], ['mosquito', 70, 20], ['vacina', 60, 46], ['pneuagua', 110, 46]] },
+      { n: 4, text: 'Várias pessoas ficaram doentes ao mesmo tempo, e o Seu Osvaldo ficou sem acompanhamento.', add: [['mosquito', 100, 14], ['mosquito', 140, 30], ['mosquito', 50, 10], ['idoso', 130, 44]] }],
+    back: 'A Lúcia voltou a visitar as casas: água parada eliminada, vacinas em dia e o Seu Osvaldo acompanhado.' },
+  benedito: { scene: 'quarto', unit: 'Dia', title: 'Uma semana sem o cuidador', meter: 'Dificuldades', tint: '#2b2233',
+    predict: { q: 'Como fica a Dona Olímpia se ninguém a ajudar por uma semana?', options: ['Igualzinha', 'Ela tem dificuldades e se sente sozinha', 'Ela fica mais animada'], answer: 1 },
+    stages: [
+      { n: 1, text: 'Dona Olímpia não achou os óculos e não conseguiu ler o jornal.', add: [['oculos', 70, 72]] },
+      { n: 3, text: 'Ela se confundiu com os horários do remédio e ficou com medo de andar sozinha pela casa.', add: [['remedios', 110, 66], ['bengala', 130, 70]] },
+      { n: 7, text: 'Sem conversa e sem passeio, ela passou os dias sozinha e triste.', add: [['xicara', 106, 36], ['album', 20, 70]] }],
+    back: 'O Benedito voltou, e a família combinou de ajudar também. Quem cuida também precisa de folga!' },
+  zefa: { scene: 'feira', unit: 'Semana', title: 'Um mês sem quem planta', meter: 'Falta de comida', tint: '#3a2f2a',
+    predict: { q: 'E se os agricultores parassem de plantar por um mês?', options: ['O mercado continua cheio', 'Começa a faltar comida e tudo fica mais caro', 'A comida aparece sozinha'], answer: 1 },
+    stages: [
+      { n: 1, text: 'Ainda tinha um pouco de tomate, mas menos que o normal.', add: [['vazia', 8, 37]] },
+      { n: 2, text: 'As barracas de verdura ficaram vazias. O preço do que sobrou subiu muito.', add: [['vazia', 26, 37], ['vazia', 62, 37], ['vazia', 82, 37]] },
+      { n: 4, text: 'A merenda da escola ficou sem salada e muitas famílias não conseguiram comprar comida fresca.', add: [['vazia', 116, 37], ['vazia', 136, 37], ['papel', 60, 70]] }],
+    back: 'Dona Zefa e outros agricultores voltaram a plantar, e a feira se encheu de cores de novo!' },
+  rafa: { scene: 'ruacasas', unit: 'Dia', title: 'Uma semana sem entregas', meter: 'Pedidos parados', tint: '#2b2233',
+    predict: { q: 'E se ninguém fizesse entregas por uma semana?', options: ['Ninguém sente falta', 'Quem não pode sair de casa fica sem remédio e comida', 'Fica tudo mais rápido'], answer: 1 },
+    stages: [
+      { n: 1, text: 'O remédio do Seu Osvaldo não chegou.', add: [['farmacia', 20, 44]] },
+      { n: 3, text: 'Quem não pode sair de casa ficou sem compras. Os pedidos se acumularam no restaurante.', add: [['sacola', 60, 46], ['caixa', 100, 46], ['pizza', 120, 46]] },
+      { n: 7, text: 'Restaurantes pequenos quase fecharam, porque não tinha quem levasse os pedidos.', add: [['caixa', 80, 46], ['caixa', 140, 46], ['sacola', 40, 46]] }],
+    back: 'O Rafa voltou a pedalar, e as entregas chegaram a quem precisava.' },
+  marina: { scene: 'cooperativa', unit: 'Dia', title: 'Uma semana sem catadores', meter: 'Lixo no lixão', tint: '#3a2f2a',
+    predict: { q: 'E se ninguém separasse os recicláveis por uma semana?', options: ['Eles se separam sozinhos', 'Vai tudo misturado para o lixão e para os rios', 'Não faz diferença nenhuma'], answer: 1 },
+    stages: [
+      { n: 1, text: 'Os recicláveis chegaram e ficaram parados, sem ninguém para separar.', add: [['pet', 30, 66], ['lata', 50, 68]] },
+      { n: 3, text: 'Tudo foi misturado com resto de comida e mandado para o lixão.', add: [['saco', 70, 64], ['papelao', 90, 68], ['banana', 110, 70], ['mosca', 96, 50]] },
+      { n: 7, text: 'O lixão encheu mais rápido, e muitas garrafas foram parar no rio. As fábricas usaram material novo em vez de reciclado.', add: [['saco', 10, 62], ['pet', 130, 68], ['lata', 146, 70], ['garrafa', 60, 74]] }],
+    back: 'Marina e a cooperativa voltaram ao trabalho: o material foi separado e virou coisa nova!' },
+  joaquim: { scene: 'parque', unit: 'Dia', title: 'Uma semana sem jardineiro', meter: 'Mato', tint: '#1f3a1f',
+    predict: { q: 'E se ninguém cuidasse do parque por uma semana?', options: ['Fica tudo igual', 'O mato cresce, as flores morrem e ninguém consegue usar', 'O parque fica mais organizado'], answer: 1 },
+    stages: [
+      { n: 1, text: 'A grama cresceu um pouquinho e as folhas começaram a cair no caminho.', add: [['folhas', 44, 72], ['mato', 10, 72]] },
+      { n: 3, text: 'As flores murcharam sem água e as folhas cobriram a trilha.', add: [['murcha', 40, 54], ['folhas', 70, 70], ['mato', 26, 74]] },
+      { n: 7, text: 'O mato ficou tão alto que fecharam o parque. Um galho seco caiu bem perto do banco!', add: [['galho', 100, 46], ['mato', 60, 60], ['mato', 0, 56], ['obra', 130, 40]] }],
+    back: 'Seu Joaquim voltou com a tesoura e o regador, e o parque reabriu, verdinho de novo.' },
+  denise: { scene: 'rua', unit: 'Dia', title: 'Uma semana sem gari', meter: 'Sujeira', tint: '#5a3d1a',
+    predict: { q: 'O que você acha que acontece com a rua se ninguém varrer por uma semana?', options: ['Nada muda', 'Fica um pouco suja', 'Fica muito suja e pode até alagar'], answer: 2 },
+    stages: [
+      { n: 1, text: 'Alguns papéis e garrafas ficaram na calçada.', add: [['papel', 20, 52], ['garrafa', 60, 54]] },
+      { n: 3, text: 'As lixeiras transbordaram. Começou um cheiro ruim e apareceram moscas.', add: [['lixeiracheia', 98, 44], ['saco', 46, 46], ['saco', 120, 46], ['mosca', 100, 30]] },
+      { n: 7, text: 'O lixo entupiu os bueiros. Choveu, a rua alagou e apareceram ratos!', add: [['bueiro', 64, 62], ['poca', 30, 70], ['poca', 100, 72], ['rato', 140, 54]] }],
+    back: 'A Denise e a equipe dela voltaram: rua limpa, bueiro livre e nada de enchente.' },
+  pedro: { scene: 'ruanoite', unit: 'Dia', title: 'Uma semana sem conserto nos postes', meter: 'Escuridão', tint: '#05060f',
+    predict: { q: 'E se ninguém consertasse os postes por uma semana?', options: ['A rua continua clara', 'A rua fica escura e perigosa à noite', 'Os postes se consertam sozinhos'], answer: 1 },
+    stages: [
+      { n: 1, text: 'Uma lâmpada queimou e ninguém trocou.', add: [['lampadaqueimada', 32, 30]] },
+      { n: 3, text: 'A rua toda ficou escura. As pessoas tropeçam e têm medo de voltar para casa.', add: [['lampadaqueimada', 112, 30], ['papel', 60, 70]] },
+      { n: 7, text: 'Os carros quase não enxergam quem atravessa a rua. Ficou perigoso para todo mundo.', add: [['cone', 80, 66], ['poca', 120, 72]] }],
+    back: 'O Pedro e a equipe dele trocaram as lâmpadas: a rua acendeu e todo mundo voltou a caminhar tranquilo.' }
+};
+for (const mid in DAYS) {
+  const st = MISSIONS[mid].steps, i = st.findIndex(s => s.t === 'reveal');
+  st.splice(i + 1, 0, { t: 'days', char: MISSIONS[mid].char, ...DAYS[mid] });
+}
+
+/* ---------------- INTERLÚDIOS DA NÉVOA (entre regiões) ---------------- */
+const INTERLUDES = [
+  [{ who: 'nevoa', text: 'Hmm? Uma luz acendeu lá embaixo... Por que vocês se importam tanto com essas pessoas?' }, { who: 'faisca', text: 'Porque sem elas nada funciona! Você vai ver.' }],
+  [{ who: 'nevoa', text: 'Sabe... antigamente eu era só uma nuvenzinha do tamanho de uma pipoca.' }, { who: 'nevoa', text: 'Cada vez que alguém passava por um trabalhador sem nem olhar, eu crescia um pouco.' }],
+  [{ who: 'nevoa', text: 'Quando vocês sorriem para quem trabalha... eu sinto um calorzinho estranho. Parece que eu encolho.' }, { who: 'faisca', text: 'Ela está ficando menor! Vamos continuar!' }],
+  [{ who: 'nevoa', text: 'Vocês estão me deixando pequena... e eu não sei se isso é ruim.' }, { who: 'nevoa', text: 'Ninguém nunca me disse obrigado por nada. Será que eu sirvo para alguma coisa?' }],
+  [{ who: 'nevoa', text: 'Eu vi vocês ajudando, conversando, agradecendo... Eu queria saber fazer isso também.' }, { who: 'faisca', text: 'Quem sabe ainda dá tempo, Névoa.' }],
+  [{ who: 'nevoa', text: 'Estou cansada de ser cinza. Me encontrem na praça. Eu... quero ver as luzes de perto.' }]
+];

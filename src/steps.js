@@ -8,6 +8,7 @@ function promptHTML(text) {
 }
 function feedback(box, kind, html, prop) {
   box.innerHTML = `<div class="feedback ${kind}" role="status">${prop ? SPR.img(prop) : ''}<div>${html}</div></div>`;
+  if (window.innerWidth < 860 && box.scrollIntoView) { try { box.scrollIntoView({ behavior: S.reduceMotion ? 'auto' : 'smooth', block: 'nearest' }); } catch (e) {} }
 }
 function wireSay(root, fn) { $$('[data-say]', root).forEach(b => b.onclick = () => { Audio8.init(); Voice.enabled = S.voice && !S.mute; if (!S.voice) toast('A leitura em voz alta está desligada nas configurações.'); Voice.speak(fn()); }); }
 

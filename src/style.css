@@ -518,3 +518,28 @@ html.rm *, html.rm *::before, html.rm *::after { animation-duration: .001ms !imp
 @media (min-width: 861px) { .two .dpad { grid-template-columns: repeat(3, 50px); grid-template-rows: repeat(3, 42px); } }
 @media (max-width: 860px) { .map-avatar { width: 7%; } }
 .dp.act { font-size: .8rem; }
+
+/* ===== v4: cinema e passagem dos dias ===== */
+.scene .layer { position: absolute; inset: 0; pointer-events: none; }
+.scene .sprite { position: absolute; height: auto; transition-property: left, top, opacity, transform, width; transition-timing-function: ease-in-out; filter: drop-shadow(0 2px 0 #0004); }
+.scene .sprite.flip { transform: scaleX(-1); }
+.scene .sprite.glow { filter: drop-shadow(0 0 8px #fff1a8) drop-shadow(0 0 18px #f4c542); animation: bob 1.8s ease-in-out infinite; }
+.scene .tint { position: absolute; inset: 0; background: #0b0f26; opacity: 0; transition: opacity 1.2s ease; pointer-events: none; mix-blend-mode: multiply; }
+.scene.cut .tint { mix-blend-mode: normal; }
+.scene.cut .fogl { opacity: 0; transition: opacity 1.4s; }
+.scene.cut > img.bg { transition: filter 1.6s ease; }
+.scene .night { position: absolute; inset: 0; background: #0b0f26; opacity: 0; pointer-events: none; }
+.scene .night.go { animation: nightpass .8s ease; }
+@keyframes nightpass { 40%, 60% { opacity: .85; } }
+.daycount { position: absolute; left: 3%; top: 5%; background: var(--paper); border: var(--bw) solid var(--ink); border-radius: 10px; padding: 2px 12px; font-family: var(--title); font-size: clamp(1rem, 3.5vw, 1.8rem); box-shadow: 3px 3px 0 var(--ink); }
+.daycount.pop { animation: pop .5s ease; }
+.meter { display: flex; gap: 10px; align-items: center; color: #fff; font-weight: 900; margin-top: 10px; }
+.meter .bar i { background: repeating-linear-gradient(90deg, #c0607f 0 10px, #d9534f 10px 20px); box-shadow: none; }
+.cons { background: var(--paper); border: var(--bw) solid var(--ink); border-radius: var(--r); padding: 14px; box-shadow: var(--shadow); }
+.cons ul { margin: 0; padding-left: 1.1em; display: grid; gap: 8px; font-weight: 700; }
+.cons li { animation: enter .4s ease both; }
+.popin { animation: popin .45s cubic-bezier(.2, 1.6, .4, 1) both; }
+@keyframes popin { from { transform: scale(0) translateY(10px); opacity: 0; } }
+.buzz { animation: popin .45s ease both, buzz 1.2s ease-in-out .5s infinite; }
+@keyframes buzz { 25% { transform: translate(3px, -2px); } 50% { transform: translate(-2px, 2px); } 75% { transform: translate(2px, 1px); } }
+.poof { transition: opacity .35s, transform .35s !important; opacity: 0 !important; transform: scale(.3) translateY(-10px) !important; }

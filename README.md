@@ -24,6 +24,7 @@ src/
                whoami, memory, logic, reveal, choice, reflect
   screens.js   telas: título, configuração + criador de personagem, mapa, região, missão, recompensa, álbum, ajustes
   finale.js    Festa das Luzes (mural do obrigado, última carta) + desafios extras como mini-missões
+  cinema.js    motor de cenas animadas (prólogo, interlúdios, final) e a mecânica de passagem dos dias
   main.js      início
   style.css    identidade visual
   fonts/       Pixelify Sans e Nunito (OFL), embutidas no build
@@ -41,6 +42,8 @@ O conteúdo fica separado das regras e da interface. Para mudar textos, pistas o
 - 12 personagens com ficha completa. Os tons de pele estão distribuídos por igual entre as profissões, de propósito.
 - Criador de personagem por jogador. O avatar anda pelo mapa e pelas cenas de investigação com o direcional na tela (celular), as setas do teclado ou tocando no destino.
 - Estrelas por missão (concluir, errar pouco, não pedir dica) e um desafio extra por região (memória ou lógica).
+- **E se ninguém fizesse?**: depois de conhecer cada trabalhador, a criança dá um palpite, passa os dias (1, 3, 7) e vê as consequências se acumularem (lixo, mato, escuridão, fome...). Depois a pessoa volta ao trabalho e a cena se recupera.
+- História animada: prólogo, interlúdios da Névoa ao restaurar cada região (a Névoa vai revelando quem é) e final na Festa das Luzes.
 - Pistas secretas no celular de cada jogador, por código de 5 dígitos, para jogar por chamada de vídeo sem servidor.
 - Acessibilidade: leitura em voz alta, alto contraste, letras maiores, reduzir animações, teclado.
 - Os testes automáticos passam em todos os modos e níveis, sem erros no console.
