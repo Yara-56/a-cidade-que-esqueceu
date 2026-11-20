@@ -6,9 +6,10 @@ Uma névoa fez a cidade de Lumiara esquecer quem a faz funcionar. As crianças e
 
 ## Como rodar
 
-- **Jogar:** abra `dist/index.html` em qualquer navegador. É um arquivo único, sem internet e sem instalação.
+- **Jogar online:** https://yara-56.github.io/a-cidade-que-esqueceu/
+- **Jogar sem internet:** abra `index.html` (ou `dist/index.html`) em qualquer navegador. É um arquivo único, sem instalação.
 - **Gerar o build:** `python3 build.py` junta `src/` em `dist/index.html`, com as fontes embutidas.
-- **Publicar:** GitHub Pages (Settings → Pages → branch `main`, pasta `/dist`) ou arrastar `dist/index.html` em app.netlify.com/drop.
+- **Publicar:** depois do build, copie `dist/index.html` para `index.html` na raiz. O GitHub Pages serve a raiz da branch `main`.
 
 ## Estrutura
 
