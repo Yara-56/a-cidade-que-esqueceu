@@ -36,7 +36,7 @@ const Store = {
 const KEY_SET = 'cidade-esqueceu:config', KEY_GAME = 'cidade-esqueceu:partida';
 
 const prefersRM = (() => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
-let S = Object.assign({ music: .5, sfx: .7, voice: true, autoRead: false, mute: false, contrast: false, bigText: false, reduceMotion: prefersRM }, Store.get(KEY_SET, {}));
+let S = Object.assign({ music: .5, sfx: .7, voice: true, autoRead: true, mute: false, contrast: false, bigText: false, reduceMotion: prefersRM }, Store.get(KEY_SET, {}));
 let G = Store.get(KEY_GAME, null);
 if (G && G.v !== 1) G = null;
 if (G) { G.stars = G.stars || {}; G.bonus = G.bonus || {}; G.clueMode = G.clueMode || 'pass'; G.thanks = G.thanks || []; G.surpriseAt = G.surpriseAt || []; G.seen = G.seen || {}; }

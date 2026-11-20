@@ -556,13 +556,17 @@ const STEPS = {
     unlockCharacter(step.char);
     ctx.stage.innerHTML = `<div class="reveal">${charCardHTML(step.char)}
       <div class="facts">
-        <div class="fact"><h4>${SPR.img('livro')} História</h4><p>${esc(c.story)}</p></div>
-        <div class="fact"><h4>${SPR.img('relogio')} Rotina</h4><ul>${c.routine.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>
-        <div class="fact"><h4>${SPR.img('coracao')} Por que importa</h4><p>${esc(c.contribution)}</p></div>
-        <div class="fact"><h4>${SPR.img('cone')} Desafios do trabalho</h4><p>${esc(c.challenges)}</p></div>
-        <div id="cur"><button class="btn" id="curio">${SPR.img('oculos')} Ver uma curiosidade</button></div>
+        <div class="fact big1"><h4>${SPR.img('coracao')} Por que importa</h4><p>${esc(c.contribution)}</p></div>
+        <div class="fact"><h4>${SPR.img('relogio')} Um dia de trabalho</h4><ol class="routine">${c.routine.map(x => `<li>${esc(x)}</li>`).join('')}</ol></div>
+        <div class="row">
+          <button class="btn small" data-more="hist">${SPR.img('livro')} História</button>
+          <button class="btn small" data-more="des">${SPR.img('cone')} Desafios</button>
+          <button class="btn small" id="curio">${SPR.img('oculos')} Curiosidade</button></div>
+        <div id="cur"></div>
       </div></div>`;
     Audio8.sfx('reveal'); sparkle($('.cardbig', ctx.stage), 20);
+    const more = { hist: ['História', 'livro', c.story], des: ['Desafios do trabalho', 'cone', c.challenges] };
+    $$('[data-more]', ctx.stage).forEach(b => b.onclick = () => { const [t, p, x] = more[b.dataset.more]; $('#cur', ctx.stage).innerHTML = `<div class="fact"><h4>${SPR.img(p)} ${t}</h4><p>${esc(x)}</p></div>`; Audio8.sfx('page'); addMedal('curiosidade', 1, 'more:' + step.char + b.dataset.more); if (S.autoRead) Voice.speak(x); });
     $('#curio', ctx.stage).onclick = () => {
       $('#cur', ctx.stage).innerHTML = `<div class="fact curio"><h4>${SPR.img('oculos')} Curiosidade</h4><p>${esc(c.curiosity)}</p></div>`;
       addMedal('curiosidade', 1, 'curio:' + step.char); Audio8.sfx('found');

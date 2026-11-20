@@ -551,6 +551,16 @@ html.rm *, html.rm *::before, html.rm *::after { animation-duration: .001ms !imp
 .buzz { animation: popin .45s ease both, buzz 1.2s ease-in-out .5s infinite; }
 @keyframes buzz { 25% { transform: translate(3px, -2px); } 50% { transform: translate(-2px, 2px); } 75% { transform: translate(2px, 1px); } }
 .poof { transition: opacity .35s, transform .35s !important; opacity: 0 !important; transform: scale(.3) translateY(-10px) !important; }
+
+.fact.big1 p { font-size: 1.1rem; font-weight: 800; }
+.routine { margin: 0; padding-left: 1.4em; display: grid; gap: 4px; font-weight: 700; }
+.routine li::marker { font-family: var(--title); color: var(--accent); }
+.scene.shift { cursor: pointer; }
+.scene.shift .sprite { transition: none; }
+.scene.shift .sprite.poof { transition: opacity .35s, transform .35s !important; }
+.smsg { position: absolute; left: 50%; bottom: 4%; transform: translate(-50%, 10px); max-width: 86%; background: var(--paper); border: 3px solid var(--ink); border-radius: 10px; padding: 4px 10px; font-weight: 800; font-size: .85rem; box-shadow: 3px 3px 0 var(--ink); opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none; text-align: center; }
+.smsg.on { opacity: 1; transform: translate(-50%, 0); }
+.smsg.soft { background: var(--softbg); } .smsg.ok { background: var(--okbg); }
 </style>
 </head>
 <body>
@@ -2023,7 +2033,7 @@ const Store = {
 const KEY_SET = 'cidade-esqueceu:config', KEY_GAME = 'cidade-esqueceu:partida';
 
 const prefersRM = (() => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
-let S = Object.assign({ music: .5, sfx: .7, voice: true, autoRead: false, mute: false, contrast: false, bigText: false, reduceMotion: prefersRM }, Store.get(KEY_SET, {}));
+let S = Object.assign({ music: .5, sfx: .7, voice: true, autoRead: true, mute: false, contrast: false, bigText: false, reduceMotion: prefersRM }, Store.get(KEY_SET, {}));
 let G = Store.get(KEY_GAME, null);
 if (G && G.v !== 1) G = null;
 if (G) { G.stars = G.stars || {}; G.bonus = G.bonus || {}; G.clueMode = G.clueMode || 'pass'; G.thanks = G.thanks || []; G.surpriseAt = G.surpriseAt || []; G.seen = G.seen || {}; }
@@ -2761,13 +2771,17 @@ const STEPS = {
     unlockCharacter(step.char);
     ctx.stage.innerHTML = `<div class="reveal">${charCardHTML(step.char)}
       <div class="facts">
-        <div class="fact"><h4>${SPR.img('livro')} História</h4><p>${esc(c.story)}</p></div>
-        <div class="fact"><h4>${SPR.img('relogio')} Rotina</h4><ul>${c.routine.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>
-        <div class="fact"><h4>${SPR.img('coracao')} Por que importa</h4><p>${esc(c.contribution)}</p></div>
-        <div class="fact"><h4>${SPR.img('cone')} Desafios do trabalho</h4><p>${esc(c.challenges)}</p></div>
-        <div id="cur"><button class="btn" id="curio">${SPR.img('oculos')} Ver uma curiosidade</button></div>
+        <div class="fact big1"><h4>${SPR.img('coracao')} Por que importa</h4><p>${esc(c.contribution)}</p></div>
+        <div class="fact"><h4>${SPR.img('relogio')} Um dia de trabalho</h4><ol class="routine">${c.routine.map(x => `<li>${esc(x)}</li>`).join('')}</ol></div>
+        <div class="row">
+          <button class="btn small" data-more="hist">${SPR.img('livro')} História</button>
+          <button class="btn small" data-more="des">${SPR.img('cone')} Desafios</button>
+          <button class="btn small" id="curio">${SPR.img('oculos')} Curiosidade</button></div>
+        <div id="cur"></div>
       </div></div>`;
     Audio8.sfx('reveal'); sparkle($('.cardbig', ctx.stage), 20);
+    const more = { hist: ['História', 'livro', c.story], des: ['Desafios do trabalho', 'cone', c.challenges] };
+    $$('[data-more]', ctx.stage).forEach(b => b.onclick = () => { const [t, p, x] = more[b.dataset.more]; $('#cur', ctx.stage).innerHTML = `<div class="fact"><h4>${SPR.img(p)} ${t}</h4><p>${esc(x)}</p></div>`; Audio8.sfx('page'); addMedal('curiosidade', 1, 'more:' + step.char + b.dataset.more); if (S.autoRead) Voice.speak(x); });
     $('#curio', ctx.stage).onclick = () => {
       $('#cur', ctx.stage).innerHTML = `<div class="fact curio"><h4>${SPR.img('oculos')} Curiosidade</h4><p>${esc(c.curiosity)}</p></div>`;
       addMedal('curiosidade', 1, 'curio:' + step.char); Audio8.sfx('found');
@@ -3167,7 +3181,7 @@ function renderMission(id, idx) {
   Audio8.music(r.music, progress());
   const revealIdx = M.steps.findIndex(s => s.t === 'reveal');
   const known = G.album.includes(M.char);
-  const label = { dialog: 'História', investigate: 'Investigação', spot: 'Antes e depois', match: 'Associação', sequence: 'Sequência', sort: 'Separação', route: 'Rota', whoami: 'Quem sou eu?', reveal: 'Descoberta', choice: 'Decisão', reflect: 'Reflexão', thanks: 'Mural do Obrigado', mirror: 'A última carta', memory: 'Desafio extra · Memória', days: 'E se ninguém fizesse?', logic: 'Desafio extra · Lógica' }[step.t];
+  const label = { dialog: 'História', investigate: 'Investigação', spot: 'Antes e depois', match: 'Associação', sequence: 'Sequência', sort: 'Separação', route: 'Rota', whoami: 'Quem sou eu?', reveal: 'Descoberta', choice: 'Decisão', reflect: 'Reflexão', thanks: 'Mural do Obrigado', mirror: 'A última carta', memory: 'Desafio extra · Memória', days: 'E se ninguém fizesse?', shift: 'Um turno com a Denise', logic: 'Desafio extra · Lógica' }[step.t];
   app().innerHTML = `<div class="screen">${hudHTML()}
     <div class="mhead"><div><div class="where">${esc(r.name)} · ${label}</div><h2>${esc(M.title)}</h2></div>
     <div class="dots" aria-label="Etapa ${idx + 1} de ${M.steps.length}">${M.steps.map((_, i) => `<i class="${i < idx ? 'done' : i === idx ? 'now' : ''}"></i>`).join('')}</div></div>
@@ -3664,6 +3678,133 @@ STEPS.days = function (step, ctx) {
     hint() { ctx.usedHint(); if (phase === 'predict') feedback(ctx.stage.appendChild(document.createElement('div')), 'info', 'Pense: se esse trabalho parar, o que vai se acumulando dia após dia?', 'faisca'); else { const b = $('#pass', ctx.stage) || $('#back', ctx.stage); if (b) b.classList.add('hint-pulse'); } }
   };
 };
+
+/* ---------- "Um turno com a Denise": varrer junto ---------- */
+STEPS.shift = function (step, ctx) {
+  const PSIDE = 80, BIN = { x: 2, y: 38 }, CAP = 5;
+  const P = { x: 20, y: 54, load: 0, total: 0, tx: null, ty: null };
+  const D = { x: 120, y: 52, total: 0 };
+  let trash = [], keys = {}, choice = null, drops = 0, asked = false, done = false, nextPass = 4, walkers = [];
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  ctx.stage.innerHTML = promptHTML('Pegue a vassoura! Ande até o lixo para varrer. Carrinho cheio? Esvazie na lixeira grande.') + `
+    <div class="two"><div><div class="scene shift" id="sh"><img class="bg px" src="${composeScene('rua').toDataURL()}" alt="Rua para varrer"><div class="layer" id="sl"></div>
+      <div class="daycount" id="sun">☀ Manhã</div></div>${dpadHTML('Varrer')}</div>
+    <div class="cons"><h3>Seu turno</h3>
+      <div class="meter" style="color:var(--ink)"><span>Carrinho</span><div class="bar"><i id="ld" style="width:0%"></i></div></div>
+      <p style="font-weight:800;margin:8px 0 0">Você: <span id="pt">0</span> · Denise: <span id="dt">0</span></p>
+      <div id="ask"></div><div id="fb" style="margin-top:8px"></div></div></div>`;
+  wireSay(ctx.stage, () => 'Pegue a vassoura e ajude a Denise. Ande até o lixo para varrer. Quando o carrinho encher, esvazie na lixeira grande.');
+  const lay = $('#sl', ctx.stage), sc = $('#sh', ctx.stage);
+  sc.insertAdjacentHTML('beforeend', '<div class="smsg" id="smsg" aria-live="polite"></div>');
+  let msgT = null;
+  const fbq = (kind, html, prop) => {
+    $('#fb', ctx.stage).innerHTML = `<div class="feedback ${kind}">${prop ? SPR.img(prop) : ''}<div>${html}</div></div>`;
+    const m = $('#smsg', ctx.stage); m.innerHTML = html.replace(/<b class="kind">(.*?)<\/b>/, '<b>$1</b> '); m.className = 'smsg on ' + kind; clearTimeout(msgT); msgT = setTimeout(() => m.className = 'smsg', 3200);
+  };
+  const bin = spriteEl('lixeira', BIN.x, BIN.y, { w: 20 }); lay.appendChild(bin);
+  const den = spriteEl('denise', D.x, D.y); lay.appendChild(den);
+  const me = spriteEl(avatarOf(), P.x, P.y); lay.appendChild(me);
+  const broom = spriteEl('vassoura', P.x + 10, P.y + 10, { w: 12 }); lay.appendChild(broom);
+  [me, den, broom].forEach(e => e.style.transitionDuration = '0s');
+  const addTrash = (x, y, side) => { const p = pick(['papel', 'garrafa', 'lata', 'banana', 'saco']); const el = spriteEl(p, x, y, { w: 13, cls: 'popin' }); lay.appendChild(el); trash.push({ x, y, el, side }); };
+  for (let i = 0; i < 6; i++) addTrash(rnd(14, PSIDE - 16), rnd(48, 72), 'p');
+  for (let i = 0; i < 6; i++) addTrash(rnd(PSIDE + 4, 146), rnd(48, 72), 'd');
+  const put = (el, x, y) => { el.style.left = pct(x, SW); el.style.top = pct(y, SH); };
+  const upd = () => {
+    $('#ld', ctx.stage).style.width = (P.load / CAP * 100) + '%'; $('#pt', ctx.stage).textContent = P.total; $('#dt', ctx.stage).textContent = D.total;
+    const sun = ['☀ Manhã', '☀ Meio da manhã', '☀ Quase meio-dia'][Math.min(2, Math.floor((P.total + D.total) / 8))]; $('#sun', ctx.stage).textContent = sun;
+  };
+  const sweepNear = (who, side) => {
+    const o = who === 'p' ? P : D;
+    for (const t of trash) if ((side === 'any' || t.side === side) && Math.hypot(t.x - (o.x + 2), t.y - (o.y + 12)) < 12) {
+      if (who === 'p' && P.load >= CAP) { if (!sweepNear._warned) { fbq( 'info', '<b>Carrinho cheio!</b> Leve até a lixeira grande, lá na esquerda.', 'lixeira'); sweepNear._warned = true; } return; }
+      t.el.classList.add('poof'); setTimeout(() => t.el.remove(), 400); trash = trash.filter(x => x !== t);
+      if (who === 'p') { P.load++; P.total++; Audio8.sfx('found'); sweepNear._warned = false; } else D.total++;
+      upd(); return;
+    }
+  };
+  const tick = () => {
+    if (done) return;
+    /* jogador */
+    const speed = Math.max(1.4, 3 - P.load * .3);
+    let dx = (keys.r ? 1 : 0) - (keys.l ? 1 : 0), dy = (keys.d ? 1 : 0) - (keys.u ? 1 : 0);
+    if (!dx && !dy && P.tx !== null) { const ddx = P.tx - P.x, ddy = P.ty - P.y, d = Math.hypot(ddx, ddy); if (d < 2) P.tx = null; else { dx = ddx / d; dy = ddy / d; } }
+    if (dx || dy) {
+      const n = Math.hypot(dx, dy) || 1; P.x = clamp(P.x + dx / n * speed, 0, 144); P.y = clamp(P.y + dy / n * speed * .8, 38, 66);
+      me._f = (me._f || 0) + 1; if (me._f % 3 === 0) me.src = SPR.url(avatarOf(), (me._f / 3) % 2 ? 'walk' : null);
+      if (dx) { me.classList.toggle('flip', dx < 0); }
+    }
+    put(me, P.x, P.y); put(broom, P.x + (me.classList.contains('flip') ? -4 : 10), P.y + 10);
+    sweepNear('p', 'any');
+    if (P.load && Math.hypot(P.x - BIN.x, P.y - BIN.y) < 16) {
+      P.load = 0; Audio8.sfx('ok'); sparkle(bin, 8); upd(); ctx.nextTurn(); me.src = SPR.url(avatarOf());
+      fbq( 'ok', 'Carrinho esvaziado! De volta para a rua.', 'lixeira');
+    }
+    /* Denise trabalha sozinha do lado dela, mais rápida */
+    const mine = trash.filter(t => t.side === 'd');
+    if (mine.length) { const t = mine.reduce((a, b) => Math.hypot(a.x - D.x, a.y - D.y) < Math.hypot(b.x - D.x, b.y - D.y) ? a : b); const ddx = t.x - 2 - D.x, ddy = t.y - 12 - D.y, d = Math.hypot(ddx, ddy) || 1; D.x += ddx / d * 2.6; D.y += ddy / d * 2; den.classList.toggle('flip', ddx < 0); den._f = (den._f || 0) + 1; if (den._f % 3 === 0) den.src = SPR.url('denise', (den._f / 3) % 2 ? 'walk' : null); }
+    put(den, D.x, D.y); sweepNear('d', 'd');
+    if (!mine.length && Math.random() < .02 && !choice) addTrash(rnd(PSIDE + 4, 146), rnd(48, 72), 'd');
+    /* pessoas passando */
+    if (P.total >= nextPass && !walkers.length) { nextPass = P.total + 3; passBy(); }
+    /* fim do turno */
+    if (choice && P.total >= 10 && !trash.some(t => t.side === 'p') && P.load === 0) finish();
+  };
+  const passBy = () => {
+    const id = pick(['theo', 'bia', 'iara', 'neide', 'davi']), el = spriteEl(id, 166, 34); lay.appendChild(el); el.classList.add('flip'); walkers.push(el);
+    el.style.transitionDuration = '0s'; void el.offsetWidth; moveEl(el, -20, 34, 3800, true);
+    setTimeout(() => {
+      if (choice) { el.insertAdjacentHTML('afterend', ''); Audio8.sfx('select'); fbq( 'ok', choice === 'placa' ? 'A pessoa viu a placa e guardou o lixo para jogar na lixeira!' : '"Opa, desculpa! Vou jogar no lixo." Funcionou!', 'coracao'); }
+      else { drops++; for (let k = 0; k < 2; k++) addTrash(rnd(16, PSIDE - 10), rnd(46, 70), 'p'); Audio8.sfx('soft'); fbq( 'soft', `Ei! Alguém passou e jogou lixo no chão de novo${drops > 1 ? '... outra vez!' : '.'}`, 'papel'); if (drops >= 2 && !asked) askChoice(); }
+    }, 1500);
+    setTimeout(() => { el.remove(); walkers = walkers.filter(w => w !== el); }, 3900);
+  };
+  const askChoice = () => {
+    asked = true;
+    $('#ask', ctx.stage).innerHTML = `<div class="fact" style="margin-top:10px"><b>O lixo não para de aparecer! O que fazer?</b><div class="options" style="margin-top:8px">
+      <button class="opt" data-ch="placa"><span class="l">A</span>Colocar uma placa "Lixo no lixo"</button>
+      <button class="opt" data-ch="falar"><span class="l">B</span>Pedir com educação para jogar no lixo</button></div></div>`;
+    $$('[data-ch]', ctx.stage).forEach(b => b.onclick = () => {
+      choice = b.dataset.ch; addMedal('gentileza', 1, 'shift:' + ctx.id); Audio8.sfx('ok');
+      $('#ask', ctx.stage).innerHTML = `<div class="feedback ok">${SPR.img('coracao')}<div><b class="kind">Boa ideia!</b>Quando todo mundo colabora, o trabalho de quem limpa rende muito mais.</div></div>`;
+      if (choice === 'placa') { const pl = spriteEl('cone', 60, 40, { w: 12, cls: 'popin' }); lay.appendChild(pl); }
+      nextPass = P.total + 1;
+    });
+    if (S.autoRead) Voice.speak('O lixo não para de aparecer! O que fazer?');
+  };
+  const finish = () => {
+    done = true; clearInterval(loop); Audio8.sfx('win'); confetti(30);
+    $('#ask', ctx.stage).innerHTML = '';
+    fbq( 'ok', `<b class="kind">Turno concluído!</b>Você recolheu ${P.total} lixos. A Denise diz: “Você limpou um quarteirão. Eu e minha equipe varremos mais de 40 por dia, desde as 5h da manhã. Obrigada pela ajuda!”`, 'vassoura');
+    if (S.autoRead) Voice.speak(`Turno concluído! Você recolheu ${P.total} lixos. Você limpou um quarteirão. Eu e minha equipe varremos mais de 40 por dia, desde as 5 da manhã.`);
+    ctx.complete();
+  };
+  /* controles: direcional, teclado e tocar na rua */
+  const map = { ArrowUp: 'u', ArrowDown: 'd', ArrowLeft: 'l', ArrowRight: 'r', w: 'u', s: 'd', a: 'l', d: 'r' };
+  const kd = e => { if ($('#modal') || /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return; const k = map[e.key]; if (k) { e.preventDefault(); keys[k] = true; P.tx = null; } };
+  const ku = e => { const k = map[e.key]; if (k) keys[k] = false; };
+  document.addEventListener('keydown', kd); document.addEventListener('keyup', ku);
+  $$('.dp[data-d]', ctx.stage).forEach(b => {
+    const [dx, dy] = b.dataset.d.split(',').map(Number), k = dx > 0 ? 'r' : dx < 0 ? 'l' : dy > 0 ? 'd' : 'u';
+    b.addEventListener('pointerdown', e => { e.preventDefault(); keys[k] = true; P.tx = null; });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, () => keys[k] = false));
+  });
+  $('.dp[data-act]', ctx.stage).onclick = () => sweepNear('p', 'any');
+  sc.addEventListener('click', e => { const r = sc.getBoundingClientRect(); P.tx = (e.clientX - r.left) / r.width * SW - 8; P.ty = (e.clientY - r.top) / r.height * SH - 20; });
+  const loop = setInterval(tick, 50);
+  onCleanup(() => { clearInterval(loop); document.removeEventListener('keydown', kd); document.removeEventListener('keyup', ku); });
+  upd();
+  return {
+    speak: () => 'Pegue a vassoura e ajude a Denise a limpar a rua.',
+    hint() {
+      ctx.usedHint();
+      const t = P.load >= CAP ? { x: BIN.x, y: BIN.y + 10 } : trash.filter(t => t.side === 'p').sort((a, b) => Math.hypot(a.x - P.x, a.y - P.y) - Math.hypot(b.x - P.x, b.y - P.y))[0];
+      if (t) { P.tx = t.x - 2; P.ty = t.y - 12; fbq( 'info', 'A Faísca mostrou o caminho: seu personagem está indo até lá.', 'faisca'); }
+    },
+    autoStep() { const t = P.load >= CAP || (!trash.some(t => t.side === 'p') && P.load) ? { x: BIN.x + 2, y: BIN.y + 12 } : trash.filter(t => t.side === 'p')[0]; if (t) { P.x = clamp(t.x - 2, 0, 144); P.y = clamp(t.y - 12, 38, 66); } }
+  };
+};
+(function () { const st = MISSIONS.denise.steps, i = st.findIndex(s => s.t === 'days'); st.splice(i + 1, 0, { t: 'shift' }); })();
 
 /* ============================================================
    INÍCIO

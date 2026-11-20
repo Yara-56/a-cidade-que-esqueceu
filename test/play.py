@@ -24,7 +24,7 @@ AUTO = r"""
   if (!q('#stage')) return 'unknown';
   const prim = q('#prim');
   const t = MISSIONS[RUN.id].steps[RUN.idx].t;
-  if (t === 'reveal' && q('#curio')) { q('#curio').click(); return 'curio'; }
+  if (t === 'reveal' && q('#curio') && window.__curK !== RUN.id) { window.__curK = RUN.id; q('#curio').click(); return 'curio'; }
   if (t === 'reflect' && q('#acc:not(:disabled)')) { click(q('#talk')); q('#acc').click(); return 'reflect'; }
   if (t === 'investigate' && qa('.hot:not(.found):not(.checked)').length) { const h = qa('.hot:not(.found):not(.checked)')[0]; h.click(); return 'investigate'; }
   if (prim && !prim.disabled) { prim.click(); return 'next'; }
@@ -61,6 +61,7 @@ AUTO = r"""
     case 'thanks': { click(q('[data-w]')); click(q('[data-m="' + (window.__tries[k] % 6) + '"]')); click(q('#send')); return 'thanks'; }
     case 'mirror': { const i = q('#mn'); if (i) i.value = 'Vó Fátima'; click(q('[data-t="0"]')); click(q('#put')); return 'mirror'; }
     case 'dialog': return 'dialog-wait';
+    case 'shift': { if (q('[data-ch]')) { q('[data-ch]').click(); return 'shift-choice'; } RUN.ctrl.autoStep(); window.__tries[k]--; return 'shift'; }
     case 'days': { if (q('[data-g]')) { q('[data-g="' + (window.__tries[k] % 3) + '"]').click(); return 'predict'; } if (q('#back')) { q('#back').click(); return 'days-back'; } if (q('#pass')) { q('#pass').click(); window.__tries[k]--; return 'day'; } window.__tries[k]--; return 'days-wait'; }
     case 'memory': {
       if (q('.mem.up:not(.done)')) { window.__tries[k]--; return 'mem-wait'; }

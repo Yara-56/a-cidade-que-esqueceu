@@ -43,6 +43,8 @@ O conteúdo fica separado das regras e da interface. Para mudar textos, pistas o
 - Criador de personagem por jogador. O avatar anda pelo mapa e pelas cenas de investigação com o direcional na tela (celular), as setas do teclado ou tocando no destino.
 - Estrelas por missão (concluir, errar pouco, não pedir dica) e um desafio extra por região (memória ou lógica).
 - **E se ninguém fizesse?**: depois de conhecer cada trabalhador, a criança dá um palpite, passa os dias (1, 3, 7) e vê as consequências se acumularem (lixo, mato, escuridão, fome...). Depois a pessoa volta ao trabalho e a cena se recupera.
+- **Um turno com a Denise**: mini-jogo em que a criança pega a vassoura e varre a rua junto com a gari (direcional, setas ou toque). Pessoas passam sujando de novo, e a criança escolhe como resolver (placa ou conversa).
+- Menos leitura: leitura em voz alta automática e ficha do personagem mais curta, com "História", "Desafios" e "Curiosidade" em botões.
 - História animada: prólogo, interlúdios da Névoa ao restaurar cada região (a Névoa vai revelando quem é) e final na Festa das Luzes.
 - Pistas secretas no celular de cada jogador, por código de 5 dígitos, para jogar por chamada de vídeo sem servidor.
 - Acessibilidade: leitura em voz alta, alto contraste, letras maiores, reduzir animações, teclado.
