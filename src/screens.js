@@ -270,6 +270,7 @@ function screenMap() {
       <img class="px map-faisca" src="${SPR.url('faisca')}" alt="" style="left:${fx.mx}%;top:${fx.my + 8}%">
       <img class="px map-avatar" id="mav" src="${SPR.url(avatarOf())}" alt="Seu personagem" style="left:${G.lastRegion ? DISTRICTS[G.lastRegion].mx : 50}%;top:${G.lastRegion ? DISTRICTS[G.lastRegion].my + 22 : 50}%">
       ${prog < 1 ? `<img class="px map-nevoa" src="${SPR.url('nevoa')}" alt="" style="left:${60 - prog * 30}%;top:${36 + prog * 10}%;opacity:${.95 - prog * .5}">` : ''}</div>
+    <div class="map-ctrl">${dpadHTML('Entrar')}<p id="near" class="near-msg">Ande com o controle ou com as setas. Chegue perto de uma região e toque em Entrar.</p></div>
     <div class="map-list">${planRegions().map(r => { const st = regionState(r.id); return `<button class="mitem ${st === 'done' ? 'done' : ''}" data-r="${r.id}" ${st === 'locked' ? 'aria-disabled="true"' : ''}><span class="rdot" style="background:${st === 'locked' ? '#b9b6c6' : r.color}"></span><span class="grow"><b>${esc(r.name)}</b><small>${{ done: 'Restaurada ✓', open: 'Toque para explorar', locked: 'Coberta pela Névoa' }[st]}</small></span>${st === 'locked' ? '' : ICON.next}</button>`; }).join('')}</div>
     <div class="map-foot"><div class="say">${bubbleHTML('faisca', say)}</div>
       ${allDone ? `<button class="btn primary big" id="finale">${SPR.img('estrela')} Grande final</button>` : ''}</div></div>`;
@@ -283,9 +284,35 @@ function screenMap() {
     if (S.reduceMotion || !av) { G.lastRegion = rid; saveGame(); go(screenRegion, rid); return; }
     const cur = parseFloat(av.style.left); av.classList.toggle('flip', D.mx < cur);
     let f = 0; const t = setInterval(() => { f ^= 1; av.src = SPR.url(avatarOf(), f ? 'walk' : null); }, 120);
-    av.style.left = D.mx + '%'; av.style.top = (D.my + 22) + '%';
+    av.style.transitionDuration = '.75s'; av.style.left = D.mx + '%'; av.style.top = (D.my + 22) + '%';
     setTimeout(() => { clearInterval(t); G.lastRegion = rid; saveGame(); go(screenRegion, rid); }, 800);
   });
+  /* andar livremente pelo mapa */
+  const av = $('#mav'); const mp = { x: parseFloat(av.style.left), y: parseFloat(av.style.top) };
+  const nearRegion = () => { let best = null, bd = 1e9; for (const r of regs) { const D = DISTRICTS[r.id]; const d = Math.hypot(D.mx - mp.x, (D.my + 22 - mp.y) * .6); if (d < bd) { bd = d; best = r; } } return bd < 13 ? best : null; };
+  const showNear = () => {
+    const r = nearRegion(), msg = $('#near'), btn = $('.map-ctrl .dp[data-act]');
+    btn.disabled = !r;
+    msg.innerHTML = r ? `Você chegou em: <b>${esc(r.name)}</b>. ${regionState(r.id) === 'locked' ? 'A Névoa ainda cobre esta região.' : 'Toque em Entrar!'}` : 'Ande com o controle ou com as setas. Chegue perto de uma região e toque em Entrar.';
+  };
+  let mf = 0, mt = null;
+  const mapMove = (dx, dy) => {
+    mp.x = clamp(mp.x + dx * 2.2, 3, 97); mp.y = clamp(mp.y + dy * 3.6, 12, 98);
+    av.style.transitionDuration = '.12s'; av.style.left = mp.x + '%'; av.style.top = mp.y + '%';
+    if (dx) av.classList.toggle('flip', dx < 0);
+    mf ^= 1; av.src = SPR.url(avatarOf(), mf ? 'walk' : null); clearTimeout(mt); mt = setTimeout(() => { av.src = SPR.url(avatarOf()); }, 220);
+    showNear();
+  };
+  const enter = () => { const r = nearRegion(); if (!r) return; const m = $(`.marker[data-r="${r.id}"]`); G.lastRegion = r.id; saveGame(); if (regionState(r.id) === 'locked') m.click(); else go(screenRegion, r.id); };
+  wireDpad($('.map-ctrl'), mapMove, enter);
+  const mapKey = e => {
+    if ($('#modal') || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
+    const m = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0], w: [0, -1], s: [0, 1], a: [-1, 0], d: [1, 0] }[e.key];
+    if (m) { e.preventDefault(); mapMove(...m); }
+    else if ((e.key === 'Enter' || e.key === ' ') && !document.activeElement.closest('button') && nearRegion()) { e.preventDefault(); enter(); }
+  };
+  document.addEventListener('keydown', mapKey); onCleanup(() => document.removeEventListener('keydown', mapKey));
+  showNear();
   if (allDone) $('#finale').onclick = () => { G.current = { mission: '_finale' }; saveGame(); go(screenFinale); };
   /* carta surpresa: depois de algumas missões */
   const dc = doneCount();
@@ -378,7 +405,7 @@ function renderMission(id, idx) {
       p.onclick = () => p.remove(); document.body.appendChild(p); p.focus();
     };
     $('#trep').onclick = () => { Audio8.init(); Voice.enabled = true; say(); Voice.enabled = S.voice && !S.mute; };
-    $('#tskip').onclick = () => advance(id, idx);
+    $('#tskip').onclick = () => { if (!RUN.done) { G.current.hints++; G.current.mistakes += 99; saveGame(); } advance(id, idx); };
   }
 }
 function advance(id, idx) {

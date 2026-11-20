@@ -39,6 +39,7 @@ const prefersRM = (() => { try { return matchMedia('(prefers-reduced-motion: red
 let S = Object.assign({ music: .5, sfx: .7, voice: true, autoRead: false, mute: false, contrast: false, bigText: false, reduceMotion: prefersRM }, Store.get(KEY_SET, {}));
 let G = Store.get(KEY_GAME, null);
 if (G && G.v !== 1) G = null;
+if (G) { G.stars = G.stars || {}; G.bonus = G.bonus || {}; G.clueMode = G.clueMode || 'pass'; G.thanks = G.thanks || []; G.surpriseAt = G.surpriseAt || []; G.seen = G.seen || {}; }
 
 function saveSettings() { Store.set(KEY_SET, S); applySettings(); }
 function saveGame() { if (G) Store.set(KEY_GAME, G); }
@@ -99,7 +100,7 @@ function readClueCode(code) {
   const d = code.slice(0, 4), chk = [...d].reduce((a, x, i) => a + (+x) * (i + 3), 0) % 10;
   if (chk !== +code[4]) return null;
   const mid = MISSION_ORDER[+d.slice(0, 2) - 1], n = +d[2], c = +d[3];
-  if (!mid || n < 2 || n > 6 || c < 1) return null;
+  if (!mid || n < 2 || n > 6 || c < 1 || !MISSIONS[mid].steps.some(s => s.t === 'whoami')) return null;
   return { mid, n, c };
 }
 function clueAssign(n, c) { const a = Array.from({ length: n }, () => []); for (let i = 0; i < c; i++) a[i % n].push(i); return a; }
@@ -153,12 +154,32 @@ function modal(html, { onClose, label = 'Janela' } = {}) {
 function closeModal() { const m = $('#modal'); if (m) { const cb = m._onClose; m.remove(); if (cb) cb(); } }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { if ($('#modal')) closeModal(); else if ($('.pause')) $('.pause').click(); } });
 
+/* direcional na tela (segura para andar sem parar) */
+function dpadHTML(actionLabel) {
+  return `<div class="dpad" aria-label="Controle para andar">
+    <button class="dp up" data-d="0,-1" aria-label="Andar para cima">▲</button>
+    <button class="dp left" data-d="-1,0" aria-label="Andar para a esquerda">◀</button>
+    <button class="dp act" data-act="1">${esc(actionLabel)}</button>
+    <button class="dp right" data-d="1,0" aria-label="Andar para a direita">▶</button>
+    <button class="dp down" data-d="0,1" aria-label="Andar para baixo">▼</button></div>`;
+}
+function wireDpad(root, move, act) {
+  $$('.dp[data-d]', root).forEach(b => {
+    const [dx, dy] = b.dataset.d.split(',').map(Number); let t = null;
+    const stop = () => { clearInterval(t); t = null; };
+    b.addEventListener('pointerdown', e => { e.preventDefault(); move(dx, dy); stop(); t = setInterval(() => move(dx, dy), 110); });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, stop));
+    b.addEventListener('click', e => { if (e.detail === 0) move(dx, dy); });
+    onCleanup(stop);
+  });
+  const a = $('.dp[data-act]', root); if (a) a.onclick = act;
+}
 function sparkle(el, n = 10) {
   if (S.reduceMotion || !el) return;
   const r = el.getBoundingClientRect();
   for (let i = 0; i < n; i++) {
     const s = document.createElement('i'); s.className = 'sparkle';
-    s.style.left = (r.left + r.width / 2 + scrollX) + 'px'; s.style.top = (r.top + r.height / 2 + scrollY) + 'px'; s.style.position = 'absolute';
+    s.style.left = (r.left + r.width / 2) + 'px'; s.style.top = (r.top + r.height / 2) + 'px'; s.style.position = 'fixed'; s.style.zIndex = 40;
     const a = Math.random() * Math.PI * 2, d = 30 + Math.random() * 50;
     s.style.setProperty('--dx', Math.cos(a) * d + 'px'); s.style.setProperty('--dy', Math.sin(a) * d + 'px');
     document.body.appendChild(s); setTimeout(() => s.remove(), 900);

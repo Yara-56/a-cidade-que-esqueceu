@@ -7,6 +7,8 @@ AUTO = r"""
 () => {
   const q = s => document.querySelector(s), qa = s => [...document.querySelectorAll(s)];
   const click = el => { if (el && !el.disabled) { el.click(); return true; } return false; };
+  const ow = document.documentElement.scrollWidth - window.innerWidth;
+  if (ow > 2) { window.__ovf = window.__ovf || {}; const key = (q('.mhead .where') || q('h2') || {}).textContent || 'tela'; window.__ovf[key.slice(0,40)] = ow; }
   if (q('.pause')) { q('.pause').click(); return 'pause'; }
   if (q('#modal')) { if (q('#modal #done')) { q('#modal #done').click(); return 'surprise'; } if (q('#modal #yes')) { q('#modal #yes').click(); return 'confirm'; } q('#modal .x').click(); return 'modal'; }
   if (q('#again')) return 'END';
@@ -94,7 +96,7 @@ async def run(mode, count, diff, length, w, h, shots_prefix=None, shot_every=())
         errs = []
         pg.on('console', lambda m: errs.append(f'{m.type}: {m.text}') if m.type in ('error', 'warning') else None)
         pg.on('pageerror', lambda e: errs.append(f'PAGEERROR: {e}'))
-        await pg.goto('file:///home/claude/cidade/dist/index.html')
+        await pg.goto('file:///home/claude/chk/index.html')
         await pg.evaluate("() => localStorage.clear()")
         await pg.reload()
         await setup(pg, mode, count, diff, length)
@@ -109,6 +111,8 @@ async def run(mode, count, diff, length, w, h, shots_prefix=None, shot_every=())
             if r == 'END' or r.startswith('STUCK') or r in ('unknown', 'map-stuck'):
                 break
             await pg.wait_for_timeout(15)
+        ovf = await pg.evaluate("() => window.__ovf || {}")
+        print('overflow:', ovf)
         state = await pg.evaluate("() => ({album: G.album.length, done: Object.keys(G.done).length, medals: G.medals, earned: G.earned, finished: G.finished, challenges: G.challenges.length, turn: G.turn})")
         if shots_prefix:
             await pg.screenshot(path=f'{shots_prefix}-end.png', full_page=True)

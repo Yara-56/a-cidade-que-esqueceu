@@ -38,14 +38,16 @@ function makeWalker(ctx, sceneKey, items, onExamine) {
     const d = Math.hypot(x - st.x, y - st.y); if (x !== st.x) st.flip = x < st.x; st.x = x; st.y = y;
     const dur = S.reduceMotion ? 0 : Math.min(1.1, d / 95);
     anim(dur > .05); place(dur); st.busy = true;
-    clearTimeout(st.to); st.to = setTimeout(() => { anim(false); st.busy = false; highlight(); if (cb) cb(); }, dur * 1000 + 40);
+    clearTimeout(st.to); st.to = setTimeout(() => { anim(false); st.busy = false; st.target = null; highlight(); if (cb) cb(); }, dur * 1000 + 40);
   };
   const goItem = (it, cb) => {
+    if (st.busy && st.target === it) return;
+    st.target = it;
     const left = it.x - 14 > 0 && (it.x - 14 >= st.x - 40 || it.x + (it.w || 18) + 2 > SW - 16);
     walkTo(left ? it.x - 14 : it.x + (it.w || 18) - 2, it.y + (it.h || 18) - 22, cb);
   };
   sc.addEventListener('click', e => {
-    if (e.target.closest('.hot') || st.busy) return;
+    if (e.target.closest(".hot")) return; st.target = null;
     const r = sc.getBoundingClientRect();
     walkTo((e.clientX - r.left) / r.width * SW - 8, (e.clientY - r.top) / r.height * SH - 20);
   });
@@ -60,6 +62,10 @@ function makeWalker(ctx, sceneKey, items, onExamine) {
   document.addEventListener('keydown', onKey);
   onCleanup(() => { document.removeEventListener('keydown', onKey); clearInterval(st.timer); clearTimeout(st.to); });
   place(0); setTimeout(highlight, 50);
+  const step = (dx, dy) => { st.target = null; walkTo(st.x + dx * 5, st.y + dy * 4); };
+  const act = () => { const k = nearest(); if (k !== null) onExamine(k); else toast('Chegue mais perto de um objeto para examinar.', 'faisca'); };
+  const pad = document.createElement('div'); pad.innerHTML = dpadHTML('Ver'); sc.after(pad.firstElementChild);
+  wireDpad(sc.parentElement, step, act);
   return { goItem, refresh: () => { img.src = SPR.url(avatarOf()); }, get busy() { return st.busy; } };
 }
 
@@ -90,7 +96,7 @@ const STEPS = {
     const found = new Set(), checked = new Set();
     const hots = items.map((it, k) => `<button class="hot" data-k="${k}" style="${hotStyle(it)}" aria-label="Examinar: ${esc(it.label)}"></button>`).join('');
     ctx.stage.innerHTML = promptHTML(step.prompt) +
-      `<div class="two"><div>${sceneHTML(step.scene, { items, cast: step.cast, faded: !ctx.colored, extra: hots, alt: 'Cena para investigar' })}<p class="walk-help">Toque num objeto e seu personagem vai até lá. No teclado: setas para andar, Enter para examinar.</p><div id="fb" style="margin-top:12px"></div></div>
+      `<div class="two"><div>${sceneHTML(step.scene, { items, cast: step.cast, faded: !ctx.colored, extra: hots, alt: 'Cena para investigar' })}<p class="walk-help">Toque num objeto, use o controle ou as setas do teclado para andar. Perto de um objeto, toque em Examinar (ou Enter).</p><div id="fb" style="margin-top:12px"></div></div>
       <aside class="notebook"><h3>Caderno de pistas</h3><p class="muted" style="margin:0 0 8px;font-weight:700">Pistas: <b id="cnt">0</b> de ${clues.length}</p><ul id="nb">${clues.map(() => '<li class="empty"><span></span></li>').join('')}</ul></aside></div>`;
     wireSay(ctx.stage, () => step.prompt);
     const fb = $('#fb', ctx.stage), nb = $('#nb', ctx.stage);
@@ -120,7 +126,7 @@ const STEPS = {
     ctx.onTurn(() => W && W.refresh());
     $$('.hot', ctx.stage).forEach(b => b.onclick = e => {
       e.stopPropagation(); const k = +b.dataset.k;
-      if (W && !W.busy) W.goItem(items[k], () => examine(k)); else if (!W) examine(k);
+      if (W) W.goItem(items[k], () => examine(k)); else examine(k);
     });
     return {
       speak: () => step.prompt,
@@ -302,7 +308,7 @@ const STEPS = {
     const key = (x, y) => x + ',' + y;
     const blockAt = (x, y) => g.blocks.find(b => b.x === x && b.y === y);
     const dropAt = (x, y) => g.drops.findIndex(d => d.x === x && d.y === y);
-    ctx.stage.innerHTML = promptHTML(step.prompt) + `<div class="route-wrap"><div class="grid" id="grid" style="grid-template-columns:repeat(${g.w},auto)" role="grid" aria-label="Mapa das entregas"></div>
+    ctx.stage.innerHTML = promptHTML(step.prompt) + `<div class="route-wrap"><div class="grid" id="grid" style="grid-template-columns:repeat(${g.w},auto);--gw:${g.w}" role="grid" aria-label="Mapa das entregas"></div>
       <div class="route-side"><div class="drop-list" id="dl"></div><div class="arrows" aria-label="Setas para mover">
         <span></span><button class="btn" data-mv="0,-1" aria-label="Para cima">▲</button><span></span>
         <button class="btn" data-mv="-1,0" aria-label="Para a esquerda">◀</button><button class="btn" id="undo" aria-label="Desfazer">${ICON.undo}</button><button class="btn" data-mv="1,0" aria-label="Para a direita">▶</button>

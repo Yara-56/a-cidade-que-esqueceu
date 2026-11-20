@@ -31,6 +31,7 @@ body {
   background: var(--night2);
   background-image: radial-gradient(circle at 20% 10%, #33407a 0, transparent 40%), radial-gradient(circle at 85% 90%, #3b2f5c 0, transparent 45%);
   -webkit-tap-highlight-color: transparent;
+  overflow-x: clip;
 }
 img.px, canvas.px { image-rendering: pixelated; image-rendering: crisp-edges; }
 button { font: inherit; color: inherit; cursor: pointer; }
@@ -154,7 +155,7 @@ html.easy .hot::after { border-color: #ffffff55; }
 .two { display: grid; grid-template-columns: 1.6fr 1fr; gap: 14px; align-items: start; }
 .prompt { display: flex; gap: 12px; align-items: center; background: var(--paper); border: var(--bw) solid var(--ink); border-radius: var(--r); padding: 10px 14px; box-shadow: var(--shadow); }
 .prompt img.px { width: 48px; height: 48px; flex: none; animation: bob 2.4s ease-in-out infinite; }
-.prompt p { margin: 0; font-weight: 800; font-size: 1.08rem; flex: 1; }
+.prompt p { margin: 0; font-weight: 800; font-size: 1.08rem; flex: 1; min-width: 0; overflow-wrap: anywhere; }
 @keyframes bob { 50% { transform: translateY(-4px); } }
 .ibtn { width: 48px; height: 48px; flex: none; border: var(--bw) solid var(--ink); border-radius: 50%; background: var(--paper2); display: grid; place-items: center; box-shadow: 2px 2px 0 var(--ink); }
 .ibtn svg { width: 24px; height: 24px; }
@@ -227,7 +228,7 @@ html.easy .hot::after { border-color: #ffffff55; }
 /* rota */
 .route-wrap { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start; }
 .grid { display: grid; gap: 4px; background: #5d6573; padding: 8px; border: var(--bw) solid var(--ink); border-radius: var(--r); box-shadow: var(--shadow); width: fit-content; max-width: 100%; }
-.cell { width: clamp(42px, 9vw, 72px); aspect-ratio: 1; border: 2px solid #4b5160; background: #7b8392; border-radius: 6px; position: relative; padding: 0; display: grid; place-items: center; }
+.cell { width: min(72px, max(30px, calc((100vw - 64px) / var(--gw, 7)))); aspect-ratio: 1; border: 2px solid #4b5160; background: #7b8392; border-radius: 6px; position: relative; padding: 0; display: grid; place-items: center; }
 .cell::before { content: ''; position: absolute; left: 50%; top: 50%; width: 30%; height: 4px; background: #fff6; transform: translate(-50%, -50%); }
 .cell.trail { background: #9aa3ad; }
 .cell.trail::after { content: ''; position: absolute; width: 22%; height: 22%; border-radius: 50%; background: var(--gold); border: 2px solid var(--ink); }
@@ -511,6 +512,20 @@ html.rm *, html.rm *::before, html.rm *::after { animation-duration: .001ms !imp
 
 .star-why { font-weight: 700; margin: 0; max-width: 640px; }
 .star-why .stars { font-size: 1.2rem; vertical-align: -2px; }
+
+/* direcional */
+.dpad { display: grid; grid-template-columns: repeat(3, 58px); grid-template-rows: repeat(3, 50px); gap: 5px; justify-content: center; margin: 10px auto 0; user-select: none; -webkit-user-select: none; touch-action: none; }
+.dp { border: var(--bw) solid var(--ink); border-radius: 10px; background: var(--paper); box-shadow: 2px 2px 0 var(--ink); font-size: 1.2rem; font-weight: 900; padding: 0; touch-action: none; }
+.dp:active { transform: translate(2px, 2px); box-shadow: none; background: var(--glow); }
+.dp.up { grid-column: 2; grid-row: 1; } .dp.left { grid-column: 1; grid-row: 2; } .dp.right { grid-column: 3; grid-row: 2; } .dp.down { grid-column: 2; grid-row: 3; }
+.dp.act { grid-column: 2; grid-row: 2; background: var(--gold); font-size: .72rem; line-height: 1; }
+.dp.act:disabled { background: #d8d4e2; opacity: .7; }
+.map-ctrl { display: flex; gap: 16px; align-items: center; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+.map-ctrl .dpad { margin: 0; }
+.near-msg { color: #fff; font-weight: 800; max-width: 340px; margin: 0; }
+@media (min-width: 861px) { .two .dpad { grid-template-columns: repeat(3, 50px); grid-template-rows: repeat(3, 42px); } }
+@media (max-width: 860px) { .map-avatar { width: 7%; } }
+.dp.act { font-size: .8rem; }
 </style>
 </head>
 <body>
@@ -1873,6 +1888,7 @@ const prefersRM = (() => { try { return matchMedia('(prefers-reduced-motion: red
 let S = Object.assign({ music: .5, sfx: .7, voice: true, autoRead: false, mute: false, contrast: false, bigText: false, reduceMotion: prefersRM }, Store.get(KEY_SET, {}));
 let G = Store.get(KEY_GAME, null);
 if (G && G.v !== 1) G = null;
+if (G) { G.stars = G.stars || {}; G.bonus = G.bonus || {}; G.clueMode = G.clueMode || 'pass'; G.thanks = G.thanks || []; G.surpriseAt = G.surpriseAt || []; G.seen = G.seen || {}; }
 
 function saveSettings() { Store.set(KEY_SET, S); applySettings(); }
 function saveGame() { if (G) Store.set(KEY_GAME, G); }
@@ -1933,7 +1949,7 @@ function readClueCode(code) {
   const d = code.slice(0, 4), chk = [...d].reduce((a, x, i) => a + (+x) * (i + 3), 0) % 10;
   if (chk !== +code[4]) return null;
   const mid = MISSION_ORDER[+d.slice(0, 2) - 1], n = +d[2], c = +d[3];
-  if (!mid || n < 2 || n > 6 || c < 1) return null;
+  if (!mid || n < 2 || n > 6 || c < 1 || !MISSIONS[mid].steps.some(s => s.t === 'whoami')) return null;
   return { mid, n, c };
 }
 function clueAssign(n, c) { const a = Array.from({ length: n }, () => []); for (let i = 0; i < c; i++) a[i % n].push(i); return a; }
@@ -1987,12 +2003,32 @@ function modal(html, { onClose, label = 'Janela' } = {}) {
 function closeModal() { const m = $('#modal'); if (m) { const cb = m._onClose; m.remove(); if (cb) cb(); } }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { if ($('#modal')) closeModal(); else if ($('.pause')) $('.pause').click(); } });
 
+/* direcional na tela (segura para andar sem parar) */
+function dpadHTML(actionLabel) {
+  return `<div class="dpad" aria-label="Controle para andar">
+    <button class="dp up" data-d="0,-1" aria-label="Andar para cima">▲</button>
+    <button class="dp left" data-d="-1,0" aria-label="Andar para a esquerda">◀</button>
+    <button class="dp act" data-act="1">${esc(actionLabel)}</button>
+    <button class="dp right" data-d="1,0" aria-label="Andar para a direita">▶</button>
+    <button class="dp down" data-d="0,1" aria-label="Andar para baixo">▼</button></div>`;
+}
+function wireDpad(root, move, act) {
+  $$('.dp[data-d]', root).forEach(b => {
+    const [dx, dy] = b.dataset.d.split(',').map(Number); let t = null;
+    const stop = () => { clearInterval(t); t = null; };
+    b.addEventListener('pointerdown', e => { e.preventDefault(); move(dx, dy); stop(); t = setInterval(() => move(dx, dy), 110); });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, stop));
+    b.addEventListener('click', e => { if (e.detail === 0) move(dx, dy); });
+    onCleanup(stop);
+  });
+  const a = $('.dp[data-act]', root); if (a) a.onclick = act;
+}
 function sparkle(el, n = 10) {
   if (S.reduceMotion || !el) return;
   const r = el.getBoundingClientRect();
   for (let i = 0; i < n; i++) {
     const s = document.createElement('i'); s.className = 'sparkle';
-    s.style.left = (r.left + r.width / 2 + scrollX) + 'px'; s.style.top = (r.top + r.height / 2 + scrollY) + 'px'; s.style.position = 'absolute';
+    s.style.left = (r.left + r.width / 2) + 'px'; s.style.top = (r.top + r.height / 2) + 'px'; s.style.position = 'fixed'; s.style.zIndex = 40;
     const a = Math.random() * Math.PI * 2, d = 30 + Math.random() * 50;
     s.style.setProperty('--dx', Math.cos(a) * d + 'px'); s.style.setProperty('--dy', Math.sin(a) * d + 'px');
     document.body.appendChild(s); setTimeout(() => s.remove(), 900);
@@ -2069,14 +2105,16 @@ function makeWalker(ctx, sceneKey, items, onExamine) {
     const d = Math.hypot(x - st.x, y - st.y); if (x !== st.x) st.flip = x < st.x; st.x = x; st.y = y;
     const dur = S.reduceMotion ? 0 : Math.min(1.1, d / 95);
     anim(dur > .05); place(dur); st.busy = true;
-    clearTimeout(st.to); st.to = setTimeout(() => { anim(false); st.busy = false; highlight(); if (cb) cb(); }, dur * 1000 + 40);
+    clearTimeout(st.to); st.to = setTimeout(() => { anim(false); st.busy = false; st.target = null; highlight(); if (cb) cb(); }, dur * 1000 + 40);
   };
   const goItem = (it, cb) => {
+    if (st.busy && st.target === it) return;
+    st.target = it;
     const left = it.x - 14 > 0 && (it.x - 14 >= st.x - 40 || it.x + (it.w || 18) + 2 > SW - 16);
     walkTo(left ? it.x - 14 : it.x + (it.w || 18) - 2, it.y + (it.h || 18) - 22, cb);
   };
   sc.addEventListener('click', e => {
-    if (e.target.closest('.hot') || st.busy) return;
+    if (e.target.closest(".hot")) return; st.target = null;
     const r = sc.getBoundingClientRect();
     walkTo((e.clientX - r.left) / r.width * SW - 8, (e.clientY - r.top) / r.height * SH - 20);
   });
@@ -2091,6 +2129,10 @@ function makeWalker(ctx, sceneKey, items, onExamine) {
   document.addEventListener('keydown', onKey);
   onCleanup(() => { document.removeEventListener('keydown', onKey); clearInterval(st.timer); clearTimeout(st.to); });
   place(0); setTimeout(highlight, 50);
+  const step = (dx, dy) => { st.target = null; walkTo(st.x + dx * 5, st.y + dy * 4); };
+  const act = () => { const k = nearest(); if (k !== null) onExamine(k); else toast('Chegue mais perto de um objeto para examinar.', 'faisca'); };
+  const pad = document.createElement('div'); pad.innerHTML = dpadHTML('Ver'); sc.after(pad.firstElementChild);
+  wireDpad(sc.parentElement, step, act);
   return { goItem, refresh: () => { img.src = SPR.url(avatarOf()); }, get busy() { return st.busy; } };
 }
 
@@ -2121,7 +2163,7 @@ const STEPS = {
     const found = new Set(), checked = new Set();
     const hots = items.map((it, k) => `<button class="hot" data-k="${k}" style="${hotStyle(it)}" aria-label="Examinar: ${esc(it.label)}"></button>`).join('');
     ctx.stage.innerHTML = promptHTML(step.prompt) +
-      `<div class="two"><div>${sceneHTML(step.scene, { items, cast: step.cast, faded: !ctx.colored, extra: hots, alt: 'Cena para investigar' })}<p class="walk-help">Toque num objeto e seu personagem vai até lá. No teclado: setas para andar, Enter para examinar.</p><div id="fb" style="margin-top:12px"></div></div>
+      `<div class="two"><div>${sceneHTML(step.scene, { items, cast: step.cast, faded: !ctx.colored, extra: hots, alt: 'Cena para investigar' })}<p class="walk-help">Toque num objeto, use o controle ou as setas do teclado para andar. Perto de um objeto, toque em Examinar (ou Enter).</p><div id="fb" style="margin-top:12px"></div></div>
       <aside class="notebook"><h3>Caderno de pistas</h3><p class="muted" style="margin:0 0 8px;font-weight:700">Pistas: <b id="cnt">0</b> de ${clues.length}</p><ul id="nb">${clues.map(() => '<li class="empty"><span></span></li>').join('')}</ul></aside></div>`;
     wireSay(ctx.stage, () => step.prompt);
     const fb = $('#fb', ctx.stage), nb = $('#nb', ctx.stage);
@@ -2151,7 +2193,7 @@ const STEPS = {
     ctx.onTurn(() => W && W.refresh());
     $$('.hot', ctx.stage).forEach(b => b.onclick = e => {
       e.stopPropagation(); const k = +b.dataset.k;
-      if (W && !W.busy) W.goItem(items[k], () => examine(k)); else if (!W) examine(k);
+      if (W) W.goItem(items[k], () => examine(k)); else examine(k);
     });
     return {
       speak: () => step.prompt,
@@ -2333,7 +2375,7 @@ const STEPS = {
     const key = (x, y) => x + ',' + y;
     const blockAt = (x, y) => g.blocks.find(b => b.x === x && b.y === y);
     const dropAt = (x, y) => g.drops.findIndex(d => d.x === x && d.y === y);
-    ctx.stage.innerHTML = promptHTML(step.prompt) + `<div class="route-wrap"><div class="grid" id="grid" style="grid-template-columns:repeat(${g.w},auto)" role="grid" aria-label="Mapa das entregas"></div>
+    ctx.stage.innerHTML = promptHTML(step.prompt) + `<div class="route-wrap"><div class="grid" id="grid" style="grid-template-columns:repeat(${g.w},auto);--gw:${g.w}" role="grid" aria-label="Mapa das entregas"></div>
       <div class="route-side"><div class="drop-list" id="dl"></div><div class="arrows" aria-label="Setas para mover">
         <span></span><button class="btn" data-mv="0,-1" aria-label="Para cima">▲</button><span></span>
         <button class="btn" data-mv="-1,0" aria-label="Para a esquerda">◀</button><button class="btn" id="undo" aria-label="Desfazer">${ICON.undo}</button><button class="btn" data-mv="1,0" aria-label="Para a direita">▶</button>
@@ -2915,6 +2957,7 @@ function screenMap() {
       <img class="px map-faisca" src="${SPR.url('faisca')}" alt="" style="left:${fx.mx}%;top:${fx.my + 8}%">
       <img class="px map-avatar" id="mav" src="${SPR.url(avatarOf())}" alt="Seu personagem" style="left:${G.lastRegion ? DISTRICTS[G.lastRegion].mx : 50}%;top:${G.lastRegion ? DISTRICTS[G.lastRegion].my + 22 : 50}%">
       ${prog < 1 ? `<img class="px map-nevoa" src="${SPR.url('nevoa')}" alt="" style="left:${60 - prog * 30}%;top:${36 + prog * 10}%;opacity:${.95 - prog * .5}">` : ''}</div>
+    <div class="map-ctrl">${dpadHTML('Entrar')}<p id="near" class="near-msg">Ande com o controle ou com as setas. Chegue perto de uma região e toque em Entrar.</p></div>
     <div class="map-list">${planRegions().map(r => { const st = regionState(r.id); return `<button class="mitem ${st === 'done' ? 'done' : ''}" data-r="${r.id}" ${st === 'locked' ? 'aria-disabled="true"' : ''}><span class="rdot" style="background:${st === 'locked' ? '#b9b6c6' : r.color}"></span><span class="grow"><b>${esc(r.name)}</b><small>${{ done: 'Restaurada ✓', open: 'Toque para explorar', locked: 'Coberta pela Névoa' }[st]}</small></span>${st === 'locked' ? '' : ICON.next}</button>`; }).join('')}</div>
     <div class="map-foot"><div class="say">${bubbleHTML('faisca', say)}</div>
       ${allDone ? `<button class="btn primary big" id="finale">${SPR.img('estrela')} Grande final</button>` : ''}</div></div>`;
@@ -2928,9 +2971,35 @@ function screenMap() {
     if (S.reduceMotion || !av) { G.lastRegion = rid; saveGame(); go(screenRegion, rid); return; }
     const cur = parseFloat(av.style.left); av.classList.toggle('flip', D.mx < cur);
     let f = 0; const t = setInterval(() => { f ^= 1; av.src = SPR.url(avatarOf(), f ? 'walk' : null); }, 120);
-    av.style.left = D.mx + '%'; av.style.top = (D.my + 22) + '%';
+    av.style.transitionDuration = '.75s'; av.style.left = D.mx + '%'; av.style.top = (D.my + 22) + '%';
     setTimeout(() => { clearInterval(t); G.lastRegion = rid; saveGame(); go(screenRegion, rid); }, 800);
   });
+  /* andar livremente pelo mapa */
+  const av = $('#mav'); const mp = { x: parseFloat(av.style.left), y: parseFloat(av.style.top) };
+  const nearRegion = () => { let best = null, bd = 1e9; for (const r of regs) { const D = DISTRICTS[r.id]; const d = Math.hypot(D.mx - mp.x, (D.my + 22 - mp.y) * .6); if (d < bd) { bd = d; best = r; } } return bd < 13 ? best : null; };
+  const showNear = () => {
+    const r = nearRegion(), msg = $('#near'), btn = $('.map-ctrl .dp[data-act]');
+    btn.disabled = !r;
+    msg.innerHTML = r ? `Você chegou em: <b>${esc(r.name)}</b>. ${regionState(r.id) === 'locked' ? 'A Névoa ainda cobre esta região.' : 'Toque em Entrar!'}` : 'Ande com o controle ou com as setas. Chegue perto de uma região e toque em Entrar.';
+  };
+  let mf = 0, mt = null;
+  const mapMove = (dx, dy) => {
+    mp.x = clamp(mp.x + dx * 2.2, 3, 97); mp.y = clamp(mp.y + dy * 3.6, 12, 98);
+    av.style.transitionDuration = '.12s'; av.style.left = mp.x + '%'; av.style.top = mp.y + '%';
+    if (dx) av.classList.toggle('flip', dx < 0);
+    mf ^= 1; av.src = SPR.url(avatarOf(), mf ? 'walk' : null); clearTimeout(mt); mt = setTimeout(() => { av.src = SPR.url(avatarOf()); }, 220);
+    showNear();
+  };
+  const enter = () => { const r = nearRegion(); if (!r) return; const m = $(`.marker[data-r="${r.id}"]`); G.lastRegion = r.id; saveGame(); if (regionState(r.id) === 'locked') m.click(); else go(screenRegion, r.id); };
+  wireDpad($('.map-ctrl'), mapMove, enter);
+  const mapKey = e => {
+    if ($('#modal') || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
+    const m = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0], w: [0, -1], s: [0, 1], a: [-1, 0], d: [1, 0] }[e.key];
+    if (m) { e.preventDefault(); mapMove(...m); }
+    else if ((e.key === 'Enter' || e.key === ' ') && !document.activeElement.closest('button') && nearRegion()) { e.preventDefault(); enter(); }
+  };
+  document.addEventListener('keydown', mapKey); onCleanup(() => document.removeEventListener('keydown', mapKey));
+  showNear();
   if (allDone) $('#finale').onclick = () => { G.current = { mission: '_finale' }; saveGame(); go(screenFinale); };
   /* carta surpresa: depois de algumas missões */
   const dc = doneCount();
@@ -3023,7 +3092,7 @@ function renderMission(id, idx) {
       p.onclick = () => p.remove(); document.body.appendChild(p); p.focus();
     };
     $('#trep').onclick = () => { Audio8.init(); Voice.enabled = true; say(); Voice.enabled = S.voice && !S.mute; };
-    $('#tskip').onclick = () => advance(id, idx);
+    $('#tskip').onclick = () => { if (!RUN.done) { G.current.hints++; G.current.mistakes += 99; saveGame(); } advance(id, idx); };
   }
 }
 function advance(id, idx) {
