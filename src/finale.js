@@ -10,6 +10,8 @@ function buildFinale() {
   MISSIONS._finale = {
     title: 'A Festa das Luzes', char: null, steps: [
       { t: 'dialog', scene: 'festa', faded: true, cast: [{ id: 'nevoa', x: 62, y: 2 }], lines: FINALE.intro },
+      { t: 'boss' },
+      { t: 'dialog', scene: 'festa', faded: true, cast: [{ id: 'nevoa', x: 62, y: 8 }], lines: FINALE.after },
       { t: 'match', prompt: 'O que aconteceria com Lumiara sem cada uma dessas pessoas?', left: 'Quem', right: 'Sem essa pessoa…',
         pairsFn() {
           const met = planMissions().map(m => MISSIONS[m].char).filter(c => G.album.includes(c));

@@ -72,15 +72,19 @@ const Audio8 = {
     this.brightness = brightness;
     if (!this.ctx) { this.cfg = cfg; return; }
     if (this.cfg === cfg && this.timer) return;
-    this.stopMusic(); this.cfg = cfg; if (!cfg) return;
-    const songI = ((cfg.root || 60) + Math.round((cfg.tempo || 100) / 8)) % this.SONGS.length, song = this.SONGS[songI];
-    const bpm = Math.max(124, Math.min(150, (cfg.tempo || 100) * 1.3)), six = 60 / bpm / 4;
-    const key = 60 + (((cfg.root || 60) - 60) % 5);
-    const toks = song.mel.map(b => b.split(' '));
+    if (!cfg) { this.stopMusic(); return; }
+    const songI = ((cfg.root || 60) + Math.round((cfg.tempo || 100) / 8)) % this.SONGS.length, sg = this.SONGS[songI];
+    const cur = { song: sg, six: 60 / 132 / 4, key: 60 + (((cfg.root || 60) - 60) % 5), toks: sg.mel.map(b => b.split(' ')) };
+    this.cfg = cfg;
+    /* já tocando: troca no começo do próximo compasso, sem corte */
+    if (this.timer) { this.pendingCur = cur; return; }
+    this.cur = cur;
     let next = this.ctx.currentTime + .12; this.step = 0;
     this.timer = setInterval(() => {
       if (!this.ctx) return;
       while (next < this.ctx.currentTime + .3) {
+        if (this.step % 16 === 0 && this.pendingCur) { this.cur = this.pendingCur; this.pendingCur = null; }
+        const { song, six, key, toks } = this.cur;
         const s = this.step++, st = s % 16, bar = Math.floor(s / 16), chordDeg = song.prog[bar % 4] + 1;
         const rootN = key - 12 + this.deg(chordDeg), br = this.brightness, full = br >= .2, chorus = Math.floor(bar / 8) % 2 === 1, en = this.energy;
         const sw = st % 2 ? six * .14 : 0, t = next + sw, lead = this.leadBus || this.musicBus;
@@ -109,7 +113,7 @@ const Audio8 = {
       }
     }, 80);
   },
-  stopMusic() { if (this.timer) clearInterval(this.timer); this.timer = null; this.cfg = null; },
+  stopMusic() { if (this.timer) clearInterval(this.timer); this.timer = null; this.cfg = null; this.pendingCur = null; },
   sfx(name) {
     if (!this.ctx || this.vol.mute) return;
     const t = this.ctx.currentTime, m = this.mtof.bind(this);
@@ -121,7 +125,8 @@ const Audio8 = {
       case 'ok': seq([72, 76, 79, 84], 'triangle', .25, .07); break;
       case 'soft': seq([67, 64], 'sine', .25, .12); break;
       case 'step': seq([60, 67], 'triangle', .15, .05); break;
-      case 'reveal': seq([60, 64, 67, 72, 76, 79, 84], 'triangle', .22, .06); break;
+      case 'reveal': seq([67, 72, 76, 79, 0, 76, 79, 84], 'square', .14, .085); seq([55, 60, 64, 67, 0, 64, 67, 72], 'triangle', .18, .085); break; /* tema do herói */
+      case 'villain': seq([50, 0, 49, 0, 46], 'sawtooth', .16, .16); seq([38, 0, 37, 0, 34], 'square', .14, .16); break; /* tema da vilã */
       case 'light': seq([88, 0, 91, 0, 96], 'sine', .3, .07); break;
       case 'medal': seq([72, 76, 79, 84, 79, 84, 88], 'square', .1, .07); break;
       case 'page': seq([90], 'sine', .1, .03); break;

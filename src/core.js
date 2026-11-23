@@ -237,11 +237,12 @@ function bubbleHTML(who, text) {
 /* vida na cidade: vira-lata caramelo, bicicletas, carros e passarinhos (decoração animada) */
 const AMBIENT = {
   ruacasas: [['dog', 50, 16], ['carro', 74, 9], ['bird', 10, 26], ['carro', 74, 13, 'carro3', 7]],
-  cidade: [['bike', 64, 10, 'bia'], ['dog', 50, 20], ['bird', 12, 20], ['carro', 76, 9, 'carro2', 2], ['bus', 66, 16, null, 9], ['carro', 76, 12, 'taxi', 11]],
+  cidade: [['smell', 8, 34], ['smell', 58, 40], ['bike', 64, 10, 'bia'], ['dog', 50, 20], ['bird', 12, 20], ['carro', 76, 9, 'carro2', 2], ['bus', 66, 16, null, 9], ['carro', 76, 12, 'taxi', 11]],
   parque: [['dog', 64, 15], ['bike', 66, 12, 'theo'], ['bird', 10, 18], ['bird', 18, 24, null, 9]],
-  feira: [['dog', 70, 17], ['bird', 8, 24]],
+  feira: [['smell', 30, 40], ['dog', 70, 17], ['bird', 8, 24]],
   festa: [['dog', 70, 14], ['bird', 10, 30]],
   sala: [['sleep', 76, 0]],
+  cozinha: [['smell', 112, 8], ['smell', 124, 6]],
   ruanoite: [['carro', 74, 11]],
   rua: [['dog', 47, 18], ['bike', 72, 11, 'davi'], ['bird', 8, 22], ['carro', 76, 10, 'carro2', 4]]
 };
@@ -249,6 +250,7 @@ function ambientHTML(key) {
   const list = AMBIENT[key]; if (!list) return '';
   return '<div class="amb-layer" aria-hidden="true">' + list.map(([kind, y, dur, who, delay]) => {
     const top = pct(y, SH), d = `--dur:${dur}s;--del:-${delay ?? (y % 7)}s;top:${top}`;
+    if (kind === 'smell') return `<div class="amb smell" style="left:${pct(y, SW)};top:${pct(dur, SH)}"><i></i><i></i><i></i></div>`;
     if (kind === 'dog') return `<div class="amb patrol" style="${d};width:${pct(16, SW)}"><img class="px f1" src="${SPR.url('dog')}" alt=""><img class="px f2" src="${SPR.url('dog2')}" alt=""></div>`;
     if (kind === 'sleep') return `<div class="amb still" style="left:${pct(118, SW)};top:${pct(66, SH)};width:${pct(16, SW)}"><img class="px" src="${SPR.url('dogsleep')}" alt=""><span class="zz">z</span></div>`;
     if (kind === 'bike') return `<div class="amb cross" style="${d};width:${pct(16, SW)}"><img class="px rider" src="${SPR.url(who || 'davi')}" alt=""><img class="px" src="${SPR.url('bike')}" alt=""></div>`;

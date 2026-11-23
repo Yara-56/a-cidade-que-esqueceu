@@ -1,6 +1,6 @@
 import pathlib
 src = pathlib.Path(__file__).parent / 'src'
-order = ['sprites.js','scenes.js','content.js','audio.js','core.js','steps.js','screens.js','finale.js','cinema.js','minigames.js','jobs.js','online.js','visit.js','main.js']
+order = ['sprites.js','scenes.js','content.js','audio.js','core.js','steps.js','screens.js','finale.js','cinema.js','minigames.js','jobs.js','catch.js','online.js','visit.js','main.js']
 js = '\n'.join((src/f).read_text() for f in order).replace("'use strict';","")
 js = "'use strict';\n" + js
 css = (src/'style.css').read_text()

@@ -1061,3 +1061,56 @@ body::before { will-change: transform; }
 .btn.auto::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: #2b223366; transform-origin: left; animation: autofill var(--t, 3s) linear forwards; }
 @keyframes autofill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 .footbar .btn.auto::after { height: 100%; background: #ffffff40; }
+/* pega-pega */
+.catchscene { touch-action: none; }
+.ctouch { position: absolute; inset: 0; z-index: 4; cursor: grab; }
+.catch-good { filter: drop-shadow(0 0 3px #fff) drop-shadow(1px 2px 0 rgba(0,0,0,.3)); }
+.catch-bad { filter: drop-shadow(0 0 4px #ff6b6b); }
+.cbtns { display: none; gap: 10px; justify-content: space-between; }
+.cbtns .btn { flex: 1; font-size: 1.4rem; }
+@media (pointer: coarse) { .cbtns { display: flex; } }
+@media (orientation: landscape) and (max-height: 520px) { .mg.job .cbtns { grid-column: 2; flex-direction: row; } .cbtns .btn { min-height: 60px; } }
+/* superpoder na carta do herói */
+.power { display: flex; align-items: center; gap: 6px; justify-content: center; margin: 6px auto 2px; background: linear-gradient(90deg, #2b2233, #4a3f6b); color: #fff1a8; border: 3px solid var(--ink); border-radius: 99px; padding: 3px 12px 3px 6px; width: max-content; max-width: 100%; box-shadow: 0 0 12px #f4c54288; }
+.power img.px { width: 22px; height: 22px; animation: flick .5s steps(2) infinite; }
+.power span { display: grid; text-align: left; line-height: 1.05; font-family: var(--title); font-size: 1rem; }
+.power small { font-family: var(--body); font-size: .62rem; font-weight: 900; text-transform: uppercase; letter-spacing: .1em; color: #c3a3e0; }
+.reveal.rv .cardbig .power { margin: 0; }
+/* energia do obrigado no topo */
+.hud .energy { display: inline-flex; align-items: center; gap: 2px; background: #2b2233; color: var(--glow); border: 3px solid var(--ink); border-radius: 99px; padding: 0 10px 0 4px; font-family: var(--title); min-height: 32px; box-shadow: 0 0 10px #f4c54255; }
+.hud .energy img.px { width: 22px; height: 22px; }
+.hud .energy.pop { animation: gulp .4s; }
+/* Fumacinhas voando */
+.fumafly { animation: fumafly 1.6s ease-in-out infinite; }
+@keyframes fumafly { 0%, 100% { transform: translate(0, 0) rotate(-4deg); } 50% { transform: translate(6px, -8px) rotate(5deg); } }
+/* batalha final */
+.bossdark { position: absolute; inset: 0; background: radial-gradient(circle at 50% 15%, #3a2a6a99, #0b0c1ccc 75%); transition: opacity .6s; pointer-events: none; z-index: 1; }
+.bosshp { position: absolute; left: 50%; top: 3%; transform: translateX(-50%); width: 46%; display: flex; gap: 6px; align-items: center; color: #fff; font-family: var(--title); z-index: 5; text-shadow: 2px 2px 0 var(--ink); }
+.bosshp .bar { flex: 1; height: 12px; background: #0006; border: 2px solid var(--ink); border-radius: 99px; overflow: hidden; }
+.bosshp .bar i { display: block; height: 100%; background: linear-gradient(90deg, #8f5fb8, #c3a3e0); transition: width .4s; }
+.bossnev { z-index: 2; transition: width .5s, left .5s; animation: drift 4s ease-in-out infinite; filter: drop-shadow(0 0 10px #8f5fb8); }
+.bossnev.hit { animation: bosshit .4s; } @keyframes bosshit { 25% { transform: translateX(-6px) rotate(-4deg); filter: brightness(2); } 75% { transform: translateX(6px) rotate(4deg); } }
+.bossnev.saved { filter: drop-shadow(0 0 18px #fff1a8); }
+.fumab { position: absolute; z-index: 4; border: 0; background: none; padding: 0; cursor: pointer; pointer-events: auto; animation: fumafly 1.2s ease-in-out infinite; }
+.fumab img { width: 100%; display: block; }
+.fumab.poof { animation: gone .35s forwards; }
+.herorow { z-index: 3; animation: bob 1.4s ease-in-out infinite; }
+.herorow.jump { animation: herojump .5s ease-out; } @keyframes herojump { 40% { transform: translateY(-30%) scale(1.1); } }
+.heartball { z-index: 5; filter: drop-shadow(0 0 6px #ff9ec0) drop-shadow(0 0 12px #f4c542); }
+.bossbar { display: flex; justify-content: center; }
+.throw { font-size: 1.3rem; min-width: 260px; }
+.throw img.px { width: 30px; } .throw b { background: var(--ink); color: var(--glow); border-radius: 99px; padding: 0 10px; margin-left: 6px; }
+.throw.ready { animation: pulse 1s infinite; }
+@media (orientation: landscape) and (max-height: 520px) { .mg.job .bossbar { grid-column: 2; } .throw { min-width: 0; width: 100%; flex-direction: column; min-height: 120px; } }
+@media (min-width: 701px) and (min-height: 521px) {
+  .mg.bossg, .mg.catchg { grid-template-columns: minmax(0, 1fr) 240px; align-items: center; }
+  .mg.bossg .mghead, .mg.catchg .mghead { grid-column: 1 / -1; }
+  .mg.bossg .jobscene, .mg.catchg .jobscene { grid-column: 1; grid-row: 2 / span 2; }
+  .mg.bossg .bossbar, .mg.catchg .mgbar { grid-column: 2; }
+  .mg.bossg .throw { flex-direction: column; min-width: 0; width: 100%; min-height: 160px; }
+}
+/* cheirinhos (marketing sensorial): fumacinhas de cheiro subindo */
+.amb.smell { position: absolute; width: 8%; height: 22%; pointer-events: none; }
+.amb.smell i { position: absolute; bottom: 0; width: 22%; height: 100%; border-left: 3px solid rgba(255, 255, 255, .85); border-radius: 50%; animation: smellup 2.6s ease-out infinite; opacity: 0; }
+.amb.smell i:nth-child(2) { left: 36%; animation-delay: .8s; } .amb.smell i:nth-child(3) { left: 70%; animation-delay: 1.6s; }
+@keyframes smellup { 0% { transform: translateY(20%) scaleY(.6) skewX(10deg); opacity: 0; } 30% { opacity: .9; } 100% { transform: translateY(-60%) scaleY(1.1) skewX(-14deg); opacity: 0; } }

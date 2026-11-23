@@ -1069,6 +1069,59 @@ body::before { will-change: transform; }
 .btn.auto::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: #2b223366; transform-origin: left; animation: autofill var(--t, 3s) linear forwards; }
 @keyframes autofill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 .footbar .btn.auto::after { height: 100%; background: #ffffff40; }
+/* pega-pega */
+.catchscene { touch-action: none; }
+.ctouch { position: absolute; inset: 0; z-index: 4; cursor: grab; }
+.catch-good { filter: drop-shadow(0 0 3px #fff) drop-shadow(1px 2px 0 rgba(0,0,0,.3)); }
+.catch-bad { filter: drop-shadow(0 0 4px #ff6b6b); }
+.cbtns { display: none; gap: 10px; justify-content: space-between; }
+.cbtns .btn { flex: 1; font-size: 1.4rem; }
+@media (pointer: coarse) { .cbtns { display: flex; } }
+@media (orientation: landscape) and (max-height: 520px) { .mg.job .cbtns { grid-column: 2; flex-direction: row; } .cbtns .btn { min-height: 60px; } }
+/* superpoder na carta do herói */
+.power { display: flex; align-items: center; gap: 6px; justify-content: center; margin: 6px auto 2px; background: linear-gradient(90deg, #2b2233, #4a3f6b); color: #fff1a8; border: 3px solid var(--ink); border-radius: 99px; padding: 3px 12px 3px 6px; width: max-content; max-width: 100%; box-shadow: 0 0 12px #f4c54288; }
+.power img.px { width: 22px; height: 22px; animation: flick .5s steps(2) infinite; }
+.power span { display: grid; text-align: left; line-height: 1.05; font-family: var(--title); font-size: 1rem; }
+.power small { font-family: var(--body); font-size: .62rem; font-weight: 900; text-transform: uppercase; letter-spacing: .1em; color: #c3a3e0; }
+.reveal.rv .cardbig .power { margin: 0; }
+/* energia do obrigado no topo */
+.hud .energy { display: inline-flex; align-items: center; gap: 2px; background: #2b2233; color: var(--glow); border: 3px solid var(--ink); border-radius: 99px; padding: 0 10px 0 4px; font-family: var(--title); min-height: 32px; box-shadow: 0 0 10px #f4c54255; }
+.hud .energy img.px { width: 22px; height: 22px; }
+.hud .energy.pop { animation: gulp .4s; }
+/* Fumacinhas voando */
+.fumafly { animation: fumafly 1.6s ease-in-out infinite; }
+@keyframes fumafly { 0%, 100% { transform: translate(0, 0) rotate(-4deg); } 50% { transform: translate(6px, -8px) rotate(5deg); } }
+/* batalha final */
+.bossdark { position: absolute; inset: 0; background: radial-gradient(circle at 50% 15%, #3a2a6a99, #0b0c1ccc 75%); transition: opacity .6s; pointer-events: none; z-index: 1; }
+.bosshp { position: absolute; left: 50%; top: 3%; transform: translateX(-50%); width: 46%; display: flex; gap: 6px; align-items: center; color: #fff; font-family: var(--title); z-index: 5; text-shadow: 2px 2px 0 var(--ink); }
+.bosshp .bar { flex: 1; height: 12px; background: #0006; border: 2px solid var(--ink); border-radius: 99px; overflow: hidden; }
+.bosshp .bar i { display: block; height: 100%; background: linear-gradient(90deg, #8f5fb8, #c3a3e0); transition: width .4s; }
+.bossnev { z-index: 2; transition: width .5s, left .5s; animation: drift 4s ease-in-out infinite; filter: drop-shadow(0 0 10px #8f5fb8); }
+.bossnev.hit { animation: bosshit .4s; } @keyframes bosshit { 25% { transform: translateX(-6px) rotate(-4deg); filter: brightness(2); } 75% { transform: translateX(6px) rotate(4deg); } }
+.bossnev.saved { filter: drop-shadow(0 0 18px #fff1a8); }
+.fumab { position: absolute; z-index: 4; border: 0; background: none; padding: 0; cursor: pointer; pointer-events: auto; animation: fumafly 1.2s ease-in-out infinite; }
+.fumab img { width: 100%; display: block; }
+.fumab.poof { animation: gone .35s forwards; }
+.herorow { z-index: 3; animation: bob 1.4s ease-in-out infinite; }
+.herorow.jump { animation: herojump .5s ease-out; } @keyframes herojump { 40% { transform: translateY(-30%) scale(1.1); } }
+.heartball { z-index: 5; filter: drop-shadow(0 0 6px #ff9ec0) drop-shadow(0 0 12px #f4c542); }
+.bossbar { display: flex; justify-content: center; }
+.throw { font-size: 1.3rem; min-width: 260px; }
+.throw img.px { width: 30px; } .throw b { background: var(--ink); color: var(--glow); border-radius: 99px; padding: 0 10px; margin-left: 6px; }
+.throw.ready { animation: pulse 1s infinite; }
+@media (orientation: landscape) and (max-height: 520px) { .mg.job .bossbar { grid-column: 2; } .throw { min-width: 0; width: 100%; flex-direction: column; min-height: 120px; } }
+@media (min-width: 701px) and (min-height: 521px) {
+  .mg.bossg, .mg.catchg { grid-template-columns: minmax(0, 1fr) 240px; align-items: center; }
+  .mg.bossg .mghead, .mg.catchg .mghead { grid-column: 1 / -1; }
+  .mg.bossg .jobscene, .mg.catchg .jobscene { grid-column: 1; grid-row: 2 / span 2; }
+  .mg.bossg .bossbar, .mg.catchg .mgbar { grid-column: 2; }
+  .mg.bossg .throw { flex-direction: column; min-width: 0; width: 100%; min-height: 160px; }
+}
+/* cheirinhos (marketing sensorial): fumacinhas de cheiro subindo */
+.amb.smell { position: absolute; width: 8%; height: 22%; pointer-events: none; }
+.amb.smell i { position: absolute; bottom: 0; width: 22%; height: 100%; border-left: 3px solid rgba(255, 255, 255, .85); border-radius: 50%; animation: smellup 2.6s ease-out infinite; opacity: 0; }
+.amb.smell i:nth-child(2) { left: 36%; animation-delay: .8s; } .amb.smell i:nth-child(3) { left: 70%; animation-delay: 1.6s; }
+@keyframes smellup { 0% { transform: translateY(20%) scaleY(.6) skewX(10deg); opacity: 0; } 30% { opacity: .9; } 100% { transform: translateY(-60%) scaleY(1.1) skewX(-14deg); opacity: 0; } }
 </style>
 </head>
 <body>
@@ -1314,6 +1367,10 @@ const PROPS = {
     ['s2', 2, 9, 14, 7], ['s2', 0, 10, 3, 4], ['s3', 0, 13, 3, 1],
     ['#f6d3b3', 4, 10, 3, 4], ['s3', 3, 15, 12, 1],
     ['white', 4, 16, 11, 3], ['greyL', 4, 18, 11, 1]] },
+  /* capanga da vilã: Fumacinha (nuvenzinha brava) */
+  fumacinha: { ops: [['greyD', 2, 6, 12, 7], ['greyD', 4, 3, 5, 4], ['greyD', 8, 2, 5, 5], ['grey', 3, 7, 10, 5], ['grey', 5, 4, 3, 3], ['grey', 9, 3, 3, 3], ['greyL', 5, 4, 2, 1], ['greyL', 9, 3, 2, 1],
+    ['white', 5, 8, 2, 2], ['white', 9, 8, 2, 2], ['ink', 6, 9, 1, 1], ['ink', 10, 9, 1, 1], ['ink', 4, 7, 3, 1], ['ink', 9, 7, 3, 1], ['ink', 6, 11, 4, 1], ['red', 7, 12, 2, 1]] },
+  raio: { ops: [['yellow', 8, 0, 4, 2], ['yellow', 6, 2, 4, 3], ['yellow', 4, 5, 8, 2], ['yellow', 7, 7, 4, 3], ['yellow', 5, 10, 4, 3], ['yellow', 4, 13, 2, 2], ['yellowL', 8, 1, 2, 1], ['yellowL', 6, 5, 3, 1]] },
   /* cozinha: receita de arroz */
   arroz: { ops: [['white', 3, 4, 10, 11], ['cream', 3, 12, 10, 3], ['yellow', 4, 7, 8, 4], ['yellowD', 4, 10, 8, 1], ['white', 5, 8, 2, 2], ['white', 8, 8, 1, 1], ['brownL', 5, 2, 6, 2], ['brown', 6, 1, 4, 1]] },
   copoagua: { ops: [['glass', 4, 3, 8, 12], ['blueL', 4, 7, 8, 8], ['blue', 4, 13, 8, 2], ['white', 5, 4, 1, 3]] },
@@ -1905,6 +1962,11 @@ const REGIONS = [
     faisca: 'Se a gente acender os caminhos, todos os bairros voltam a se encontrar!',
     missions: ['denise', 'pedro', 'carlos'] }
 ];
+
+/* ---------------- SUPERPODERES (carta de herói) ---------------- */
+const POWERS = { cida: 'Organização Turbo', jorge: 'Memória de Elefante', ze: 'Panelão de Energia', katia: 'Brilho Total', lucia: 'Escudo da Saúde',
+  benedito: 'Abraço Protetor', zefa: 'Mão Verde', rafa: 'Pedal Relâmpago', marina: 'Olho Reciclador', joaquim: 'Floresta Instantânea',
+  denise: 'Vassoura Turbo', pedro: 'Raio de Luz', tania: 'Água Cristalina', joana: 'Jato Antifogo', carlos: 'Escudo da Travessia' };
 
 /* ---------------- PERSONAGENS (álbum) ---------------- */
 const CHARACTERS = {
@@ -2500,9 +2562,12 @@ const MEDALS = {
 /* ---------------- FINAL ---------------- */
 const FINALE = {
   intro: [
-    { who: 'faisca', text: 'Vocês conseguiram! Lumiara acendeu!' },
-    { who: 'nevoa', text: 'Eu não sou má... nasci dos "obrigados" esquecidos.' },
-    { who: 'faisca', text: 'Vamos encher o céu de obrigados!' }],
+    { who: 'faisca', text: 'Lumiara acendeu! Mas olha quem voltou...' },
+    { who: 'nevoa', text: 'MUAHAHA! Vou apagar tudo de novo!' },
+    { who: 'faisca', text: 'Heróis, juntos!' }],
+  after: [
+    { who: 'nevoa', text: 'Ai... Eu não sou má. Nasci dos "obrigados" esquecidos.' },
+    { who: 'faisca', text: 'Então vamos encher o céu de obrigados!' }],
   without: { /* o que aconteceria sem cada trabalhador */
     cida: 'A casa ficaria sem comida pronta e sem roupa limpa.', jorge: 'Ninguém saberia quem entra no prédio, e as encomendas se perderiam.',
     ze: 'Muitas crianças estudariam com fome.', katia: 'A escola ficaria suja, e muita gente poderia ficar doente.',
@@ -2719,15 +2784,19 @@ const Audio8 = {
     this.brightness = brightness;
     if (!this.ctx) { this.cfg = cfg; return; }
     if (this.cfg === cfg && this.timer) return;
-    this.stopMusic(); this.cfg = cfg; if (!cfg) return;
-    const songI = ((cfg.root || 60) + Math.round((cfg.tempo || 100) / 8)) % this.SONGS.length, song = this.SONGS[songI];
-    const bpm = Math.max(124, Math.min(150, (cfg.tempo || 100) * 1.3)), six = 60 / bpm / 4;
-    const key = 60 + (((cfg.root || 60) - 60) % 5);
-    const toks = song.mel.map(b => b.split(' '));
+    if (!cfg) { this.stopMusic(); return; }
+    const songI = ((cfg.root || 60) + Math.round((cfg.tempo || 100) / 8)) % this.SONGS.length, sg = this.SONGS[songI];
+    const cur = { song: sg, six: 60 / 132 / 4, key: 60 + (((cfg.root || 60) - 60) % 5), toks: sg.mel.map(b => b.split(' ')) };
+    this.cfg = cfg;
+    /* já tocando: troca no começo do próximo compasso, sem corte */
+    if (this.timer) { this.pendingCur = cur; return; }
+    this.cur = cur;
     let next = this.ctx.currentTime + .12; this.step = 0;
     this.timer = setInterval(() => {
       if (!this.ctx) return;
       while (next < this.ctx.currentTime + .3) {
+        if (this.step % 16 === 0 && this.pendingCur) { this.cur = this.pendingCur; this.pendingCur = null; }
+        const { song, six, key, toks } = this.cur;
         const s = this.step++, st = s % 16, bar = Math.floor(s / 16), chordDeg = song.prog[bar % 4] + 1;
         const rootN = key - 12 + this.deg(chordDeg), br = this.brightness, full = br >= .2, chorus = Math.floor(bar / 8) % 2 === 1, en = this.energy;
         const sw = st % 2 ? six * .14 : 0, t = next + sw, lead = this.leadBus || this.musicBus;
@@ -2756,7 +2825,7 @@ const Audio8 = {
       }
     }, 80);
   },
-  stopMusic() { if (this.timer) clearInterval(this.timer); this.timer = null; this.cfg = null; },
+  stopMusic() { if (this.timer) clearInterval(this.timer); this.timer = null; this.cfg = null; this.pendingCur = null; },
   sfx(name) {
     if (!this.ctx || this.vol.mute) return;
     const t = this.ctx.currentTime, m = this.mtof.bind(this);
@@ -2768,7 +2837,8 @@ const Audio8 = {
       case 'ok': seq([72, 76, 79, 84], 'triangle', .25, .07); break;
       case 'soft': seq([67, 64], 'sine', .25, .12); break;
       case 'step': seq([60, 67], 'triangle', .15, .05); break;
-      case 'reveal': seq([60, 64, 67, 72, 76, 79, 84], 'triangle', .22, .06); break;
+      case 'reveal': seq([67, 72, 76, 79, 0, 76, 79, 84], 'square', .14, .085); seq([55, 60, 64, 67, 0, 64, 67, 72], 'triangle', .18, .085); break; /* tema do herói */
+      case 'villain': seq([50, 0, 49, 0, 46], 'sawtooth', .16, .16); seq([38, 0, 37, 0, 34], 'square', .14, .16); break; /* tema da vilã */
       case 'light': seq([88, 0, 91, 0, 96], 'sine', .3, .07); break;
       case 'medal': seq([72, 76, 79, 84, 79, 84, 88], 'square', .1, .07); break;
       case 'page': seq([90], 'sine', .1, .03); break;
@@ -3038,11 +3108,12 @@ function bubbleHTML(who, text) {
 /* vida na cidade: vira-lata caramelo, bicicletas, carros e passarinhos (decoração animada) */
 const AMBIENT = {
   ruacasas: [['dog', 50, 16], ['carro', 74, 9], ['bird', 10, 26], ['carro', 74, 13, 'carro3', 7]],
-  cidade: [['bike', 64, 10, 'bia'], ['dog', 50, 20], ['bird', 12, 20], ['carro', 76, 9, 'carro2', 2], ['bus', 66, 16, null, 9], ['carro', 76, 12, 'taxi', 11]],
+  cidade: [['smell', 8, 34], ['smell', 58, 40], ['bike', 64, 10, 'bia'], ['dog', 50, 20], ['bird', 12, 20], ['carro', 76, 9, 'carro2', 2], ['bus', 66, 16, null, 9], ['carro', 76, 12, 'taxi', 11]],
   parque: [['dog', 64, 15], ['bike', 66, 12, 'theo'], ['bird', 10, 18], ['bird', 18, 24, null, 9]],
-  feira: [['dog', 70, 17], ['bird', 8, 24]],
+  feira: [['smell', 30, 40], ['dog', 70, 17], ['bird', 8, 24]],
   festa: [['dog', 70, 14], ['bird', 10, 30]],
   sala: [['sleep', 76, 0]],
+  cozinha: [['smell', 112, 8], ['smell', 124, 6]],
   ruanoite: [['carro', 74, 11]],
   rua: [['dog', 47, 18], ['bike', 72, 11, 'davi'], ['bird', 8, 22], ['carro', 76, 10, 'carro2', 4]]
 };
@@ -3050,6 +3121,7 @@ function ambientHTML(key) {
   const list = AMBIENT[key]; if (!list) return '';
   return '<div class="amb-layer" aria-hidden="true">' + list.map(([kind, y, dur, who, delay]) => {
     const top = pct(y, SH), d = `--dur:${dur}s;--del:-${delay ?? (y % 7)}s;top:${top}`;
+    if (kind === 'smell') return `<div class="amb smell" style="left:${pct(y, SW)};top:${pct(dur, SH)}"><i></i><i></i><i></i></div>`;
     if (kind === 'dog') return `<div class="amb patrol" style="${d};width:${pct(16, SW)}"><img class="px f1" src="${SPR.url('dog')}" alt=""><img class="px f2" src="${SPR.url('dog2')}" alt=""></div>`;
     if (kind === 'sleep') return `<div class="amb still" style="left:${pct(118, SW)};top:${pct(66, SH)};width:${pct(16, SW)}"><img class="px" src="${SPR.url('dogsleep')}" alt=""><span class="zz">z</span></div>`;
     if (kind === 'bike') return `<div class="amb cross" style="${d};width:${pct(16, SW)}"><img class="px rider" src="${SPR.url(who || 'davi')}" alt=""><img class="px" src="${SPR.url('bike')}" alt=""></div>`;
@@ -3154,9 +3226,14 @@ const STEPS = {
       setTimeout(() => { moveEl(el, m.x, m.y, S.reduceMotion ? 0 : 1100 + k * 150, true); setTimeout(() => el.classList.remove('flip'), 1300 + k * 150); }, 60);
       return el;
     });
+    /* os capangas da vilã aprontam na cena e fogem quando o herói chega */
+    const fumas = (ctx.id !== '_finale' && !ctx.colored) ? [[18, 10], [118, 16], [70, 6]].map(([x, y], k) => { const f = spriteEl('fumacinha', x, y, { w: 14, cls: 'fumafly' }); f.style.animationDelay = (k * .4) + 's'; lay.appendChild(f); return f; }) : [];
+    if (fumas.length) setTimeout(() => { if (typeof floatText === 'function') floatText(sc, 'Hehehe!', 20, 18); Audio8.sfx('villain'); }, 700);
+    const flee = () => fumas.forEach((f, k) => { f.classList.remove('fumafly'); moveEl(f, k % 2 ? 180 : -30, -20, 900); });
     const show = () => {
       const l = lines[i];
       const who = l.who.replace('?', '');
+      if (i === lines.length - 1 && fumas.length) setTimeout(flee, 600);
       actors.forEach(a => a.classList.toggle('talk', a.dataset.who === who));
       $('#bub', ctx.stage).innerHTML = bubbleHTML(l.who, l.text);
       ctx.setPrimary(i < lines.length - 1 ? 'Continuar' : 'Vamos lá!');
@@ -3694,7 +3771,7 @@ const STEPS = {
       ctx.activity(); const o = step.options[+b.dataset.o]; tried.add(+b.dataset.o);
       $$('.opt', ctx.stage).forEach(x => { x.classList.remove('chosen'); if (tried.has(+x.dataset.o)) x.classList.add('tried'); });
       b.classList.add('chosen'); b.classList.remove('tried');
-      if (o.kind) { Audio8.sfx('ok'); addMedal('gentileza', 1, 'kind:' + ctx.id); sparkle(b); }
+      if (o.kind) { Audio8.sfx('ok'); addMedal('gentileza', 1, 'kind:' + ctx.id); sparkle(b); if (!G.seen['en:' + ctx.id]) { G.seen['en:' + ctx.id] = 1; G.energy = (G.energy || 0) + 2; saveGame(); if (typeof floatText === 'function') floatText(ctx.stage, '+2 Energia do Obrigado!', 50, 20); updEnergy(); } }
       else Audio8.sfx('soft');
       feedback($('#fb', ctx.stage), o.kind ? 'ok' : 'soft', `<b class="kind">${o.kind ? 'Escolha gentil!' : 'O que acontece:'}</b>${esc(o.result)}${o.kind ? '' : '<br><span style="font-weight:800">Quer pensar em outra escolha? Pode tentar de novo.</span>'}`, o.kind ? 'coracao' : null);
       if (S.autoRead) Voice.speak(o.result);
@@ -3726,7 +3803,7 @@ function unlockCharacter(id) { if (!G.album.includes(id)) { G.album.push(id); sa
 function charCardHTML(id) {
   const c = CHARACTERS[id], r = REGIONS.find(x => x.id === c.region);
   return `<div class="cardbig" style="--rc:${r.color}"><div class="inner"><div class="portrait"><img class="px char" src="${SPR.url(id)}" alt="${esc(c.name)}"><img class="px prop" src="${SPR.url(c.prop)}" alt=""></div>
-    <h3>${esc(c.name)}</h3><div class="job">${esc(c.job)}</div><span class="tag">${esc(r.name)}</span><p class="quote">“${esc(c.quote)}”</p></div></div>`;
+    <h3>${esc(c.name)}</h3><div class="job">${esc(c.job)}</div>${POWERS[id] ? `<div class="power">${SPR.img('raio')}<span><small>Superpoder</small>${esc(POWERS[id])}</span></div>` : ''}<span class="tag">${esc(r.name)}</span><p class="quote">“${esc(c.quote)}”</p></div></div>`;
 }
 
 /* ============================================================
@@ -3735,12 +3812,14 @@ function charCardHTML(id) {
 
 
 /* ---------------- HUD ---------------- */
+function updEnergy() { const e = $('#energy b'); if (e) { e.textContent = G.energy || 0; const p = e.parentElement; p.classList.remove('pop'); void p.offsetWidth; p.classList.add('pop'); } }
 function hudHTML() {
   const p = Math.round(progress() * 100);
   document.documentElement.style.setProperty('--lit', (p / 100).toFixed(2));
   return `<div class="hud">
     <button class="btn small" data-act="home" data-local aria-label="Tela inicial">${ICON.home}</button>
     <button class="btn small" data-act="map" aria-label="Mapa da cidade">${ICON.map}<span class="lbl">Mapa</span></button>
+    <span class="energy" id="energy" title="Energia do Obrigado">${SPR.img('raio')}<b>${G.energy || 0}</b></span>
     <div class="lights" role="img" aria-label="Luz de Lumiara: ${p}%"><span class="lbl">Luz de Lumiara</span><div class="bar"><i style="width:${p}%"></i></div><span class="pct">${p}%</span></div>
     ${isJuntos() ? `<span class="turn" id="turn" aria-live="polite">${turnInner()}</span>` : ''}
     <button class="btn small" data-act="album" data-local aria-label="Álbum e medalhas">${ICON.book}<span class="lbl">Álbum</span></button>
@@ -4072,13 +4151,13 @@ function renderMission(id, idx) {
   const M = MISSIONS[id], step = M.steps[idx], r = regionOf(id);
   if (!step) { finishMission(id); return; }
   /* menos cartas e leitura: no modo sozinho, o 'Quem sou eu?' fica só no Detetive; a associação some no Explorador */
-  if ((step.t === 'whoami' && G.mode === 'solo' && G.diff !== 'det') || (step.t === 'match' && G.diff === 'exp') || (step.t === 'reflect' && flowOn() && G.diff !== 'det')) return renderMission(id, idx + 1);
+  if ((step.t === 'whoami' && G.mode === 'solo' && G.diff !== 'det') || (step.t === 'match' && G.diff === 'exp') || (step.t === 'reflect' && flowOn() && G.diff !== 'det') || (['match', 'sequence', 'sort', 'logic'].includes(step.t) && flowOn() && G.diff !== 'det' && !MISSIONS[id].bonus)) return renderMission(id, idx + 1);
   const prev = G.current && G.current.mission === id ? G.current : {};
   G.current = { mission: id, step: idx, mistakes: prev.mistakes || 0, hints: prev.hints || 0 }; saveGame();
   Audio8.music(r.music, progress());
   const revealIdx = M.steps.findIndex(s => s.t === 'reveal');
   const known = G.album.includes(M.char);
-  const label = { dialog: 'História', investigate: 'Investigação', spot: 'Antes e depois', match: 'Associação', sequence: 'Sequência', sort: 'Separação', route: 'Rota', whoami: 'Quem sou eu?', reveal: 'Descoberta', choice: 'Decisão', reflect: 'Reflexão', thanks: 'Mural do Obrigado', mirror: 'A última carta', memory: 'Desafio extra · Memória', days: 'E se ninguém fizesse?', shift: 'Um turno com a Denise', tidy: 'Minijogo · Arruma-arruma', cook: 'Minijogo · Cozinha', fire: 'Minijogo · Apagar o fogo', water: 'Minijogo · Caminho da água', cross: 'Minijogo · Travessia segura', power: 'Minijogo · De onde vem a luz', recycle: 'Minijogo · Centro de reciclagem', logic: 'Desafio extra · Lógica' }[step.t];
+  const label = { dialog: 'História', investigate: 'Investigação', spot: 'Antes e depois', match: 'Associação', sequence: 'Sequência', sort: 'Separação', route: 'Rota', whoami: 'Quem sou eu?', reveal: 'Descoberta', choice: 'Decisão', reflect: 'Reflexão', thanks: 'Mural do Obrigado', mirror: 'A última carta', memory: 'Desafio extra · Memória', days: 'E se ninguém fizesse?', shift: 'Um turno com a Denise', tidy: 'Minijogo · Arruma-arruma', cook: 'Minijogo · Cozinha', fire: 'Minijogo · Apagar o fogo', catch: 'Minijogo · Pega-pega', boss: 'Batalha final', water: 'Minijogo · Caminho da água', cross: 'Minijogo · Travessia segura', power: 'Minijogo · De onde vem a luz', recycle: 'Minijogo · Centro de reciclagem', logic: 'Desafio extra · Lógica' }[step.t];
   app().innerHTML = `<div class="screen">${hudHTML()}
     <div class="mhead"><div><div class="where">${esc(r.name)} · ${label}</div><h2>${esc(M.title)}</h2></div>
     <div class="dots" aria-label="Etapa ${idx + 1} de ${M.steps.length}">${M.steps.map((_, i) => `<i class="${i < idx ? 'done' : i === idx ? 'now' : ''}"></i>`).join('')}</div></div>
@@ -4094,7 +4173,7 @@ function renderMission(id, idx) {
   const ctx = {
     stage: $('#stage'), id, idx, step, colored: idx > revealIdx,
     complete() { RUN.done = true; prim.disabled = false; prim.classList.add('ready');
-      if (['tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift'].includes(step.t)) addMedal('criatividade', 1, 'mg:' + id);
+      if (['tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift', 'catch'].includes(step.t)) { addMedal('criatividade', 1, 'mg:' + id); if (!G.seen['eg:' + id]) { G.seen['eg:' + id] = 1; G.energy = (G.energy || 0) + 1; saveGame(); updEnergy(); } }
       const ms = { dialog: 0, choice: 5200, reveal: 9000, thanks: 0, mirror: 0, reflect: 0, days: 3200 }[step.t] ?? 2600;
       if (ms) autoNext(prim, ms, () => prim.click()); },
     setPrimary(t) { prim.innerHTML = `${esc(t)} ${ICON.next}`; },
@@ -4124,7 +4203,7 @@ function renderMission(id, idx) {
   RUN.ctrl = STEPS[step.t](step, ctx) || {};
   refreshHint(); resetIdle();
   /* primeira vez num tipo de etapa: a mãozinha mostra onde tocar */
-  if (!G.seen['tut:' + step.t] && !['dialog', 'reveal', 'tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift'].includes(step.t)) {
+  if (!G.seen['tut:' + step.t] && !['dialog', 'reveal', 'tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift', 'catch', 'boss'].includes(step.t)) {
     G.seen['tut:' + step.t] = 1; saveGame();
     setTimeout(() => { const t = $('#stage .hot:not(.found), #stage .opt, #stage .mcard, #stage .scard, #stage .sil, #stage .sort-item, #stage .cell.hint-pulse, #stage [data-g], #stage #pass, #stage .mem, #stage .chip'); if (t && typeof demoTap === 'function') demoTap(t, 0); }, 1300);
   }
@@ -4316,6 +4395,8 @@ function buildFinale() {
   MISSIONS._finale = {
     title: 'A Festa das Luzes', char: null, steps: [
       { t: 'dialog', scene: 'festa', faded: true, cast: [{ id: 'nevoa', x: 62, y: 2 }], lines: FINALE.intro },
+      { t: 'boss' },
+      { t: 'dialog', scene: 'festa', faded: true, cast: [{ id: 'nevoa', x: 62, y: 8 }], lines: FINALE.after },
       { t: 'match', prompt: 'O que aconteceria com Lumiara sem cada uma dessas pessoas?', left: 'Quem', right: 'Sem essa pessoa…',
         pairsFn() {
           const met = planMissions().map(m => MISSIONS[m].char).filter(c => G.album.includes(c));
@@ -4484,6 +4565,7 @@ function playCutscene(frames, { title = 'Lumiara', where = 'História', onDone }
     }
     if (f.sparkle) setTimeout(() => { for (let n = 0; n < 4; n++) setTimeout(() => sparkle($('#cut'), 14), n * 250); }, 300);
     $('#cb').innerHTML = bubbleHTML(f.who || 'faisca', f.text);
+    if (f.who === 'nevoa') Audio8.sfx('villain');
     if (S.autoRead) Voice.speak(f.text);
     setFoot(`<button class="btn" id="say" data-local aria-label="Ouvir">${ICON.voice}<span class="lbl">Ouvir</span></button><span class="grow"></span><button class="btn ghost" id="skip" style="color:#fff">Pular</button><button class="btn primary big" id="nx">${i < frames.length - 1 ? 'Continuar' : (f.last || 'Vamos lá!')} ${ICON.next}</button>`);
     $('#say').onclick = () => { Audio8.init(); Voice.speak(f.text); };
@@ -4498,20 +4580,20 @@ function playCutscene(frames, { title = 'Lumiara', where = 'História', onDone }
 
 /* ---------- prólogo animado ---------- */
 const PROLOGUE_FRAMES = [
-  { scene: 'cidade', text: 'Esta é Lumiara!',
+  { scene: 'cidade', text: 'Lumiara: a cidade mais colorida do mundo!',
     actors: { denise: { s: 'denise', from: [-18, 60], x: 26, y: 60, walk: true }, rafa: { s: 'rafa', from: [170, 62], x: 112, y: 62, walk: true, flip: true }, lucia: { s: 'lucia', from: [-30, 62], x: 60, y: 62, walk: true, ms: 1800 } } },
-  { scene: 'cidade', text: 'Muita gente trabalha para tudo funcionar.',
+  { scene: 'cidade', text: 'Cheirinho de pão, ônibus passando, gente trabalhando...',
     actors: { denise: { s: 'denise', x: 40, y: 60, walk: true }, rafa: { s: 'rafa', x: 92, y: 62, walk: true, flip: true }, ze: { s: 'ze', from: [170, 58], x: 132, y: 58, walk: true, flip: true } } },
-  { scene: 'cidade', fog: .35, text: 'Até que chegou a Névoa do Esquecimento!',
-    actors: { nevoa: { s: 'nevoa', from: [175, 0], x: 64, y: 2, w: 40, ms: 2600 } } },
-  { scene: 'cidade', gray: 1, fog: .5, text: 'Ninguém mais via os trabalhadores.',
-    actors: { denise: { s: 'denise', mode: 'sil', x: 40, y: 60 }, rafa: { s: 'rafa', mode: 'sil', x: 92, y: 62, flip: true }, lucia: { s: 'lucia', mode: 'sil', x: 60, y: 62 }, ze: { s: 'ze', mode: 'sil', x: 132, y: 58, flip: true }, nevoa: { s: 'nevoa', x: 48, y: 0, w: 64, ms: 2000 } } },
-  { scene: 'cidade', gray: 1, dark: .55, fog: .6, text: 'As cores sumiram. As luzes apagaram.',
-    actors: { nevoa: { s: 'nevoa', x: 34, y: -2, w: 92, ms: 2000 } } },
-  { scene: 'cidade', gray: 1, dark: .55, fog: .5, sparkle: true, text: 'Mas eu continuei acesa: a Faísca!',
-    actors: { faisca: { s: 'faisca', from: [76, 80], x: 72, y: 34, w: 16, glow: true, ms: 1600 } } },
-  { scene: 'cidade', gray: .8, dark: .35, fog: .4, last: 'Vamos ajudar!', text: 'Me ajuda a trazer as luzes de volta?',
-    actors: { you: { s: 'avatar', from: [-18, 62], x: 56, y: 62, walk: true, ms: 1800 }, faisca: { s: 'faisca', x: 74, y: 44, w: 14, glow: true } } }
+  { scene: 'cidade', fog: .35, who: 'nevoa', text: 'MUAHAHA! Eu sou a Névoa do Esquecimento!',
+    actors: { nevoa: { s: 'nevoa', from: [175, 0], x: 58, y: 0, w: 44, ms: 1600 } } },
+  { scene: 'cidade', gray: .6, fog: .45, who: 'nevoa', text: 'Fumacinhas! Roubem as cores!',
+    actors: { f1: { s: 'fumacinha', from: [70, 8], x: 14, y: 30, w: 14, ms: 900 }, f2: { s: 'fumacinha', from: [80, 8], x: 128, y: 24, w: 14, ms: 1000 }, f3: { s: 'fumacinha', from: [76, 8], x: 92, y: 44, w: 12, ms: 1100 }, f4: { s: 'fumacinha', from: [74, 8], x: 40, y: 46, w: 12, ms: 1200 } } },
+  { scene: 'cidade', gray: 1, dark: .5, fog: .55, who: 'faisca', text: 'Agora ninguém lembra quem faz a cidade funcionar!',
+    actors: { denise: { s: 'denise', mode: 'sil', x: 40, y: 60 }, rafa: { s: 'rafa', mode: 'sil', x: 92, y: 62, flip: true }, lucia: { s: 'lucia', mode: 'sil', x: 60, y: 62 }, ze: { s: 'ze', mode: 'sil', x: 132, y: 58, flip: true }, nevoa: { s: 'nevoa', x: 34, y: -2, w: 92, ms: 1800 } } },
+  { scene: 'cidade', gray: 1, dark: .55, fog: .5, sparkle: true, text: 'Mas eu escapei! Eu sou a Faísca!',
+    actors: { faisca: { s: 'faisca', from: [76, 80], x: 72, y: 34, w: 16, glow: true, ms: 1400 } } },
+  { scene: 'cidade', gray: .8, dark: .35, fog: .4, last: 'Bora!', text: 'Preciso de um herói. Você topa?',
+    actors: { you: { s: 'avatar', from: [-18, 62], x: 56, y: 62, walk: true, ms: 1600 }, faisca: { s: 'faisca', x: 74, y: 44, w: 14, glow: true } } }
 ];
 
 /* ---------- interlúdio entre regiões ---------- */
@@ -4990,7 +5072,7 @@ STEPS.cook = function (step, ctx) {
   const FX = {
     wash: () => { pot.wash = 22; Audio8.sfx('page'); },
     fire: () => { pot.fire = true; }, oil: () => { pot.fill = 'oil'; }, garlic: () => { pot.fill = 'garlic'; },
-    golden: () => { pot.fill = 'golden'; }, rice: () => { pot.fill = 'rice'; }, toast: () => { pot.fill = 'toast'; },
+    golden: () => { pot.fill = 'golden'; floatText(kit, 'Hmm... cheirinho de alho!', 50, 18); }, rice: () => { pot.fill = 'rice'; }, toast: () => { pot.fill = 'toast'; },
     water: () => { pot.fill = 'water'; pot.bub = true; }, salt: () => {},
     lid: () => { pot.lid = true; }, off: () => { pot.fire = false; pot.fill = 'cooked'; pot.done = true; }
   };
@@ -5475,6 +5557,156 @@ STEPS.recycle = function (step, ctx) {
   const ps = MISSIONS.pedro.steps; ps.splice(1, 0, { t: 'power' });
   const ms = MISSIONS.marina.steps, i = ms.findIndex(s => s.t === 'sort'); if (i >= 0) ms.splice(i, 1, { t: 'recycle' }); else ms.splice(1, 0, { t: 'recycle' });
 })();
+
+/* ============================================================
+   PEGA-PEGA: as coisas caem do céu (os Fumacinhas jogaram tudo!)
+   e o herói corre com a cesta para pegar. Cuidado com os Fumacinhas.
+   ============================================================ */
+
+const CATCH = {
+  jorge: { scene: 'portaria', good: ['caixa', 'racao', 'violao', 'pneu', 'sementes'], bad: ['fumacinha'], unit: 'encomendas', say: 'Os Fumacinhas jogaram as encomendas pro alto! <b>Pegue</b> as caixas!', end: 'Tudo entregue! Valeu, parceiro!' },
+  katia: { scene: 'salaaula', good: ['papel', 'casaco', 'garrafinha', 'livro', 'giz'], bad: ['fumacinha'], unit: 'coisas', say: 'Os Fumacinhas bagunçaram a sala! <b>Pegue</b> tudo antes do sinal!', end: 'Sala brilhando antes do sinal!' },
+  lucia: { scene: 'ruacasas', good: ['vacina', 'remedios', 'agua'], bad: ['mosquito', 'fumacinha'], unit: 'cuidados', say: 'Pegue as <b>vacinas</b> e fuja dos <b>mosquitos</b>!', end: 'Bairro protegido! Mosquito aqui não!' },
+  benedito: { scene: 'quarto', good: ['oculos', 'remedios', 'bengala', 'radio', 'album'], bad: ['fumacinha'], unit: 'coisas', say: 'Os Fumacinhas esconderam as coisas da Dona Olímpia! <b>Pegue</b>!', end: 'Achou tudo! Dona Olímpia agradece!' },
+  zefa: { scene: 'feira', good: ['tomate', 'banana', 'legumes'], bad: ['fumacinha'], unit: 'alimentos', say: 'Hora da colheita! <b>Pegue</b> os alimentos na cesta!', end: 'Cesta cheia! Direto pra feira!' },
+  joaquim: { scene: 'parque', good: ['semente', 'muda', 'flor', 'regador'], bad: ['fumacinha'], unit: 'mudas', say: 'Pegue <b>sementes</b> e <b>mudas</b> para o jardim!', end: 'Jardim plantado! Vai ficar lindo!' }
+};
+STEPS.catch = function (step, ctx) {
+  const C = CATCH[step.who || ctx.id], goal = G.diff === 'exp' ? 8 : G.diff === 'inv' ? 10 : 12;
+  Audio8.energy = 1; onCleanup(() => { Audio8.energy = 0; });
+  let px = 72, tx = 72, got = 0, items = [], tick = 0, done = false, combo = 0;
+  ctx.stage.innerHTML = `<div class="mg job catchg">${mgHead(ctx.id, C.say)}
+    <div class="scene jobscene catchscene" id="js"><img class="bg px" src="${composeScene(C.scene).toDataURL()}" alt="Cena do pega-pega"><div class="layer" id="lay"></div><div class="mgsay" id="say"></div>
+      <div class="ctouch" id="ct" aria-label="Arraste para mover"></div></div>
+    <div class="mgbar"><span>${C.unit}</span><div class="bar"><i id="cm" style="width:0%;background:linear-gradient(90deg,#3d9a55,#a5d97f)"></i></div><b id="cnt">0/${goal}</b></div>
+    <div class="cbtns"><button class="btn big" id="cl" aria-label="Para a esquerda">◀</button><button class="btn big" id="cr" aria-label="Para a direita">▶</button></div></div>`;
+  wireSay(ctx.stage, () => C.say.replace(/<[^>]+>/g, ''));
+  const lay = $('#lay', ctx.stage), sc = $('#js', ctx.stage), say = $('#say', ctx.stage);
+  const hero = spriteEl(ctx.id, px, 56); hero.style.transitionDuration = '0s'; lay.appendChild(hero);
+  const basket = spriteEl('cesta', px + 1, 56, { w: 16 }); basket.style.transitionDuration = '0s'; lay.appendChild(basket);
+  const place = () => { hero.style.left = pct(px, SW); basket.style.left = pct(px + 1, SW); basket.style.top = pct(45, SH); };
+  /* controles: arrastar o dedo na cena, tocar nos lados, setas */
+  const toX = e => { const r = sc.getBoundingClientRect(); return clamp((e.clientX - r.left) / r.width * SW - 8, 0, 144); };
+  const ct = $('#ct', ctx.stage);
+  ct.addEventListener('pointerdown', e => { tx = toX(e); ctx.activity(); ct.setPointerCapture && ct.setPointerCapture(e.pointerId); });
+  ct.addEventListener('pointermove', e => { if (e.buttons || e.pointerType === 'touch') tx = toX(e); });
+  const hold = (id, d) => { const b = $(id, ctx.stage); let iv; const st = () => { clearInterval(iv); iv = setInterval(() => { tx = clamp(tx + d * 4, 0, 144); }, 40); }; b.addEventListener('pointerdown', st); ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, () => clearInterval(iv))); b.onclick = () => { tx = clamp(tx + d * 18, 0, 144); }; onCleanup(() => clearInterval(iv)); };
+  hold('#cl', -1); hold('#cr', 1);
+  const kd = e => { if (e.key === 'ArrowLeft') tx = clamp(tx - 14, 0, 144); if (e.key === 'ArrowRight') tx = clamp(tx + 14, 0, 144); };
+  document.addEventListener('keydown', kd); onCleanup(() => document.removeEventListener('keydown', kd));
+  const spawn = () => {
+    const bad = RNG.next() < .28, prop = pick(bad ? C.bad : C.good), x = 6 + RNG.next() * 140;
+    const el = spriteEl(prop, x, -14, { w: bad ? 15 : 13, cls: bad ? 'catch-bad' : 'catch-good' }); el.style.transitionDuration = '0s'; lay.appendChild(el);
+    items.push({ x, y: -14, vy: .55 + RNG.next() * .35 + got * .02, bad, el, wob: RNG.next() * 6 });
+  };
+  const upd = () => { $('#cnt', ctx.stage).textContent = `${got}/${goal}`; $('#cm', ctx.stage).style.width = Math.min(100, got / goal * 100) + '%'; };
+  const loop = setInterval(() => {
+    if (done) return; tick++;
+    px += (tx - px) * .25; place(); hero.classList.toggle('flip', tx < px - .5);
+    if (tick % 18 === 0) spawn();
+    for (const it of items) {
+      it.y += it.vy; const xx = it.bad ? it.x + Math.sin((tick + it.wob * 10) / 8) * 6 : it.x;
+      it.el.style.top = pct(it.y, SH); it.el.style.left = pct(xx, SW);
+      if (!it.gone && it.y > 44 && it.y < 60 && Math.abs(xx - px) < 13) {
+        it.gone = true; it.el.classList.add(it.bad ? 'gone' : 'poof'); setTimeout(() => it.el.remove(), 350);
+        if (it.bad) { got = Math.max(0, got - 1); combo = 0; ctx.mistake(); Audio8.sfx('soft'); hero.classList.add('shake'); setTimeout(() => hero.classList.remove('shake'), 400); floatText(sc, it.el._name === 'mosquito' ? 'Ai! Mosquito!' : 'Ei! Fumacinha!', xx / SW * 100, 40); }
+        else { got++; combo++; Audio8.sfx(combo >= 3 ? 'medal' : 'found'); floatText(sc, combo >= 3 ? `Combo x${combo}!` : '+1', xx / SW * 100, 40); ctx.nextTurn(); if (got >= goal) finish(); }
+        upd();
+      }
+      if (!it.gone && it.y > 92) { it.gone = true; it.el.remove(); if (!it.bad) combo = 0; }
+    }
+    items = items.filter(i => !i.gone || document.body.contains(i.el));
+  }, 40);
+  onCleanup(() => clearInterval(loop));
+  const finish = () => {
+    done = true; clearInterval(loop); Audio8.sfx('win'); confetti(40);
+    items.forEach(i => i.el.remove());
+    setHead(ctx, `<b>${C.end}</b>`); mgSay(say, C.end);
+    if (S.autoRead) Voice.speak(C.end);
+    ctx.complete();
+  };
+  place(); upd(); setTimeout(() => demoTap(ct, 0), 600);
+  return {
+    speak: () => C.say.replace(/<[^>]+>/g, ''),
+    hint() { ctx.usedHint(); mgSay(say, 'Arraste o dedo para os lados e pegue o que cai!', 'info'); },
+    autoStep() { const t = items.filter(i => !i.gone && !i.bad).sort((a, b) => b.y - a.y)[0]; if (t) tx = clamp(t.x, 0, 144); }
+  };
+};
+/* coloca o pega-pega nas missões que tinham atividades de cartas */
+(function () {
+  for (const id of Object.keys(CATCH)) {
+    const st = MISSIONS[id].steps, i = st.findIndex(s => ['match', 'sequence', 'sort', 'whoami'].includes(s.t));
+    st.splice(i >= 0 ? i : 1, 0, { t: 'catch', who: id });
+  }
+})();
+
+/* ============================================================
+   BATALHA FINAL: a Névoa contra os heróis de Lumiara
+   Estoure os Fumacinhas (cada um vira energia) e lance OBRIGADOS na vilã.
+   Os heróis que você conheceu aparecem para ajudar, cada um com seu superpoder.
+   ============================================================ */
+STEPS.boss = function (step, ctx) {
+  Audio8.energy = 1; onCleanup(() => { Audio8.energy = 0; });
+  const maxHp = G.diff === 'exp' ? 8 : 10;
+  let hp = maxHp, charge = Math.max(3, Math.min(12, G.energy || 0)), fumas = [], tick = 0, done = false, k = 0;
+  const heroes = (G.album.length ? G.album : ['denise', 'pedro', 'cida']).slice(0, 10);
+  ctx.stage.innerHTML = `<div class="mg job bossg">${mgHead('faisca', 'Estoure os <b>Fumacinhas</b> e lance <b>OBRIGADO</b> na Névoa!')}
+    <div class="scene jobscene bossscene" id="js"><img class="bg px" src="${composeScene('festa').toDataURL()}" alt="Praça à noite com a Névoa"><div class="bossdark" id="bd"></div><div class="layer" id="lay"></div>
+      <div class="bosshp"><span>Névoa</span><div class="bar"><i id="hp" style="width:100%"></i></div></div><div class="mgsay" id="say"></div></div>
+    <div class="bossbar"><button class="btn big primary throw" id="throw">${SPR.img('coracao')} OBRIGADO! <b id="ch">${charge}</b></button></div></div>`;
+  wireSay(ctx.stage, () => 'Estoure os Fumacinhas e lance obrigado na Névoa!');
+  const lay = $('#lay', ctx.stage), sc = $('#js', ctx.stage), say = $('#say', ctx.stage);
+  const nev = spriteEl('nevoa', 52, 0, { w: 56, cls: 'bossnev' }); lay.appendChild(nev);
+  const row = heroes.map((id, i) => { const e = spriteEl(id, 6 + i * (140 / Math.max(1, heroes.length - 1)) * (heroes.length > 1 ? 1 : 0) + (heroes.length === 1 ? 70 : 0), 64); e.classList.add('herorow'); e.style.animationDelay = (i * .12) + 's'; lay.appendChild(e); return { id, e, x: 6 + i * (140 / Math.max(1, heroes.length - 1)) }; });
+  const upd = () => { $('#hp', ctx.stage).style.width = (hp / maxHp * 100) + '%'; $('#ch', ctx.stage).textContent = charge; $('#throw', ctx.stage).classList.toggle('ready', charge > 0); $('#bd', ctx.stage).style.opacity = .15 + .45 * hp / maxHp; nev.style.width = pct(30 + 26 * hp / maxHp, SW); };
+  const spawnFuma = () => {
+    const x = 50 + RNG.next() * 50, el = document.createElement('button'); el.className = 'fumab'; el.innerHTML = SPR.img('fumacinha'); el.style.left = pct(x, SW); el.style.top = pct(14, SH); el.style.width = pct(13, SW); lay.appendChild(el);
+    const f = { x, y: 14, vx: (RNG.next() - .5) * 1.4, el }; fumas.push(f);
+    el.onclick = () => { if (f.gone || done) return; ctx.activity(); f.gone = true; el.classList.add('poof'); setTimeout(() => el.remove(), 350); charge++; Audio8.sfx('found'); floatText(sc, '+1', f.x / SW * 100, f.y / SH * 100); upd(); };
+  };
+  $('#throw', ctx.stage).onclick = () => {
+    if (done) return; ctx.activity();
+    if (charge <= 0) { mgSay(say, 'Sem energia! Estoure Fumacinhas!', 'info'); Audio8.sfx('soft'); return; }
+    charge--; const h = row[k++ % row.length];
+    h.e.classList.remove('jump'); void h.e.offsetWidth; h.e.classList.add('jump');
+    const ball = spriteEl('coracao', h.x + 2, 60, { w: 10, cls: 'heartball' }); lay.appendChild(ball);
+    setTimeout(() => moveEl(ball, 74, 12, 520), 20);
+    floatText(sc, (POWERS[h.id] || 'Obrigado') + '!', h.x / SW * 100 + 4, 70);
+    Audio8.sfx('select');
+    setTimeout(() => {
+      ball.remove(); hp--; Audio8.sfx('ok'); nev.classList.remove('hit'); void nev.offsetWidth; nev.classList.add('hit'); sparkle(nev, 8);
+      floatText(sc, pick(['OBRIGADO!', 'VALEU!', 'GRATIDÃO!', 'VOCÊ IMPORTA!']), 70, 18); ctx.nextTurn(); upd();
+      if (hp <= 0) win();
+    }, 560);
+    upd();
+  };
+  const loop = setInterval(() => {
+    if (done) return; tick++;
+    if (tick % 22 === 0 && fumas.filter(f => !f.gone).length < 5) spawnFuma();
+    for (const f of fumas) {
+      if (f.gone) continue;
+      f.y += .32; f.x = clamp(f.x + f.vx + Math.sin((tick + f.y) / 9) * .4, 2, 146);
+      f.el.style.left = pct(f.x, SW); f.el.style.top = pct(f.y, SH);
+      if (f.y > 58) { f.gone = true; f.el.classList.add('poof'); setTimeout(() => f.el.remove(), 350); floatText(sc, 'Hehehe!', f.x / SW * 100, 62); }
+    }
+    fumas = fumas.filter(f => !f.gone || document.body.contains(f.el));
+  }, 40);
+  onCleanup(() => clearInterval(loop));
+  const win = () => {
+    done = true; clearInterval(loop); fumas.forEach(f => f.el.remove());
+    nev.src = SPR.url('nevoaFeliz'); nev.classList.add('saved'); $('#bd', ctx.stage).style.opacity = 0;
+    Audio8.sfx('win'); confetti(80); row.forEach((h, i) => setTimeout(() => { h.e.classList.remove('jump'); void h.e.offsetWidth; h.e.classList.add('jump'); }, i * 90));
+    setHead(ctx, '<b>VOCÊS VENCERAM!</b> A Névoa ficou... diferente?'); mgSay(say, 'Heróis de verdade não usam capa!');
+    if (S.autoRead) Voice.speak('Vocês venceram! Heróis de verdade não usam capa!');
+    ctx.complete();
+  };
+  upd(); Audio8.sfx('villain'); setTimeout(() => demoTap($('#throw', ctx.stage), 0), 700);
+  return {
+    speak: () => 'Estoure os Fumacinhas e lance obrigado na Névoa!',
+    hint() { ctx.usedHint(); $('#throw', ctx.stage).classList.add('glow'); setTimeout(() => $('#throw', ctx.stage).classList.remove('glow'), 1500); },
+    autoStep() { if (done) return; if (charge > 0) $('#throw', ctx.stage).click(); else { const f = fumas.find(x => !x.gone); if (f) f.el.click(); } }
+  };
+};
 
 /* ============================================================
    JOGAR ONLINE — cada um na sua casa, na mesma partida

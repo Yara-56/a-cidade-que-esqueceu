@@ -55,6 +55,7 @@ function playCutscene(frames, { title = 'Lumiara', where = 'História', onDone }
     }
     if (f.sparkle) setTimeout(() => { for (let n = 0; n < 4; n++) setTimeout(() => sparkle($('#cut'), 14), n * 250); }, 300);
     $('#cb').innerHTML = bubbleHTML(f.who || 'faisca', f.text);
+    if (f.who === 'nevoa') Audio8.sfx('villain');
     if (S.autoRead) Voice.speak(f.text);
     setFoot(`<button class="btn" id="say" data-local aria-label="Ouvir">${ICON.voice}<span class="lbl">Ouvir</span></button><span class="grow"></span><button class="btn ghost" id="skip" style="color:#fff">Pular</button><button class="btn primary big" id="nx">${i < frames.length - 1 ? 'Continuar' : (f.last || 'Vamos lá!')} ${ICON.next}</button>`);
     $('#say').onclick = () => { Audio8.init(); Voice.speak(f.text); };
@@ -69,20 +70,20 @@ function playCutscene(frames, { title = 'Lumiara', where = 'História', onDone }
 
 /* ---------- prólogo animado ---------- */
 const PROLOGUE_FRAMES = [
-  { scene: 'cidade', text: 'Esta é Lumiara!',
+  { scene: 'cidade', text: 'Lumiara: a cidade mais colorida do mundo!',
     actors: { denise: { s: 'denise', from: [-18, 60], x: 26, y: 60, walk: true }, rafa: { s: 'rafa', from: [170, 62], x: 112, y: 62, walk: true, flip: true }, lucia: { s: 'lucia', from: [-30, 62], x: 60, y: 62, walk: true, ms: 1800 } } },
-  { scene: 'cidade', text: 'Muita gente trabalha para tudo funcionar.',
+  { scene: 'cidade', text: 'Cheirinho de pão, ônibus passando, gente trabalhando...',
     actors: { denise: { s: 'denise', x: 40, y: 60, walk: true }, rafa: { s: 'rafa', x: 92, y: 62, walk: true, flip: true }, ze: { s: 'ze', from: [170, 58], x: 132, y: 58, walk: true, flip: true } } },
-  { scene: 'cidade', fog: .35, text: 'Até que chegou a Névoa do Esquecimento!',
-    actors: { nevoa: { s: 'nevoa', from: [175, 0], x: 64, y: 2, w: 40, ms: 2600 } } },
-  { scene: 'cidade', gray: 1, fog: .5, text: 'Ninguém mais via os trabalhadores.',
-    actors: { denise: { s: 'denise', mode: 'sil', x: 40, y: 60 }, rafa: { s: 'rafa', mode: 'sil', x: 92, y: 62, flip: true }, lucia: { s: 'lucia', mode: 'sil', x: 60, y: 62 }, ze: { s: 'ze', mode: 'sil', x: 132, y: 58, flip: true }, nevoa: { s: 'nevoa', x: 48, y: 0, w: 64, ms: 2000 } } },
-  { scene: 'cidade', gray: 1, dark: .55, fog: .6, text: 'As cores sumiram. As luzes apagaram.',
-    actors: { nevoa: { s: 'nevoa', x: 34, y: -2, w: 92, ms: 2000 } } },
-  { scene: 'cidade', gray: 1, dark: .55, fog: .5, sparkle: true, text: 'Mas eu continuei acesa: a Faísca!',
-    actors: { faisca: { s: 'faisca', from: [76, 80], x: 72, y: 34, w: 16, glow: true, ms: 1600 } } },
-  { scene: 'cidade', gray: .8, dark: .35, fog: .4, last: 'Vamos ajudar!', text: 'Me ajuda a trazer as luzes de volta?',
-    actors: { you: { s: 'avatar', from: [-18, 62], x: 56, y: 62, walk: true, ms: 1800 }, faisca: { s: 'faisca', x: 74, y: 44, w: 14, glow: true } } }
+  { scene: 'cidade', fog: .35, who: 'nevoa', text: 'MUAHAHA! Eu sou a Névoa do Esquecimento!',
+    actors: { nevoa: { s: 'nevoa', from: [175, 0], x: 58, y: 0, w: 44, ms: 1600 } } },
+  { scene: 'cidade', gray: .6, fog: .45, who: 'nevoa', text: 'Fumacinhas! Roubem as cores!',
+    actors: { f1: { s: 'fumacinha', from: [70, 8], x: 14, y: 30, w: 14, ms: 900 }, f2: { s: 'fumacinha', from: [80, 8], x: 128, y: 24, w: 14, ms: 1000 }, f3: { s: 'fumacinha', from: [76, 8], x: 92, y: 44, w: 12, ms: 1100 }, f4: { s: 'fumacinha', from: [74, 8], x: 40, y: 46, w: 12, ms: 1200 } } },
+  { scene: 'cidade', gray: 1, dark: .5, fog: .55, who: 'faisca', text: 'Agora ninguém lembra quem faz a cidade funcionar!',
+    actors: { denise: { s: 'denise', mode: 'sil', x: 40, y: 60 }, rafa: { s: 'rafa', mode: 'sil', x: 92, y: 62, flip: true }, lucia: { s: 'lucia', mode: 'sil', x: 60, y: 62 }, ze: { s: 'ze', mode: 'sil', x: 132, y: 58, flip: true }, nevoa: { s: 'nevoa', x: 34, y: -2, w: 92, ms: 1800 } } },
+  { scene: 'cidade', gray: 1, dark: .55, fog: .5, sparkle: true, text: 'Mas eu escapei! Eu sou a Faísca!',
+    actors: { faisca: { s: 'faisca', from: [76, 80], x: 72, y: 34, w: 16, glow: true, ms: 1400 } } },
+  { scene: 'cidade', gray: .8, dark: .35, fog: .4, last: 'Bora!', text: 'Preciso de um herói. Você topa?',
+    actors: { you: { s: 'avatar', from: [-18, 62], x: 56, y: 62, walk: true, ms: 1600 }, faisca: { s: 'faisca', x: 74, y: 44, w: 14, glow: true } } }
 ];
 
 /* ---------- interlúdio entre regiões ---------- */

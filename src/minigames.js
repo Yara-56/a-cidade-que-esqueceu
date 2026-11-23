@@ -244,7 +244,7 @@ STEPS.cook = function (step, ctx) {
   const FX = {
     wash: () => { pot.wash = 22; Audio8.sfx('page'); },
     fire: () => { pot.fire = true; }, oil: () => { pot.fill = 'oil'; }, garlic: () => { pot.fill = 'garlic'; },
-    golden: () => { pot.fill = 'golden'; }, rice: () => { pot.fill = 'rice'; }, toast: () => { pot.fill = 'toast'; },
+    golden: () => { pot.fill = 'golden'; floatText(kit, 'Hmm... cheirinho de alho!', 50, 18); }, rice: () => { pot.fill = 'rice'; }, toast: () => { pot.fill = 'toast'; },
     water: () => { pot.fill = 'water'; pot.bub = true; }, salt: () => {},
     lid: () => { pot.lid = true; }, off: () => { pot.fire = false; pot.fill = 'cooked'; pot.done = true; }
   };

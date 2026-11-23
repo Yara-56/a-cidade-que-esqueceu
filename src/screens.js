@@ -4,12 +4,14 @@
 'use strict';
 
 /* ---------------- HUD ---------------- */
+function updEnergy() { const e = $('#energy b'); if (e) { e.textContent = G.energy || 0; const p = e.parentElement; p.classList.remove('pop'); void p.offsetWidth; p.classList.add('pop'); } }
 function hudHTML() {
   const p = Math.round(progress() * 100);
   document.documentElement.style.setProperty('--lit', (p / 100).toFixed(2));
   return `<div class="hud">
     <button class="btn small" data-act="home" data-local aria-label="Tela inicial">${ICON.home}</button>
     <button class="btn small" data-act="map" aria-label="Mapa da cidade">${ICON.map}<span class="lbl">Mapa</span></button>
+    <span class="energy" id="energy" title="Energia do Obrigado">${SPR.img('raio')}<b>${G.energy || 0}</b></span>
     <div class="lights" role="img" aria-label="Luz de Lumiara: ${p}%"><span class="lbl">Luz de Lumiara</span><div class="bar"><i style="width:${p}%"></i></div><span class="pct">${p}%</span></div>
     ${isJuntos() ? `<span class="turn" id="turn" aria-live="polite">${turnInner()}</span>` : ''}
     <button class="btn small" data-act="album" data-local aria-label="Álbum e medalhas">${ICON.book}<span class="lbl">Álbum</span></button>
@@ -341,13 +343,13 @@ function renderMission(id, idx) {
   const M = MISSIONS[id], step = M.steps[idx], r = regionOf(id);
   if (!step) { finishMission(id); return; }
   /* menos cartas e leitura: no modo sozinho, o 'Quem sou eu?' fica só no Detetive; a associação some no Explorador */
-  if ((step.t === 'whoami' && G.mode === 'solo' && G.diff !== 'det') || (step.t === 'match' && G.diff === 'exp') || (step.t === 'reflect' && flowOn() && G.diff !== 'det')) return renderMission(id, idx + 1);
+  if ((step.t === 'whoami' && G.mode === 'solo' && G.diff !== 'det') || (step.t === 'match' && G.diff === 'exp') || (step.t === 'reflect' && flowOn() && G.diff !== 'det') || (['match', 'sequence', 'sort', 'logic'].includes(step.t) && flowOn() && G.diff !== 'det' && !MISSIONS[id].bonus)) return renderMission(id, idx + 1);
   const prev = G.current && G.current.mission === id ? G.current : {};
   G.current = { mission: id, step: idx, mistakes: prev.mistakes || 0, hints: prev.hints || 0 }; saveGame();
   Audio8.music(r.music, progress());
   const revealIdx = M.steps.findIndex(s => s.t === 'reveal');
   const known = G.album.includes(M.char);
-  const label = { dialog: 'História', investigate: 'Investigação', spot: 'Antes e depois', match: 'Associação', sequence: 'Sequência', sort: 'Separação', route: 'Rota', whoami: 'Quem sou eu?', reveal: 'Descoberta', choice: 'Decisão', reflect: 'Reflexão', thanks: 'Mural do Obrigado', mirror: 'A última carta', memory: 'Desafio extra · Memória', days: 'E se ninguém fizesse?', shift: 'Um turno com a Denise', tidy: 'Minijogo · Arruma-arruma', cook: 'Minijogo · Cozinha', fire: 'Minijogo · Apagar o fogo', water: 'Minijogo · Caminho da água', cross: 'Minijogo · Travessia segura', power: 'Minijogo · De onde vem a luz', recycle: 'Minijogo · Centro de reciclagem', logic: 'Desafio extra · Lógica' }[step.t];
+  const label = { dialog: 'História', investigate: 'Investigação', spot: 'Antes e depois', match: 'Associação', sequence: 'Sequência', sort: 'Separação', route: 'Rota', whoami: 'Quem sou eu?', reveal: 'Descoberta', choice: 'Decisão', reflect: 'Reflexão', thanks: 'Mural do Obrigado', mirror: 'A última carta', memory: 'Desafio extra · Memória', days: 'E se ninguém fizesse?', shift: 'Um turno com a Denise', tidy: 'Minijogo · Arruma-arruma', cook: 'Minijogo · Cozinha', fire: 'Minijogo · Apagar o fogo', catch: 'Minijogo · Pega-pega', boss: 'Batalha final', water: 'Minijogo · Caminho da água', cross: 'Minijogo · Travessia segura', power: 'Minijogo · De onde vem a luz', recycle: 'Minijogo · Centro de reciclagem', logic: 'Desafio extra · Lógica' }[step.t];
   app().innerHTML = `<div class="screen">${hudHTML()}
     <div class="mhead"><div><div class="where">${esc(r.name)} · ${label}</div><h2>${esc(M.title)}</h2></div>
     <div class="dots" aria-label="Etapa ${idx + 1} de ${M.steps.length}">${M.steps.map((_, i) => `<i class="${i < idx ? 'done' : i === idx ? 'now' : ''}"></i>`).join('')}</div></div>
@@ -363,7 +365,7 @@ function renderMission(id, idx) {
   const ctx = {
     stage: $('#stage'), id, idx, step, colored: idx > revealIdx,
     complete() { RUN.done = true; prim.disabled = false; prim.classList.add('ready');
-      if (['tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift'].includes(step.t)) addMedal('criatividade', 1, 'mg:' + id);
+      if (['tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift', 'catch'].includes(step.t)) { addMedal('criatividade', 1, 'mg:' + id); if (!G.seen['eg:' + id]) { G.seen['eg:' + id] = 1; G.energy = (G.energy || 0) + 1; saveGame(); updEnergy(); } }
       const ms = { dialog: 0, choice: 5200, reveal: 9000, thanks: 0, mirror: 0, reflect: 0, days: 3200 }[step.t] ?? 2600;
       if (ms) autoNext(prim, ms, () => prim.click()); },
     setPrimary(t) { prim.innerHTML = `${esc(t)} ${ICON.next}`; },
@@ -393,7 +395,7 @@ function renderMission(id, idx) {
   RUN.ctrl = STEPS[step.t](step, ctx) || {};
   refreshHint(); resetIdle();
   /* primeira vez num tipo de etapa: a mãozinha mostra onde tocar */
-  if (!G.seen['tut:' + step.t] && !['dialog', 'reveal', 'tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift'].includes(step.t)) {
+  if (!G.seen['tut:' + step.t] && !['dialog', 'reveal', 'tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift', 'catch', 'boss'].includes(step.t)) {
     G.seen['tut:' + step.t] = 1; saveGame();
     setTimeout(() => { const t = $('#stage .hot:not(.found), #stage .opt, #stage .mcard, #stage .scard, #stage .sil, #stage .sort-item, #stage .cell.hint-pulse, #stage [data-g], #stage #pass, #stage .mem, #stage .chip'); if (t && typeof demoTap === 'function') demoTap(t, 0); }, 1300);
   }

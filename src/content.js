@@ -46,6 +46,11 @@ const REGIONS = [
     missions: ['denise', 'pedro', 'carlos'] }
 ];
 
+/* ---------------- SUPERPODERES (carta de herói) ---------------- */
+const POWERS = { cida: 'Organização Turbo', jorge: 'Memória de Elefante', ze: 'Panelão de Energia', katia: 'Brilho Total', lucia: 'Escudo da Saúde',
+  benedito: 'Abraço Protetor', zefa: 'Mão Verde', rafa: 'Pedal Relâmpago', marina: 'Olho Reciclador', joaquim: 'Floresta Instantânea',
+  denise: 'Vassoura Turbo', pedro: 'Raio de Luz', tania: 'Água Cristalina', joana: 'Jato Antifogo', carlos: 'Escudo da Travessia' };
+
 /* ---------------- PERSONAGENS (álbum) ---------------- */
 const CHARACTERS = {
   tania: { name: 'Tânia', full: 'Tânia Ribeiro', job: 'Técnica de saneamento', region: 'casas', prop: 'copoagua',
@@ -640,9 +645,12 @@ const MEDALS = {
 /* ---------------- FINAL ---------------- */
 const FINALE = {
   intro: [
-    { who: 'faisca', text: 'Vocês conseguiram! Lumiara acendeu!' },
-    { who: 'nevoa', text: 'Eu não sou má... nasci dos "obrigados" esquecidos.' },
-    { who: 'faisca', text: 'Vamos encher o céu de obrigados!' }],
+    { who: 'faisca', text: 'Lumiara acendeu! Mas olha quem voltou...' },
+    { who: 'nevoa', text: 'MUAHAHA! Vou apagar tudo de novo!' },
+    { who: 'faisca', text: 'Heróis, juntos!' }],
+  after: [
+    { who: 'nevoa', text: 'Ai... Eu não sou má. Nasci dos "obrigados" esquecidos.' },
+    { who: 'faisca', text: 'Então vamos encher o céu de obrigados!' }],
   without: { /* o que aconteceria sem cada trabalhador */
     cida: 'A casa ficaria sem comida pronta e sem roupa limpa.', jorge: 'Ninguém saberia quem entra no prédio, e as encomendas se perderiam.',
     ze: 'Muitas crianças estudariam com fome.', katia: 'A escola ficaria suja, e muita gente poderia ficar doente.',

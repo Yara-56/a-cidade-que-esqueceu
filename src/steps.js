@@ -84,9 +84,14 @@ const STEPS = {
       setTimeout(() => { moveEl(el, m.x, m.y, S.reduceMotion ? 0 : 1100 + k * 150, true); setTimeout(() => el.classList.remove('flip'), 1300 + k * 150); }, 60);
       return el;
     });
+    /* os capangas da vilã aprontam na cena e fogem quando o herói chega */
+    const fumas = (ctx.id !== '_finale' && !ctx.colored) ? [[18, 10], [118, 16], [70, 6]].map(([x, y], k) => { const f = spriteEl('fumacinha', x, y, { w: 14, cls: 'fumafly' }); f.style.animationDelay = (k * .4) + 's'; lay.appendChild(f); return f; }) : [];
+    if (fumas.length) setTimeout(() => { if (typeof floatText === 'function') floatText(sc, 'Hehehe!', 20, 18); Audio8.sfx('villain'); }, 700);
+    const flee = () => fumas.forEach((f, k) => { f.classList.remove('fumafly'); moveEl(f, k % 2 ? 180 : -30, -20, 900); });
     const show = () => {
       const l = lines[i];
       const who = l.who.replace('?', '');
+      if (i === lines.length - 1 && fumas.length) setTimeout(flee, 600);
       actors.forEach(a => a.classList.toggle('talk', a.dataset.who === who));
       $('#bub', ctx.stage).innerHTML = bubbleHTML(l.who, l.text);
       ctx.setPrimary(i < lines.length - 1 ? 'Continuar' : 'Vamos lá!');
@@ -624,7 +629,7 @@ const STEPS = {
       ctx.activity(); const o = step.options[+b.dataset.o]; tried.add(+b.dataset.o);
       $$('.opt', ctx.stage).forEach(x => { x.classList.remove('chosen'); if (tried.has(+x.dataset.o)) x.classList.add('tried'); });
       b.classList.add('chosen'); b.classList.remove('tried');
-      if (o.kind) { Audio8.sfx('ok'); addMedal('gentileza', 1, 'kind:' + ctx.id); sparkle(b); }
+      if (o.kind) { Audio8.sfx('ok'); addMedal('gentileza', 1, 'kind:' + ctx.id); sparkle(b); if (!G.seen['en:' + ctx.id]) { G.seen['en:' + ctx.id] = 1; G.energy = (G.energy || 0) + 2; saveGame(); if (typeof floatText === 'function') floatText(ctx.stage, '+2 Energia do Obrigado!', 50, 20); updEnergy(); } }
       else Audio8.sfx('soft');
       feedback($('#fb', ctx.stage), o.kind ? 'ok' : 'soft', `<b class="kind">${o.kind ? 'Escolha gentil!' : 'O que acontece:'}</b>${esc(o.result)}${o.kind ? '' : '<br><span style="font-weight:800">Quer pensar em outra escolha? Pode tentar de novo.</span>'}`, o.kind ? 'coracao' : null);
       if (S.autoRead) Voice.speak(o.result);
@@ -656,5 +661,5 @@ function unlockCharacter(id) { if (!G.album.includes(id)) { G.album.push(id); sa
 function charCardHTML(id) {
   const c = CHARACTERS[id], r = REGIONS.find(x => x.id === c.region);
   return `<div class="cardbig" style="--rc:${r.color}"><div class="inner"><div class="portrait"><img class="px char" src="${SPR.url(id)}" alt="${esc(c.name)}"><img class="px prop" src="${SPR.url(c.prop)}" alt=""></div>
-    <h3>${esc(c.name)}</h3><div class="job">${esc(c.job)}</div><span class="tag">${esc(r.name)}</span><p class="quote">“${esc(c.quote)}”</p></div></div>`;
+    <h3>${esc(c.name)}</h3><div class="job">${esc(c.job)}</div>${POWERS[id] ? `<div class="power">${SPR.img('raio')}<span><small>Superpoder</small>${esc(POWERS[id])}</span></div>` : ''}<span class="tag">${esc(r.name)}</span><p class="quote">“${esc(c.quote)}”</p></div></div>`;
 }

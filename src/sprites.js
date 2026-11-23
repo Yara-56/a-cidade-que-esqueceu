@@ -229,6 +229,10 @@ const PROPS = {
     ['s2', 2, 9, 14, 7], ['s2', 0, 10, 3, 4], ['s3', 0, 13, 3, 1],
     ['#f6d3b3', 4, 10, 3, 4], ['s3', 3, 15, 12, 1],
     ['white', 4, 16, 11, 3], ['greyL', 4, 18, 11, 1]] },
+  /* capanga da vilã: Fumacinha (nuvenzinha brava) */
+  fumacinha: { ops: [['greyD', 2, 6, 12, 7], ['greyD', 4, 3, 5, 4], ['greyD', 8, 2, 5, 5], ['grey', 3, 7, 10, 5], ['grey', 5, 4, 3, 3], ['grey', 9, 3, 3, 3], ['greyL', 5, 4, 2, 1], ['greyL', 9, 3, 2, 1],
+    ['white', 5, 8, 2, 2], ['white', 9, 8, 2, 2], ['ink', 6, 9, 1, 1], ['ink', 10, 9, 1, 1], ['ink', 4, 7, 3, 1], ['ink', 9, 7, 3, 1], ['ink', 6, 11, 4, 1], ['red', 7, 12, 2, 1]] },
+  raio: { ops: [['yellow', 8, 0, 4, 2], ['yellow', 6, 2, 4, 3], ['yellow', 4, 5, 8, 2], ['yellow', 7, 7, 4, 3], ['yellow', 5, 10, 4, 3], ['yellow', 4, 13, 2, 2], ['yellowL', 8, 1, 2, 1], ['yellowL', 6, 5, 3, 1]] },
   /* cozinha: receita de arroz */
   arroz: { ops: [['white', 3, 4, 10, 11], ['cream', 3, 12, 10, 3], ['yellow', 4, 7, 8, 4], ['yellowD', 4, 10, 8, 1], ['white', 5, 8, 2, 2], ['white', 8, 8, 1, 1], ['brownL', 5, 2, 6, 2], ['brown', 6, 1, 4, 1]] },
   copoagua: { ops: [['glass', 4, 3, 8, 12], ['blueL', 4, 7, 8, 8], ['blue', 4, 13, 8, 2], ['white', 5, 4, 1, 3]] },
