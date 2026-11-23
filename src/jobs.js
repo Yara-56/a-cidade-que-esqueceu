@@ -30,7 +30,7 @@ STEPS.fire = function (step, ctx) {
   const lay = $('#lay', ctx.stage), sc = $('#js', ctx.stage), say = $('#say', ctx.stage);
   const truck = spriteEl('bombeiros', -50, 66, { w: 48 }); lay.appendChild(truck); setTimeout(() => moveEl(truck, 4, 66, 1200), 50);
   const jo = spriteEl('joana', 26, 50); lay.appendChild(jo);
-  $('#hyd', ctx.stage).classList.add('glow');
+  $('#hyd', ctx.stage).classList.add('glow'); setTimeout(() => demoTap($('#hyd', ctx.stage)), 900);
   const spawn = () => {
     if (spawned >= goal) return;
     const free = SPOTS.filter(p => !flames.some(f => f.x === p[0]));
@@ -65,7 +65,7 @@ STEPS.fire = function (step, ctx) {
   $('#hyd', ctx.stage).onclick = () => {
     if (hose) return; ctx.activity(); hose = true; Audio8.sfx('ok');
     $('#hyd', ctx.stage).classList.remove('glow'); $('#hose', ctx.stage).hidden = false;
-    setHead(ctx, 'Água ligada! <b>Toque nas chamas</b> até apagar.');
+    setHead(ctx, 'Água ligada! <b>Toque nas chamas</b> até apagar.'); if (flames[0]) setTimeout(() => demoTap(flames[0].el, 0), 200);
     mgSay(say, 'Mangueira ligada!');
   };
   for (let i = 0; i < (G.diff === 'exp' ? 3 : 4); i++) spawn();
@@ -171,7 +171,7 @@ STEPS.water = function (step, ctx) {
     if (S.autoRead) Voice.speak('Água limpinha na torneira! Muita gente trabalhou para ela chegar aqui.');
     ctx.complete();
   };
-  showStep();
+  showStep(); setTimeout(() => demoTap($('.jhot[data-st="0"]', ctx.stage)), 500);
   return {
     speak: () => ST[k] ? ST[k].say.replace(/<[^>]+>/g, '') : 'Água limpinha!',
     hint() { ctx.usedHint(); showStep(); },
@@ -200,7 +200,7 @@ STEPS.cross = function (step, ctx) {
   const spawnKids = () => {
     const ids = shuffle(['theo', 'bia', 'iara', 'davi']).slice(0, 2);
     const els = ids.map((id, i) => { const e = spriteEl(id, 60 + i * 9, 40); lay.appendChild(e); return e; });
-    kids = { els, state: 'wait' }; waitT = 0;
+    kids = { els, state: 'wait' }; waitT = 0; if (!crossed) demoTap($('#cpare', ctx.stage), 300);
     floatText(sc, 'Quero atravessar!', 45, 30); Audio8.sfx('select');
   };
   const upd = () => { $('#cnt', ctx.stage).textContent = `${crossed}/${goal}`; $('#cpare', ctx.stage).disabled = mode === 'stop'; $('#csiga', ctx.stage).disabled = mode === 'go'; sign.style.opacity = mode === 'stop' ? 1 : 0; };
@@ -297,7 +297,7 @@ STEPS.power = function (step, ctx) {
   const glow = p => $$('.jhot', ctx.stage).forEach(b => b.classList.toggle('glow', b.dataset.p === p || (p === 'roofs' && b.dataset.p.startsWith('roof') && !panels.has(+b.dataset.p.slice(4)))));
   const bar = v => { $('#en', ctx.stage).style.width = Math.min(100, v) + '%'; };
   let turbTaps = 0; const need = G.diff === 'exp' ? 6 : 9;
-  glow('gate');
+  glow('gate'); setTimeout(() => demoTap($('.jhot[data-p="gate"]', ctx.stage)), 500);
   $$('.jhot', ctx.stage).forEach(b => b.onclick = () => {
     if (done) return; ctx.activity(); const p = b.dataset.p;
     const wrong = msg => { ctx.mistake(); Audio8.sfx('soft'); mgSay(say, msg, 'soft'); };
@@ -404,7 +404,7 @@ STEPS.recycle = function (step, ctx) {
     if (S.autoRead) Voice.speak(msg);
     ctx.complete();
   };
-  renderSort();
+  renderSort(); setTimeout(() => demoTap($(`.rbin[data-b="${items[0][1]}"]`, ra)), 600);
   return {
     speak: () => $('#mgt', ctx.stage).textContent,
     hint() { ctx.usedHint(); if (phase === 'sort') { const b = $(`.rbin[data-b="${items[k][1]}"]`, ra); if (b) { b.classList.add('glow'); setTimeout(() => b.classList.remove('glow'), 1500); } } },

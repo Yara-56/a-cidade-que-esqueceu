@@ -1030,3 +1030,29 @@ html.rm body::before { animation: none; }
 @media (min-width: 701px) and (min-height: 521px) {
   .mg.job .jobscene { width: min(100%, calc((100vh - 330px) * 16 / 9)); justify-self: center; }
 }
+/* criador de personagem no online */
+.avp { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; }
+.avp-prev { display: grid; justify-items: center; gap: 6px; }
+.avp-prev img.px { width: 72px; height: 108px; background: radial-gradient(#fff8, transparent 70%); }
+.avp-rows { display: grid; gap: 4px; } .avp-rows b { font-size: .85rem; }
+.avp-row { display: flex; flex-wrap: wrap; gap: 5px; }
+.av-mini { border: 3px solid var(--ink); border-radius: 10px; cursor: pointer; padding: 0; }
+.av-mini.sw { width: 30px; height: 30px; }
+.av-mini.pic { width: 40px; height: 48px; background: var(--paper); display: grid; place-items: center; overflow: hidden; }
+.av-mini.pic img.px { width: 28px; height: 42px; }
+.av-mini[aria-pressed="true"] { outline: 3px solid var(--gold); outline-offset: 2px; transform: scale(1.08); }
+.online-card { border-color: var(--gold) !important; background: linear-gradient(180deg, #fff6d8, var(--paper)) !important; }
+/* animações mais leves no celular */
+body::before { will-change: transform; }
+@keyframes enter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@media (pointer: coarse) { body::before { animation-duration: 60s; } }
+/* física: tudo apoiado no chão, com sombra */
+.scene .sprite, .amb img, .castl img, .mess-it img { filter: drop-shadow(1px 2px 0 rgba(20, 16, 30, .28)); }
+.amb.cross img { filter: drop-shadow(0 3px 0 rgba(20, 16, 30, .35)); }
+/* mãozinha de tutorial e objeto sendo arrastado */
+.ghand { position: fixed; z-index: 300; width: 46px; pointer-events: none; opacity: 0; filter: drop-shadow(2px 3px 0 #0006); }
+.ghand img { width: 100%; display: block; }
+.gdrag { position: fixed; z-index: 299; pointer-events: none; transform: translate(-50%, -50%); filter: drop-shadow(3px 5px 0 #0005); }
+.mess-it { touch-action: none; }
+.tbin.over { background: var(--glow); transform: scale(1.08); }
+.scene .layer .mess-it, .scene .layer .flame, .scene .layer .trashit { pointer-events: auto; }

@@ -1038,6 +1038,32 @@ html.rm body::before { animation: none; }
 @media (min-width: 701px) and (min-height: 521px) {
   .mg.job .jobscene { width: min(100%, calc((100vh - 330px) * 16 / 9)); justify-self: center; }
 }
+/* criador de personagem no online */
+.avp { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; }
+.avp-prev { display: grid; justify-items: center; gap: 6px; }
+.avp-prev img.px { width: 72px; height: 108px; background: radial-gradient(#fff8, transparent 70%); }
+.avp-rows { display: grid; gap: 4px; } .avp-rows b { font-size: .85rem; }
+.avp-row { display: flex; flex-wrap: wrap; gap: 5px; }
+.av-mini { border: 3px solid var(--ink); border-radius: 10px; cursor: pointer; padding: 0; }
+.av-mini.sw { width: 30px; height: 30px; }
+.av-mini.pic { width: 40px; height: 48px; background: var(--paper); display: grid; place-items: center; overflow: hidden; }
+.av-mini.pic img.px { width: 28px; height: 42px; }
+.av-mini[aria-pressed="true"] { outline: 3px solid var(--gold); outline-offset: 2px; transform: scale(1.08); }
+.online-card { border-color: var(--gold) !important; background: linear-gradient(180deg, #fff6d8, var(--paper)) !important; }
+/* animações mais leves no celular */
+body::before { will-change: transform; }
+@keyframes enter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@media (pointer: coarse) { body::before { animation-duration: 60s; } }
+/* física: tudo apoiado no chão, com sombra */
+.scene .sprite, .amb img, .castl img, .mess-it img { filter: drop-shadow(1px 2px 0 rgba(20, 16, 30, .28)); }
+.amb.cross img { filter: drop-shadow(0 3px 0 rgba(20, 16, 30, .35)); }
+/* mãozinha de tutorial e objeto sendo arrastado */
+.ghand { position: fixed; z-index: 300; width: 46px; pointer-events: none; opacity: 0; filter: drop-shadow(2px 3px 0 #0006); }
+.ghand img { width: 100%; display: block; }
+.gdrag { position: fixed; z-index: 299; pointer-events: none; transform: translate(-50%, -50%); filter: drop-shadow(3px 5px 0 #0005); }
+.mess-it { touch-action: none; }
+.tbin.over { background: var(--glow); transform: scale(1.08); }
+.scene .layer .mess-it, .scene .layer .flame, .scene .layer .trashit { pointer-events: auto; }
 </style>
 </head>
 <body>
@@ -1277,6 +1303,7 @@ const PROPS = {
   chip: { ops: [['ink', 4, 4, 8, 8], ['greyD', 5, 5, 6, 6], ['yellow', 2, 5, 2, 1], ['yellow', 2, 8, 2, 1], ['yellow', 12, 5, 2, 1], ['yellow', 12, 8, 2, 1], ['yellow', 5, 2, 1, 2], ['yellow', 9, 2, 1, 2], ['yellow', 5, 12, 1, 2], ['yellow', 9, 12, 1, 2], ['white', 6, 6, 2, 1]] },
   porquinho: { ops: [['pink', 2, 5, 12, 8], ['pink', 12, 6, 3, 4], ['pinkD', 14, 7, 2, 2], ['pink', 4, 3, 3, 3], ['ink', 10, 7, 1, 1], ['pinkD', 3, 13, 2, 2], ['pinkD', 10, 13, 2, 2], ['ink', 6, 5, 4, 1], ['pinkD', 0, 7, 2, 1]] },
   moeda: { ops: [['yellowD', 3, 3, 10, 10], ['yellow', 4, 4, 8, 8], ['yellowL', 5, 5, 2, 3], ['yellowD', 7, 6, 2, 4]] },
+  mao: { ops: [['s2', 6, 0, 3, 8], ['s2', 3, 7, 10, 7], ['s2', 1, 8, 2, 4], ['s3', 4, 9, 1, 3], ['s3', 7, 9, 1, 3], ['s3', 10, 9, 1, 3], ['white', 6, 1, 1, 2], ['white', 4, 14, 9, 2]] },
   /* cozinha: receita de arroz */
   arroz: { ops: [['white', 3, 4, 10, 11], ['cream', 3, 12, 10, 3], ['yellow', 4, 7, 8, 4], ['yellowD', 4, 10, 8, 1], ['white', 5, 8, 2, 2], ['white', 8, 8, 1, 1], ['brownL', 5, 2, 6, 2], ['brown', 6, 1, 4, 1]] },
   copoagua: { ops: [['glass', 4, 3, 8, 12], ['blueL', 4, 7, 8, 8], ['blue', 4, 13, 8, 2], ['white', 5, 4, 1, 3]] },
@@ -1606,6 +1633,56 @@ function road(ctx, y, h, zebra) {
 function lamp(ctx, x, y, h = 26) { R(ctx, 'ink', x - 1, y, 3, h); R(ctx, 'greyD', x, y, 1, h); R(ctx, 'ink', x - 1, y - 1, 8, 3); R(ctx, 'greyD', x, y, 6, 1); R(ctx, '#fff1a8', x + 4, y + 1, 3, 2); }
 function busStop(ctx, x, y) { R(ctx, 'ink', x - 1, y - 1, 22, 4); R(ctx, 'tealD', x, y, 20, 2); R(ctx, 'ink', x + 1, y + 2, 1, 14); R(ctx, 'ink', x + 18, y + 2, 1, 14); R(ctx, 'glass', x + 2, y + 3, 15, 7); R(ctx, 'brownL', x + 3, y + 11, 13, 2); R(ctx, 'ink', x + 4, y + 13, 1, 3); R(ctx, 'ink', x + 14, y + 13, 1, 3); R(ctx, 'yellow', x + 19, y - 6, 4, 4); R(ctx, 'ink', x + 20, y - 2, 1, 4); }
 
+/* ---- cidade brasileira: letreiros, morro, caixa d'água azul, fiação, orelhão, banca, ipê ---- */
+const FONT3 = { A: '010101111101101', B: '110101110101110', C: '011100100100011', D: '110101101101110', E: '111100110100111', F: '111100110100100', G: '011100101101011', H: '101101111101101', I: '111010010010111', L: '100100100100111', M: '101111111101101', N: '110101101101101', O: '010101101101010', P: '110101110100100', R: '110101110101101', S: '011100010001110', T: '111010010010010', U: '101101101101111', V: '101101101101010', Ç: '011100100011010', ' ': '000000000000000' };
+function pxText(ctx, txt, x, y, c = 'ink') { let cx = x; for (const ch of txt) { const g = FONT3[ch] || FONT3[' ']; for (let i = 0; i < 15; i++) if (g[i] === '1') R(ctx, c, cx + (i % 3), y + Math.floor(i / 3), 1, 1); cx += 4; } return cx - x; }
+function sign(ctx, x, y, w, txt, bg, fg) { R(ctx, 'ink', x - 1, y - 1, w + 2, 9); R(ctx, bg, x, y, w, 7); const tw = txt.length * 4 - 1; pxText(ctx, txt, x + Math.max(1, (w - tw) >> 1), y + 1, fg); }
+function morro(ctx, base = 50) {
+  for (let x = 0; x < SW; x++) { const h = Math.round(24 + 7 * Math.sin(x / 17) + 4 * Math.sin(x / 7 + 1)); R(ctx, '#6fa86a', x, h, 1, base - h); R(ctx, '#86bd7a', x, h, 1, 1); }
+  const cols = ['#f3c6a0', '#e98bb0', '#f4c542', '#8fd6cf', '#fff8ef', '#c3a3e0', '#f08a3c', '#9cc1ef'];
+  for (let i = 0; i < 46; i++) { const x = (i * 29) % 156, top = Math.round(24 + 7 * Math.sin(x / 17) + 4 * Math.sin(x / 7 + 1)) + 2 + (i * 5) % 14; if (top > base - 6) continue;
+    R(ctx, '#00000033', x + 1, top + 1, 6, 5); R(ctx, cols[i % 8], x, top, 6, 5); R(ctx, '#2b223388', x + 2, top + 2, 1, 2); R(ctx, '#ffffff66', x, top, 6, 1); if (i % 3 === 0) R(ctx, '#4a78c9', x + 4, top - 2, 2, 2); }
+}
+function caixaAgua(ctx, x, y) { R(ctx, 'ink', x - 1, y - 1, 9, 7); R(ctx, '#3f8fd9', x, y, 7, 5); R(ctx, '#7fbcf0', x + 1, y, 5, 1); R(ctx, '#2c64a8', x, y + 4, 7, 1); }
+function predioBR(ctx, x, y, w, base, c, shade, k, loja) {
+  const h = base - y;
+  R(ctx, '#00000026', x + 2, y + 2, w, h); /* sombra no chão/parede de trás */
+  R(ctx, 'ink', x - 1, y - 1, w + 2, h + 1); R(ctx, c, x, y, w, h); R(ctx, shade, x + w - 2, y, 2, h);
+  for (let j = y + 2; j < base; j += 3) R(ctx, '#0000000c', x, j, w - 2, 1);
+  R(ctx, '#ffffff55', x, y, w, 1);
+  caixaAgua(ctx, x + 2 + (k % 2) * (w - 11), y - 6);
+  if (k % 3 === 1) { R(ctx, 'ink', x + w - 4, y - 8, 1, 8); R(ctx, 'ink', x + w - 6, y - 7, 5, 1); }
+  /* andares com sacada de grade, janelas e ar-condicionado */
+  let n = 0;
+  for (let wy = y + 3; wy < base - 15; wy += 7) {
+    for (let wx = x + 2; wx < x + w - 5; wx += 6) {
+      const v = (k * 5 + n++ * 3) % 6;
+      R(ctx, 'ink', wx, wy, 4, 5); R(ctx, v === 0 ? '#ffd65e' : v === 1 ? 'navy' : 'glass', wx + 1, wy + 1, 2, 3);
+      if (v === 2) R(ctx, 'pink', wx + 1, wy + 1, 1, 3);
+      if (v === 4) { R(ctx, 'ink', wx + 4, wy + 3, 3, 2); R(ctx, 'greyL', wx + 4, wy + 3, 2, 1); }
+    }
+    /* sacada: piso + grade */
+    R(ctx, shade, x, wy + 5, w - 2, 1); for (let gx = x + 1; gx < x + w - 2; gx += 2) R(ctx, '#2b223366', gx, wy + 3, 1, 2);
+    if ((k + wy) % 3 === 0) { R(ctx, 'ink', x + 3, wy + 2, w - 8, 1); R(ctx, ['red', 'yellow', 'blue', 'white'][(wy + k) % 4], x + 4, wy + 3, 2, 2); R(ctx, ['white', 'pink', 'green'][k % 3], x + 8, wy + 3, 2, 2); }
+  }
+  /* térreo: loja com letreiro, porta de aço e vitrine */
+  R(ctx, 'ink', x - 1, base - 15, w + 2, 15);
+  R(ctx, '#e9e3d6', x, base - 14, w, 14);
+  if (loja) sign(ctx, x + 1, base - 14, w - 2, loja[0], loja[1], loja[2]);
+  R(ctx, 'ink', x + 2, base - 6, w - 4, 6); R(ctx, '#9aa3ad', x + 3, base - 5, w - 6, 5); for (let j = base - 5; j < base; j += 2) R(ctx, '#7c8591', x + 3, j, w - 6, 1);
+  if (loja && loja[0] === 'FARMA') { R(ctx, 'white', x + w - 6, base - 22, 5, 5); R(ctx, 'green', x + w - 5, base - 21, 3, 3); R(ctx, 'white', x + w - 4, base - 21, 1, 3); R(ctx, 'white', x + w - 5, base - 20, 3, 1); }
+}
+function posteBR(ctx, x, top, base) { R(ctx, '#00000033', x + 1, base - 1, 5, 1); R(ctx, 'ink', x - 1, top, 4, base - top); R(ctx, '#b9b6ad', x, top, 2, base - top); R(ctx, 'ink', x - 4, top + 2, 10, 1); R(ctx, 'ink', x - 2, top + 6, 6, 3); R(ctx, '#5d6573', x - 1, top + 7, 4, 1); R(ctx, 'ink', x + 2, top - 1, 6, 2); R(ctx, '#fff1a8', x + 5, top + 1, 2, 1); }
+function fios(ctx, xs, y) { for (let w = 0; w < 3; w++) for (let i = 0; i < xs.length - 1; i++) { const a = xs[i], b = xs[i + 1]; for (let x = a; x <= b; x++) { const t = (x - a) / (b - a), sag = Math.sin(t * Math.PI) * (3 + w); R(ctx, '#2b2233aa', x, Math.round(y + w * 2 + sag), 1, 1); } } }
+function orelhao(ctx, x, base) { R(ctx, 'ink', x + 3, base - 13, 2, 13); R(ctx, '#00000033', x, base - 1, 8, 1); R(ctx, 'ink', x - 1, base - 20, 10, 9); R(ctx, '#2f7fd0', x, base - 19, 8, 7); R(ctx, '#f08a3c', x, base - 19, 8, 2); R(ctx, 'greyD', x + 3, base - 16, 2, 3); }
+function banca(ctx, x, base) { R(ctx, '#00000033', x + 1, base - 1, 22, 1); R(ctx, 'ink', x - 1, base - 19, 24, 19); R(ctx, '#2e8b57', x, base - 18, 22, 18); R(ctx, '#3cae6e', x, base - 18, 22, 3); sign(ctx, x + 1, base - 17, 20, 'BANCA', 'yellow', 'ink');
+  for (let i = 0; i < 4; i++) { R(ctx, ['red', 'white', 'blue', 'yellow'][i], x + 2 + i * 4, base - 9, 3, 4); R(ctx, '#2b223355', x + 2 + i * 4, base - 6, 3, 1); } R(ctx, 'ink', x, base - 3, 20, 1); }
+function ipe(ctx, x, base) { R(ctx, '#00000030', x - 2, base - 1, 18, 2); R(ctx, 'ink', x + 5, base - 14, 4, 14); R(ctx, 'brown', x + 6, base - 14, 2, 14); R(ctx, 'ink', x - 2, base - 28, 18, 15);
+  R(ctx, '#f4c542', x - 1, base - 27, 16, 13); R(ctx, '#ffd84d', x + 1, base - 29, 12, 3); for (let i = 0; i < 18; i++) R(ctx, i % 3 ? '#fff1a8' : '#d9a520', x - 1 + (i * 7) % 16, base - 27 + (i * 5) % 12, 1, 1); }
+function calcadaPortuguesa(ctx, y, h) { R(ctx, '#f3efe6', 0, y, SW, h); for (let x = 0; x < SW; x++) { const yy = Math.round(y + h / 2 + Math.sin(x / 4) * (h / 2 - 1)); R(ctx, '#2b2233', x, yy, 1, 1); } R(ctx, 'white', 0, y + h, SW, 1); R(ctx, '#d3d0c6', 0, y + h + 1, SW, 1); }
+function muroGrafite(ctx, x, y, w, h) { R(ctx, 'ink', x - 1, y - 1, w + 2, h + 1); R(ctx, '#e9e3d6', x, y, w, h); const c = ['#e0705a', '#f4c542', '#3fa7a0', '#8f5fb8', '#4a78c9'];
+  for (let i = 0; i < w; i += 6) { R(ctx, c[(i / 6) % 5], x + i, y + 3 + (i % 4), 5, h - 6 - (i % 4)); R(ctx, '#ffffff88', x + i + 1, y + 4 + (i % 4), 2, 1); } R(ctx, '#b9b2a4', x, y, w, 1); }
+
 const SCENES = {
   sala(ctx) {
     R(ctx, 'cream', 0, 0, SW, 64); stripes(ctx, '#ead8b8', 0, 0, SW, 64, 6);
@@ -1666,13 +1743,19 @@ const SCENES = {
     }
   },
   ruacasas(ctx) {
-    sky(ctx, 'sky', 58);
-    house(ctx, 6, 28, 34, 30, 'yellowL', 'red'); house(ctx, 50, 22, 30, 36, 'tealL', 'blueD'); house(ctx, 92, 30, 28, 28, 'pink', 'brown'); house(ctx, 128, 26, 30, 32, 'greenL', 'redD');
-    sidewalk(ctx, 58, 7);
+    sky(ctx, 'sky', 58); morro(ctx, 46);
+    house(ctx, 6, 28, 34, 30, 'yellowL', 'orangeD'); house(ctx, 50, 22, 30, 36, 'tealL', 'orangeD'); house(ctx, 92, 30, 28, 28, 'pink', 'red'); house(ctx, 128, 26, 30, 32, 'greenL', 'orangeD');
+    caixaAgua(ctx, 30, 14); caixaAgua(ctx, 70, 8); caixaAgua(ctx, 146, 12);
+    for (const x of [0, 44, 84, 124]) { R(ctx, 'ink', x, 50, 4, 8); R(ctx, '#e9e3d6', x + 1, 51, 2, 7); }
+    for (let x = 4; x < SW; x += 3) if (!((x > 18 && x < 28) || (x > 60 && x < 70) || (x > 100 && x < 110) || (x > 138 && x < 148))) R(ctx, '#2b223399', x, 51, 1, 7);
+    R(ctx, '#2b223399', 0, 51, SW, 1);
+    sidewalk(ctx, 58, 7); R(ctx, 'white', 0, 65, SW, 2);
     road(ctx, 67, 23, 64);
-    put(ctx, 'vaso', 42, 42); put(ctx, 'vaso', 84, 42); put(ctx, 'hidrante', 122, 42);
-    R(ctx, 'ink', 140, 8, 6, 2); R(ctx, 'pink', 141, 6, 4, 2);
+    posteBR(ctx, 46, 14, 60); posteBR(ctx, 122, 14, 60); fios(ctx, [0, 47, 123, 160], 15);
+    ipe(ctx, 84, 60);
+    put(ctx, 'vaso', 42, 42); put(ctx, 'hidrante', 122, 42);
   },
+
   quarto(ctx) {
     R(ctx, 'purpleL', 0, 0, SW, 64);
     for (let y = 4; y < 60; y += 12) for (let x = (y / 12 % 2) * 8 + 4; x < SW; x += 16) { R(ctx, 'pink', x, y, 3, 3); R(ctx, 'white', x + 1, y + 1, 1, 1); }
@@ -1718,15 +1801,18 @@ const SCENES = {
     for (const [x, y, c] of [[30, 50, 'pink'], [36, 52, 'yellow'], [84, 46, 'red'], [140, 50, 'pink'], [150, 46, 'yellow']]) { R(ctx, 'green', x, y + 2, 1, 3); R(ctx, c, x - 1, y, 3, 2); }
   },
   rua(ctx) {
-    sky(ctx, '#ffd9a8', 50); R(ctx, '#ffe9c7', 0, 0, SW, 20);
-    house(ctx, 4, 22, 30, 28, 'cream', 'orangeD'); house(ctx, 44, 16, 36, 34, 'blueL', 'navy'); house(ctx, 92, 24, 28, 26, 'yellowL', 'red'); house(ctx, 130, 20, 26, 30, 'pink', 'brownD');
-    sidewalk(ctx, 50, 14); R(ctx, 'grey', 0, 64, SW, 2);
+    sky(ctx, '#ffd9a8', 50); R(ctx, '#ffe9c7', 0, 0, SW, 20); morro(ctx, 44);
+    house(ctx, 4, 22, 30, 28, 'cream', 'orangeD'); house(ctx, 44, 16, 36, 34, 'blueL', 'orangeD'); house(ctx, 92, 24, 28, 26, 'yellowL', 'red'); house(ctx, 130, 20, 26, 30, 'pink', 'brownD');
+    caixaAgua(ctx, 70, 4); caixaAgua(ctx, 22, 10);
+    R(ctx, 'ink', 96, 18, 18, 1); R(ctx, 'red', 99, 19, 3, 3); R(ctx, 'white', 104, 19, 3, 4); R(ctx, 'blue', 109, 19, 3, 3);
+    muroGrafite(ctx, 0, 42, 44, 8); muroGrafite(ctx, 120, 42, 40, 8);
+    sidewalk(ctx, 50, 14); R(ctx, 'white', 0, 64, SW, 2);
     road(ctx, 66, 24, null);
-    R(ctx, 'greyD', 86, 18, 2, 34); R(ctx, 'greyD', 86, 18, 9, 2); R(ctx, 'greyL', 92, 20, 5, 2);
-    /* amarelinha na calçada e detalhes */
+    posteBR(ctx, 86, 18, 52); fios(ctx, [0, 87, 160], 19);
     for (let i = 0; i < 4; i++) { R(ctx, 'white', 112 + i * 7, 56, 6, 1); R(ctx, 'white', 112 + i * 7, 61, 6, 1); R(ctx, 'white', 112 + i * 7, 56, 1, 6); }
     put(ctx, 'hidrante', 2, 40); put(ctx, 'vaso', 36, 38);
   },
+
   ruanoite(ctx) {
     R(ctx, 'night', 0, 0, SW, 50); for (const [x, y] of [[10, 6], [40, 12], [70, 4], [104, 9], [140, 5], [150, 18], [24, 20]]) R(ctx, 'yellowL', x, y, 1, 1);
     R(ctx, 'white', 128, 6, 8, 8); R(ctx, 'night', 131, 5, 8, 7);
@@ -1741,14 +1827,14 @@ const SCENES = {
     for (let i = 0; i < SW; i += 8) { const y = 18 + Math.round(Math.sin(i / 25) * 3); R(ctx, ['red', 'yellow', 'teal', 'pink', 'green'][(i / 8) % 5], i + 2, y, 4, 4); R(ctx, 'ink', i, y - 1, 8, 1); }
   },
   cidade(ctx) {
-    skyGrad(ctx, 'skyD', 'sky', 62); skyline(ctx, '#9fc7e3', 56);
-    const b = [[2, 26, 21, 'pink', 'pinkD'], [25, 14, 18, 'yellowL', 'yellowD'], [45, 30, 16, 'tealL', 'teal'], [63, 8, 22, 'purpleL', 'purple'], [87, 22, 18, 'greenL', 'green'], [107, 12, 20, 'blueL', 'blue'], [129, 28, 14, 'cream', 'tan'], [145, 18, 15, 'orange', 'orangeD']];
-    b.forEach(([x, y, w, c, sh], k) => building(ctx, x, y, w, 60, c, sh, k));
-    sidewalk(ctx, 60, 6); road(ctx, 67, 23, 72);
-    lamp(ctx, 22, 36, 24); lamp(ctx, 104, 36, 24);
-    tree(ctx, 30, 44, 1); tree(ctx, 118, 46, 1);
-    busStop(ctx, 135, 46);
-    put(ctx, 'hidrante', 66, 46); put(ctx, 'bancoparque', 88, 50);
+    skyGrad(ctx, 'skyD', 'sky', 60); morro(ctx, 52);
+    const lojas = [['PADOCA', 'yellow', 'brownD'], ['FARMA', 'green', 'white'], ['LANCHE', 'red', 'white'], ['BAR', 'blue', 'white'], ['SALAO', 'pink', 'ink'], ['FEIRA', 'orange', 'ink']];
+    const b = [[1, 22, 26, 'cream', 'tan'], [29, 12, 26, 'tealL', 'teal'], [57, 26, 22, 'pink', 'pinkD'], [81, 8, 26, 'yellowL', 'yellowD'], [109, 20, 24, 'blueL', 'blue'], [135, 14, 25, 'greenL', 'green']];
+    b.forEach(([x, y, w, c, sh], k) => predioBR(ctx, x, y, w, 60, c, sh, k, lojas[k]));
+    calcadaPortuguesa(ctx, 60, 5); R(ctx, 'white', 0, 66, SW, 1);
+    road(ctx, 67, 23, 72);
+    posteBR(ctx, 24, 30, 64); posteBR(ctx, 96, 30, 64); posteBR(ctx, 150, 30, 64); fios(ctx, [0, 25, 97, 151, 160], 31);
+    ipe(ctx, 4, 64); orelhao(ctx, 70, 64); banca(ctx, 112, 64);
   }
 };
 
@@ -2775,7 +2861,7 @@ const DIFFS = {
 };
 const MODES = {
   solo: { label: 'Aventureiro', desc: 'Uma pessoa joga no próprio ritmo, com dicas aos poucos.' },
-  juntos: { label: 'Juntos na aventura', desc: 'De 2 a 6 pessoas no mesmo aparelho, revezando a vez e dividindo pistas secretas.' },
+  juntos: { label: 'Juntos no mesmo aparelho', desc: 'De 2 a 6 pessoas no mesmo celular ou computador, revezando a vez.' },
   sala: { label: 'Sala de aula', desc: 'Para projetor: letras grandes, a turma conversa e vota, o professor conduz.' }
 };
 
@@ -2950,8 +3036,9 @@ function ambientHTML(key) {
   }).join('') + '</div>';
 }
 function sceneHTML(key, { items = [], cast = [], faded = true, alt = '', extra = '', cap = false } = {}) {
-  const url = composeScene(key, items, cast).toDataURL();
-  return `<div class="scene ${faded ? 'faded' : ''} ${cap ? 'cap' : ''}"><img class="bg px" src="${url}" alt="${esc(alt)}">${ambientHTML(key)}<div class="fogl"></div>${extra}</div>`;
+  const url = composeScene(key, items, []).toDataURL();
+  const people = cast.map(m => { const c = SPR.canvas(m.id, m.mode); return `<img class="px sprite" src="${SPR.url(m.id, m.mode)}" alt="" style="left:${pct(m.x, SW)};top:${pct(m.y, SH)};width:${pct(c.width, SW)}${m.flip ? ';transform:scaleX(-1)' : ''}">`; }).join('');
+  return `<div class="scene ${faded ? 'faded' : ''} ${cap ? 'cap' : ''}"><img class="bg px" src="${url}" alt="${esc(alt)}">${ambientHTML(key)}<div class="layer castl">${people}</div><div class="fogl"></div>${extra}</div>`;
 }
 const pct = (v, total) => (v / total * 100).toFixed(3) + '%';
 function hotStyle(it) {
@@ -3704,7 +3791,8 @@ function screenSetup() {
     const dots = `<div class="steps-dots" aria-hidden="true">${V.map((_, i) => `<i class="${i <= st ? 'on' : ''}"></i>`).join('')}</div>`;
     let body = '';
     if (view === 'mode') body = `<h2>Como vocês vão jogar?</h2><p class="sub">Escolha um jeito de jogar. Dá para mudar numa próxima partida.</p>
-      <div class="choices">${Object.entries(MODES).map(([k, m]) => `<button class="panel choice-card" data-v="${k}" aria-pressed="${cfg.mode === k}"><div class="art">${modeArt[k].map(c => SPR.img(c)).join('')}</div><h3>${m.label}</h3><p>${m.desc}</p></button>`).join('')}</div>`;
+      <div class="choices">${Object.entries(MODES).map(([k, m]) => `<button class="panel choice-card" data-v="${k}" aria-pressed="${cfg.mode === k}"><div class="art">${modeArt[k].map(c => SPR.img(c)).join('')}</div><h3>${m.label}</h3><p>${m.desc}</p></button>`).join('')}
+        <button class="panel choice-card online-card" id="gonline"><div class="art">${SPR.img('casa')}${SPR.img('carta')}${SPR.img('casa')}</div><h3>Online: cada um na sua casa</h3><p>Você cria uma sala e manda um link. Seu amigo entra e cria o personagem dele no celular dele.</p></button></div>`;
     if (view === 'players') body = `<h2>Quem vai jogar?</h2><p class="sub">Quantas pessoas? Os apelidos são opcionais.</p>
       <div class="panel"><div class="count-pick" role="group" aria-label="Quantidade de jogadores">${[2, 3, 4, 5, 6].map(n => `<button class="btn" data-n="${n}" aria-pressed="${cfg.count === n}">${n}</button>`).join('')}</div>
       <div class="players">${Array.from({ length: cfg.count }, (_, i) => `<div class="player-row"><span class="pdot" style="background:${PLAYER_COLORS[i]};width:42px;height:42px">${i + 1}</span><label class="sr" for="pn${i}">Apelido do jogador ${i + 1}</label><input id="pn${i}" maxlength="18" value="${esc(cfg.names[i])}" autocomplete="off"></div>`).join('')}</div>
@@ -3731,6 +3819,7 @@ function screenSetup() {
       <div class="choices">${Object.entries(PLANS).map(([k, p]) => { const n = Object.values(p.regions).flat().length, r = Object.keys(p.regions).length; return `<button class="panel choice-card" data-v="${k}" aria-pressed="${cfg.length === k}"><div class="art">${Object.values(p.regions).flat().slice(0, 6).map(c => SPR.img(c, 'sil')).join('')}</div><h3>${p.label} · ${p.time}</h3><p>${r} regiões, ${n} ${n > 1 ? 'missões' : 'missão'} e o grande final.</p></button>`; }).join('')}</div>`;
     app().innerHTML = `<div class="screen setup">${dots}${body}<div class="row" style="margin-top:20px;justify-content:space-between"><button class="btn" id="back">${ICON.back} Voltar</button><button class="btn primary big" id="fwd">${st === steps - 1 ? 'Começar!' : 'Próximo'} ${ICON.next}</button></div></div>`;
     $$('[data-v]').forEach(b => b.onclick = () => { Audio8.sfx('select'); cfg[view] = b.dataset.v; draw(); $(`[data-v="${b.dataset.v}"]`).focus(); });
+    if ($('#gonline')) $('#gonline').onclick = () => { Audio8.sfx('select'); go(screenOnlineHost); };
     $$('[data-n]').forEach(b => b.onclick = () => { saveNames(); cfg.count = +b.dataset.n; Audio8.sfx('select'); draw(); $(`[data-n="${b.dataset.n}"]`).focus(); });
     $$('[data-cm]').forEach(b => b.onclick = () => { saveNames(); cfg.clueMode = b.dataset.cm; Audio8.sfx('select'); draw(); $(`[data-cm="${b.dataset.cm}"]`).focus(); });
     $$('[data-who]').forEach(b => b.onclick = () => { cfg.who = +b.dataset.who; Audio8.sfx('select'); draw(); });
@@ -4602,6 +4691,31 @@ function mgSay(box, html, kind = 'ok') {
   box.innerHTML = html; box.className = 'mgsay on ' + kind;
   clearTimeout(box._t); box._t = setTimeout(() => box.className = 'mgsay', 2400);
 }
+/* mãozinha que ensina o gesto (some no primeiro toque da criança) */
+function handEl() { const h = document.createElement('div'); h.className = 'ghand'; h.innerHTML = SPR.img('mao'); document.body.appendChild(h); onCleanup(() => h.remove()); return h; }
+const centerOf = el => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; };
+function stopOnTouch(fn) { const f = e => { if (e.isTrusted) { fn(); document.removeEventListener('pointerdown', f, true); } }; document.addEventListener('pointerdown', f, true); onCleanup(() => document.removeEventListener('pointerdown', f, true)); }
+function demoTap(el, delay = 700) {
+  if (!el || S.reduceMotion || window.__noDemo) return;
+  const h = handEl(); let alive = true; stopOnTouch(() => { alive = false; h.remove(); });
+  const go = n => { if (!alive || !document.body.contains(el)) return h.remove(); const [x, y] = centerOf(el); h.style.left = x + 'px'; h.style.top = y + 'px'; h.style.opacity = 1;
+    h.animate([{ transform: 'translate(-30%, 30%) scale(1)' }, { transform: 'translate(-30%, 5%) scale(.82)' }, { transform: 'translate(-30%, 30%) scale(1)' }], { duration: 650, iterations: 2 }).onfinish = () => { if (n > 1) setTimeout(() => go(n - 1), 900); else h.remove(); }; };
+  setTimeout(() => go(3), delay);
+}
+function demoDrag(from, to, src, delay = 700) {
+  if (!from || !to || S.reduceMotion || window.__noDemo) return;
+  const h = handEl(), gh = document.createElement('img'); gh.className = 'gdrag px'; gh.src = src; document.body.appendChild(gh); onCleanup(() => gh.remove());
+  let alive = true; const end = () => { alive = false; h.remove(); gh.remove(); }; stopOnTouch(end);
+  const run = n => {
+    if (!alive || !document.body.contains(from)) return end();
+    const [x0, y0] = centerOf(from), [x1, y1] = centerOf(to), w = from.getBoundingClientRect().width;
+    gh.style.width = w + 'px'; [h, gh].forEach(e => { e.style.left = x0 + 'px'; e.style.top = y0 + 'px'; e.style.opacity = 1; });
+    const kf = [{ transform: 'translate(-50%, -50%) scale(1)', offset: 0 }, { transform: 'translate(-50%, -60%) scale(1.2)', offset: .15 }, { transform: `translate(calc(-50% + ${x1 - x0}px), calc(-50% + ${y1 - y0}px)) scale(1.1)`, offset: .8 }, { transform: `translate(calc(-50% + ${x1 - x0}px), calc(-50% + ${y1 - y0}px)) scale(.3)`, offset: 1 }];
+    gh.animate(kf, { duration: 1700, easing: 'ease-in-out' });
+    h.style.marginLeft = '10px'; h.style.marginTop = '16px'; h.animate(kf, { duration: 1700, easing: 'ease-in-out' }).onfinish = () => { gh.style.opacity = 0; h.style.opacity = 0; if (n > 1) setTimeout(() => run(n - 1), 900); else end(); };
+  };
+  setTimeout(() => run(3), delay);
+}
 function floatText(root, html, x = 50, y = 40) {
   if (!root) return;
   const e = document.createElement('div'); e.className = 'floattx'; e.innerHTML = html;
@@ -4628,7 +4742,7 @@ STEPS.tidy = function (step, ctx) {
   let sel = null, combo = 0, lastOk = 0, phase = 'tidy', folds = [0, 0, 0], left = items.length;
 
   ctx.stage.innerHTML = `<div class="mg tidy">
-    <div class="mghead"><img class="px" src="${SPR.url('cida')}" alt=""><b id="mgt">Arruma-arruma! Toque num objeto e depois no lugar dele.</b>
+    <div class="mghead"><img class="px" src="${SPR.url('cida')}" alt=""><b id="mgt">Arruma-arruma! <b>Arraste</b> cada coisa para o lugar certo.</b>
       <button class="ibtn" data-say data-local aria-label="Ouvir">${ICON.voice}</button></div>
     <div class="scene tidyroom" id="room"><img class="bg px" src="${composeScene('sala').toDataURL()}" alt="Sala bagunçada">
       <div class="dust" id="dust"></div><div class="layer" id="lay"></div><div class="mgsay" id="say"></div></div>
@@ -4643,13 +4757,13 @@ STEPS.tidy = function (step, ctx) {
     b.style.animationDelay = (it.k * .07) + 's';
     b.innerHTML = SPR.img(it.prop); b.setAttribute('aria-label', 'Objeto bagunçado');
     lay.appendChild(b); it.el = b;
-    b.onclick = () => { if (it.done || phase !== 'tidy') return; ctx.activity(); Audio8.sfx('select'); if (sel) sel.el.classList.remove('sel'); sel = it; b.classList.add('sel'); $('#bins', ctx.stage).classList.add('ready'); };
+    b.onclick = () => { if (it.done || phase !== 'tidy' || (b._dragged && Date.now() - b._dragged < 400)) return; ctx.activity(); Audio8.sfx('select'); if (sel) sel.el.classList.remove('sel'); sel = it; b.classList.add('sel'); $('#bins', ctx.stage).classList.add('ready'); };
   });
   const upd = () => {
     const p = left / items.length; $('#mess', ctx.stage).style.width = (p * 100) + '%';
     $('#dust', ctx.stage).style.opacity = .55 * p;
   };
-  $$('.tbin', ctx.stage).forEach(b => b.onclick = () => {
+  const tryPut = b => {
     if (phase !== 'tidy') return; ctx.activity();
     if (!sel) { mgSay(say, 'Primeiro toque num objeto bagunçado!', 'info'); b.classList.add('shake'); setTimeout(() => b.classList.remove('shake'), 400); return; }
     const it = sel;
@@ -4667,10 +4781,31 @@ STEPS.tidy = function (step, ctx) {
       const nm = BINS.find(x => x.id === it.bin).label;
       mgSay(say, ctx.colored || G.diff === 'exp' ? `Ops! Esse vai em <b>${nm}</b>.` : 'Ops! Não é aí. Tente outro lugar!', 'soft');
     }
+  };
+  $$('.tbin', ctx.stage).forEach(b => b.onclick = () => tryPut(b));
+  /* arrastar com o dedo (no online, só tocar, para os aparelhos ficarem iguais) */
+  items.forEach(it => {
+    it.el.addEventListener('pointerdown', e => {
+      if (it.done || phase !== 'tidy' || (typeof NET !== 'undefined' && NET.started)) return;
+      const x0 = e.clientX, y0 = e.clientY; let gh = null;
+      const mv = ev => {
+        if (!gh && Math.hypot(ev.clientX - x0, ev.clientY - y0) > 8) { gh = document.createElement('img'); gh.className = 'gdrag px'; gh.src = SPR.url(it.prop); gh.style.width = it.el.getBoundingClientRect().width * 1.3 + 'px'; document.body.appendChild(gh); it.el.style.opacity = .3; it.el.click(); }
+        if (gh) { gh.style.left = ev.clientX + 'px'; gh.style.top = ev.clientY + 'px'; gh.style.transform = 'translate(-50%, -60%) rotate(-6deg)'; const t = document.elementFromPoint(ev.clientX, ev.clientY); $$('.tbin', ctx.stage).forEach(b => b.classList.toggle('over', !!t && b.contains(t))); ev.preventDefault(); }
+      };
+      const up = ev => {
+        document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up);
+        if (!gh) return; gh.remove(); it.el.style.opacity = ''; $$('.tbin', ctx.stage).forEach(b => b.classList.remove('over'));
+        const t = document.elementFromPoint(ev.clientX, ev.clientY), b = t && t.closest('.tbin'); if (b) tryPut(b);
+        it.el._dragged = Date.now();
+      };
+      document.addEventListener('pointermove', mv, { passive: false }); document.addEventListener('pointerup', up);
+    });
   });
+  { const f = items[0]; setTimeout(() => demoDrag(f.el, $(`.tbin[data-bin="${f.bin}"]`, ctx.stage), SPR.url(f.prop)), 400); }
   const foldPhase = () => {
     phase = 'fold'; Audio8.sfx('ok'); confetti(20);
     $('#mgt', ctx.stage).textContent = 'Sala arrumada! Agora dobre as camisetas: toque 3 vezes em cada uma.';
+    setTimeout(() => demoTap($('.shirt', ctx.stage)), 300);
     $('#bins', ctx.stage).hidden = true; $('.mgbar', ctx.stage).hidden = true;
     const f = $('#folds', ctx.stage); room.appendChild(f); f.hidden = false;
     f.innerHTML = folds.map((_, i) => `<button class="shirt" data-f="${i}">${SPR.img('camiseta')}<span class="dots"><i></i><i></i><i></i></span></button>`).join('') + `<div class="drawer">${SPR.img('roupa')}<span>Gaveta</span></div>`;
@@ -4778,7 +4913,7 @@ STEPS.cook = function (step, ctx) {
     tray.innerHTML = `<p class="traylab">Ferramentas e ingredientes</p>` + TOOLS.concat(Object.keys(ING)).map(id => btn(id, id === 'fogo' ? 'Fogo' : id === 'colher' ? 'Mexer' : id === 'escorredor' ? 'Escorredor' : id === 'tampa' ? 'Tampa' : LABEL[id])).join('');
     $$('.ing', tray).forEach(b => b.onclick = () => act(b.dataset.ing, b));
     cv.onclick = () => act('colher', $('[data-ing="colher"]', tray));
-    showStep();
+    showStep(); setTimeout(() => demoTap($('[data-ing="escorredor"]', tray)), 300);
   };
   const showStep = () => {
     const s = PLAN[k]; $('#mgt', ctx.stage).textContent = s.say; stirs = 0; wrongInRow = 0;
@@ -4830,7 +4965,7 @@ STEPS.cook = function (step, ctx) {
     addMedal('curiosidade', 1, 'cook:' + ctx.id);
     ctx.complete();
   };
-  renderShop();
+  renderShop(); setTimeout(() => demoTap($('[data-ing="arroz"]', tray)), 500);
   return {
     speak: () => phase === 'shop' ? 'Pegue só o que vai na receita de arroz.' : PLAN[k] ? PLAN[k].say : 'Arroz pronto!',
     hint() {
@@ -4884,7 +5019,7 @@ STEPS.fire = function (step, ctx) {
   const lay = $('#lay', ctx.stage), sc = $('#js', ctx.stage), say = $('#say', ctx.stage);
   const truck = spriteEl('bombeiros', -50, 66, { w: 48 }); lay.appendChild(truck); setTimeout(() => moveEl(truck, 4, 66, 1200), 50);
   const jo = spriteEl('joana', 26, 50); lay.appendChild(jo);
-  $('#hyd', ctx.stage).classList.add('glow');
+  $('#hyd', ctx.stage).classList.add('glow'); setTimeout(() => demoTap($('#hyd', ctx.stage)), 900);
   const spawn = () => {
     if (spawned >= goal) return;
     const free = SPOTS.filter(p => !flames.some(f => f.x === p[0]));
@@ -4919,7 +5054,7 @@ STEPS.fire = function (step, ctx) {
   $('#hyd', ctx.stage).onclick = () => {
     if (hose) return; ctx.activity(); hose = true; Audio8.sfx('ok');
     $('#hyd', ctx.stage).classList.remove('glow'); $('#hose', ctx.stage).hidden = false;
-    setHead(ctx, 'Água ligada! <b>Toque nas chamas</b> até apagar.');
+    setHead(ctx, 'Água ligada! <b>Toque nas chamas</b> até apagar.'); if (flames[0]) setTimeout(() => demoTap(flames[0].el, 0), 200);
     mgSay(say, 'Mangueira ligada!');
   };
   for (let i = 0; i < (G.diff === 'exp' ? 3 : 4); i++) spawn();
@@ -5025,7 +5160,7 @@ STEPS.water = function (step, ctx) {
     if (S.autoRead) Voice.speak('Água limpinha na torneira! Muita gente trabalhou para ela chegar aqui.');
     ctx.complete();
   };
-  showStep();
+  showStep(); setTimeout(() => demoTap($('.jhot[data-st="0"]', ctx.stage)), 500);
   return {
     speak: () => ST[k] ? ST[k].say.replace(/<[^>]+>/g, '') : 'Água limpinha!',
     hint() { ctx.usedHint(); showStep(); },
@@ -5054,7 +5189,7 @@ STEPS.cross = function (step, ctx) {
   const spawnKids = () => {
     const ids = shuffle(['theo', 'bia', 'iara', 'davi']).slice(0, 2);
     const els = ids.map((id, i) => { const e = spriteEl(id, 60 + i * 9, 40); lay.appendChild(e); return e; });
-    kids = { els, state: 'wait' }; waitT = 0;
+    kids = { els, state: 'wait' }; waitT = 0; if (!crossed) demoTap($('#cpare', ctx.stage), 300);
     floatText(sc, 'Quero atravessar!', 45, 30); Audio8.sfx('select');
   };
   const upd = () => { $('#cnt', ctx.stage).textContent = `${crossed}/${goal}`; $('#cpare', ctx.stage).disabled = mode === 'stop'; $('#csiga', ctx.stage).disabled = mode === 'go'; sign.style.opacity = mode === 'stop' ? 1 : 0; };
@@ -5151,7 +5286,7 @@ STEPS.power = function (step, ctx) {
   const glow = p => $$('.jhot', ctx.stage).forEach(b => b.classList.toggle('glow', b.dataset.p === p || (p === 'roofs' && b.dataset.p.startsWith('roof') && !panels.has(+b.dataset.p.slice(4)))));
   const bar = v => { $('#en', ctx.stage).style.width = Math.min(100, v) + '%'; };
   let turbTaps = 0; const need = G.diff === 'exp' ? 6 : 9;
-  glow('gate');
+  glow('gate'); setTimeout(() => demoTap($('.jhot[data-p="gate"]', ctx.stage)), 500);
   $$('.jhot', ctx.stage).forEach(b => b.onclick = () => {
     if (done) return; ctx.activity(); const p = b.dataset.p;
     const wrong = msg => { ctx.mistake(); Audio8.sfx('soft'); mgSay(say, msg, 'soft'); };
@@ -5258,7 +5393,7 @@ STEPS.recycle = function (step, ctx) {
     if (S.autoRead) Voice.speak(msg);
     ctx.complete();
   };
-  renderSort();
+  renderSort(); setTimeout(() => demoTap($(`.rbin[data-b="${items[0][1]}"]`, ra)), 600);
   return {
     speak: () => $('#mgt', ctx.stage).textContent,
     hint() { ctx.usedHint(); if (phase === 'sort') { const b = $(`.rbin[data-b="${items[k][1]}"]`, ra); if (b) { b.classList.add('glow'); setTimeout(() => b.classList.remove('glow'), 1500); } } },
@@ -5385,7 +5520,19 @@ function onData(raw, conn) {
 
 /* ---------- telas ---------- */
 function avatarPickerHTML(av) {
-  return `<div class="row" style="align-items:center;gap:14px"><img class="px" id="oav" src="${SPR.url(avatarId(av))}" style="width:64px;height:96px" alt="Seu personagem"><button class="btn" id="oavr" data-local>Trocar visual</button></div>`;
+  const O = AVATAR_OPTS, sw = (k, v) => `<button class="av-mini sw" data-ak="${k}" data-av="${v}" aria-pressed="${av[k] === v}" style="background:${col(k === 'skin' ? PAL[v] : v)}" aria-label="${k}"></button>`;
+  const pic = (k, v) => `<button class="av-mini pic" data-ak="${k}" data-av="${v}" aria-pressed="${av[k] === v}">${SPR.img(avatarId({ ...av, [k]: v }))}</button>`;
+  return `<div class="avp" id="avp"><div class="avp-prev"><img class="px" id="oav" src="${SPR.url(avatarId(av))}" alt="Seu personagem"><button class="btn small" id="oavr" data-local>Surpresa!</button></div>
+    <div class="avp-rows"><b>Pele</b><div class="avp-row">${O.skin.map(v => sw('skin', v)).join('')}</div>
+    <b>Cabelo</b><div class="avp-row">${O.hair.map(v => pic('hair', v)).join('')}</div>
+    <b>Cor do cabelo</b><div class="avp-row">${O.hairColor.map(v => sw('hairColor', v)).join('')}</div>
+    <b>Roupa</b><div class="avp-row">${O.shirt.map(v => sw('shirt', v)).join('')}</div>
+    <b>Detalhe</b><div class="avp-row">${O.extra.map(v => pic('extra', v)).join('')}</div></div></div>`;
+}
+function wireAvatarPicker(cfg) {
+  const redraw = () => { const box = $('#avp'); if (!box) return; box.outerHTML = avatarPickerHTML(cfg.avatar); wireAvatarPicker(cfg); };
+  $('#oavr').onclick = () => { cfg.avatar = randomAvatar(); Audio8.sfx('select'); redraw(); };
+  $$('#avp [data-ak]').forEach(b => { b.setAttribute('data-local', ''); b.onclick = () => { cfg.avatar[b.dataset.ak] = b.dataset.av; Audio8.sfx('click'); redraw(); }; });
 }
 function screenOnline() {
   app().innerHTML = `<div class="screen setup"><h2>Jogar online com amigos</h2>
@@ -5413,7 +5560,7 @@ function screenOnlineHost() {
         <div class="row"><button class="btn" id="bk">${ICON.back} Voltar</button><span class="grow"></span><button class="btn primary big" id="go">Criar sala</button></div>
       </div></div>`;
     $('#on').oninput = e => cfg.name = e.target.value;
-    $('#oavr').onclick = () => { cfg.avatar = randomAvatar(); $('#oav').src = SPR.url(avatarId(cfg.avatar)); };
+    wireAvatarPicker(cfg);
     $$('[data-d]').forEach(b => b.onclick = () => { cfg.diff = b.dataset.d; draw(); });
     $$('[data-l]').forEach(b => b.onclick = () => { cfg.length = b.dataset.l; draw(); });
     $('#bk').onclick = () => go(screenOnline);
@@ -5443,17 +5590,18 @@ function startHost(cfg, tries = 0) {
     });
   });
 }
-function screenOnlineJoin() {
-  const cfg = { name: '', avatar: randomAvatar(), code: '' };
+function screenOnlineJoin(code0 = '') {
+  const cfg = { name: '', avatar: randomAvatar(), code: code0 };
   app().innerHTML = `<div class="screen setup"><h2>Entrar numa sala</h2>
     <div class="panel stage" style="max-width:720px;margin:0 auto">
-      <label for="oc" style="font-weight:800">Código da sala</label><input class="txt code-in" id="oc" maxlength="4" autocomplete="off" autocapitalize="characters" placeholder="ABCD">
+      <label for="oc" style="font-weight:800">Código da sala</label><input class="txt code-in" id="oc" maxlength="4" autocomplete="off" autocapitalize="characters" placeholder="ABCD" value="${esc(cfg.code)}">
       <label for="on" style="font-weight:800">Seu apelido</label><input class="txt" id="on" maxlength="18" placeholder="Ex.: Ana">
-      ${avatarPickerHTML(cfg.avatar)}
+      <p style="font-weight:800;margin:0">Monte o seu personagem:</p>${avatarPickerHTML(cfg.avatar)}
       <div id="st"></div>
       <div class="row"><button class="btn" id="bk">${ICON.back} Voltar</button><span class="grow"></span><button class="btn primary big" id="go">Entrar</button></div>
     </div></div>`;
-  $('#oavr').onclick = () => { cfg.avatar = randomAvatar(); $('#oav').src = SPR.url(avatarId(cfg.avatar)); };
+  wireAvatarPicker(cfg);
+  if (cfg.code) setTimeout(() => { const n = $('#on'); if (n) n.focus(); }, 50);
   $('#bk').onclick = () => { netReset(); go(screenOnline); };
   $('#go').onclick = () => {
     const code = $('#oc').value.toUpperCase().replace(/[^A-Z0-9]/g, ''); if (code.length !== 4) { $('#st').innerHTML = '<div class="feedback soft">O código tem 4 letras ou números.</div>'; return; }
@@ -5480,12 +5628,20 @@ function renderLobby() {
   box.innerHTML = `<h2>${host ? 'Sua sala está aberta!' : 'Você entrou na sala!'}</h2>
     <div class="panel stage" style="max-width:760px;margin:0 auto;text-align:center">
       ${host ? `<p style="font-weight:800;margin:0">Mande este código para seus amigos:</p><div class="code big" style="margin:0 auto">${NET.peer && NET.peer.open ? NET.code : '····'}</div>
-        <p class="muted" style="font-weight:700;margin:0">Eles abrem o jogo, tocam em <b>Jogar online</b> › <b>Entrar numa sala</b> e digitam o código.</p>` : `<p style="font-weight:800;margin:0">Sala <span class="code">${esc(NET.code)}</span>. Esperando o anfitrião começar…</p>`}
+        <div class="row center"><button class="btn primary" id="invite" data-local>${SPR.img('carta')} Convidar amigo</button><button class="btn" id="cpcode" data-local>Copiar código</button></div>
+        <p class="muted" style="font-weight:700;margin:0">Seu amigo abre o link, digita o apelido e <b>monta o personagem dele</b>. Depois é só você tocar em Começar.</p>` : `<p style="font-weight:800;margin:0">Sala <span class="code">${esc(NET.code)}</span>. Esperando o anfitrião começar…</p>`}
       <div class="row center" style="gap:18px;margin-top:10px">${NET.players.map((p, i) => `<div style="display:grid;justify-items:center;gap:4px"><img class="px" src="${SPR.url(avatarId(p.avatar))}" style="width:56px;height:84px" alt=""><span class="tag" style="background:${p.color}">${esc(p.name)}${i === NET.me ? ' (você)' : ''}</span></div>`).join('')}</div>
       <p style="font-weight:700;margin:0">${NET.players.length} de 4 jogadores</p>
       <div class="row center">${host ? `<button class="btn primary big" id="start" ${NET.players.length < 2 ? 'disabled' : ''}>Começar a aventura</button>` : ''}<button class="btn" id="leave">Sair da sala</button></div>
       ${host && NET.players.length < 2 ? '<p class="muted" style="font-weight:700;margin:0">O botão de começar libera quando alguém entrar.</p>' : ''}
     </div>`;
+  const inv = $('#invite'); if (inv) inv.onclick = async () => {
+    const link = location.href.split(/[?#]/)[0] + '?sala=' + NET.code + (new URLSearchParams(location.search).get('peer') ? '&peer=' + new URLSearchParams(location.search).get('peer') : '');
+    const text = `Bora jogar "A Cidade que Esqueceu" comigo? Toque no link e entre na sala ${NET.code}:`;
+    try { if (navigator.share) { await navigator.share({ title: 'A Cidade que Esqueceu', text, url: link }); return; } } catch (e) { return; }
+    try { await navigator.clipboard.writeText(text + ' ' + link); toast('Link copiado! Cole no WhatsApp do seu amigo.', 'carta'); } catch (e) { toast('Mande este link: ' + link); }
+  };
+  const cp = $('#cpcode'); if (cp) cp.onclick = async () => { try { await navigator.clipboard.writeText(NET.code); toast('Código copiado!', 'carta'); } catch (e) { toast('Código: ' + NET.code); } };
   const st = $('#start'); if (st) st.onclick = () => {
     newGame({ mode: 'juntos', players: NET.players, diff: NET.cfg.diff, length: NET.cfg.length, clueMode: 'online' });
     NET.started = true; netSend({ t: 'start' }); go(screenPrologue);
@@ -5648,7 +5804,9 @@ function screenVisit(d, name = 'Amigo') {
   const wake = () => { Audio8.init(); };
   document.addEventListener('pointerdown', wake, { once: true });
   document.addEventListener('keydown', wake, { once: true });
-  if (window.__visit) go(screenVisit, ...window.__visit); else go(screenTitle);
+  const sala = (new URLSearchParams(location.search).get('sala') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
+  if (sala.length === 4) { const q = new URLSearchParams(location.search).get('peer'); history.replaceState(null, '', location.pathname + (q ? '?peer=' + q : '')); go(screenOnlineJoin, sala); }
+  else if (window.__visit) go(screenVisit, ...window.__visit); else go(screenTitle);
 })();
 /* celular: pedir para girar e, no Android, tela cheia na horizontal */
 (function () {
@@ -5661,11 +5819,11 @@ function screenVisit(d, name = 'Amigo') {
   document.body.appendChild(el);
   el.querySelector('#rotskip').onclick = () => { document.documentElement.classList.add('rotok'); try { sessionStorage.setItem('rotOk', '1'); } catch (e) {} };
   /* primeiro toque: tela cheia + travar na horizontal quando o navegador deixa (Android) */
-  let tried = false;
+  /* tela cheia só quando o celular já está deitado (não gira a tela sozinho) */
   document.addEventListener('pointerup', () => {
-    if (tried) return; tried = true;
     const d = document.documentElement;
-    if (d.requestFullscreen && !document.fullscreenElement) d.requestFullscreen({ navigationUI: 'hide' }).then(() => screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape').catch(() => {})).catch(() => {});
+    if (!matchMedia('(orientation: landscape)').matches || document.fullscreenElement || !d.requestFullscreen) return;
+    d.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
   }, { capture: true });
 })();
 </script>

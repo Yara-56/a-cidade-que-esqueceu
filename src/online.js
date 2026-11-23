@@ -107,7 +107,19 @@ function onData(raw, conn) {
 
 /* ---------- telas ---------- */
 function avatarPickerHTML(av) {
-  return `<div class="row" style="align-items:center;gap:14px"><img class="px" id="oav" src="${SPR.url(avatarId(av))}" style="width:64px;height:96px" alt="Seu personagem"><button class="btn" id="oavr" data-local>Trocar visual</button></div>`;
+  const O = AVATAR_OPTS, sw = (k, v) => `<button class="av-mini sw" data-ak="${k}" data-av="${v}" aria-pressed="${av[k] === v}" style="background:${col(k === 'skin' ? PAL[v] : v)}" aria-label="${k}"></button>`;
+  const pic = (k, v) => `<button class="av-mini pic" data-ak="${k}" data-av="${v}" aria-pressed="${av[k] === v}">${SPR.img(avatarId({ ...av, [k]: v }))}</button>`;
+  return `<div class="avp" id="avp"><div class="avp-prev"><img class="px" id="oav" src="${SPR.url(avatarId(av))}" alt="Seu personagem"><button class="btn small" id="oavr" data-local>Surpresa!</button></div>
+    <div class="avp-rows"><b>Pele</b><div class="avp-row">${O.skin.map(v => sw('skin', v)).join('')}</div>
+    <b>Cabelo</b><div class="avp-row">${O.hair.map(v => pic('hair', v)).join('')}</div>
+    <b>Cor do cabelo</b><div class="avp-row">${O.hairColor.map(v => sw('hairColor', v)).join('')}</div>
+    <b>Roupa</b><div class="avp-row">${O.shirt.map(v => sw('shirt', v)).join('')}</div>
+    <b>Detalhe</b><div class="avp-row">${O.extra.map(v => pic('extra', v)).join('')}</div></div></div>`;
+}
+function wireAvatarPicker(cfg) {
+  const redraw = () => { const box = $('#avp'); if (!box) return; box.outerHTML = avatarPickerHTML(cfg.avatar); wireAvatarPicker(cfg); };
+  $('#oavr').onclick = () => { cfg.avatar = randomAvatar(); Audio8.sfx('select'); redraw(); };
+  $$('#avp [data-ak]').forEach(b => { b.setAttribute('data-local', ''); b.onclick = () => { cfg.avatar[b.dataset.ak] = b.dataset.av; Audio8.sfx('click'); redraw(); }; });
 }
 function screenOnline() {
   app().innerHTML = `<div class="screen setup"><h2>Jogar online com amigos</h2>
@@ -135,7 +147,7 @@ function screenOnlineHost() {
         <div class="row"><button class="btn" id="bk">${ICON.back} Voltar</button><span class="grow"></span><button class="btn primary big" id="go">Criar sala</button></div>
       </div></div>`;
     $('#on').oninput = e => cfg.name = e.target.value;
-    $('#oavr').onclick = () => { cfg.avatar = randomAvatar(); $('#oav').src = SPR.url(avatarId(cfg.avatar)); };
+    wireAvatarPicker(cfg);
     $$('[data-d]').forEach(b => b.onclick = () => { cfg.diff = b.dataset.d; draw(); });
     $$('[data-l]').forEach(b => b.onclick = () => { cfg.length = b.dataset.l; draw(); });
     $('#bk').onclick = () => go(screenOnline);
@@ -165,17 +177,18 @@ function startHost(cfg, tries = 0) {
     });
   });
 }
-function screenOnlineJoin() {
-  const cfg = { name: '', avatar: randomAvatar(), code: '' };
+function screenOnlineJoin(code0 = '') {
+  const cfg = { name: '', avatar: randomAvatar(), code: code0 };
   app().innerHTML = `<div class="screen setup"><h2>Entrar numa sala</h2>
     <div class="panel stage" style="max-width:720px;margin:0 auto">
-      <label for="oc" style="font-weight:800">Código da sala</label><input class="txt code-in" id="oc" maxlength="4" autocomplete="off" autocapitalize="characters" placeholder="ABCD">
+      <label for="oc" style="font-weight:800">Código da sala</label><input class="txt code-in" id="oc" maxlength="4" autocomplete="off" autocapitalize="characters" placeholder="ABCD" value="${esc(cfg.code)}">
       <label for="on" style="font-weight:800">Seu apelido</label><input class="txt" id="on" maxlength="18" placeholder="Ex.: Ana">
-      ${avatarPickerHTML(cfg.avatar)}
+      <p style="font-weight:800;margin:0">Monte o seu personagem:</p>${avatarPickerHTML(cfg.avatar)}
       <div id="st"></div>
       <div class="row"><button class="btn" id="bk">${ICON.back} Voltar</button><span class="grow"></span><button class="btn primary big" id="go">Entrar</button></div>
     </div></div>`;
-  $('#oavr').onclick = () => { cfg.avatar = randomAvatar(); $('#oav').src = SPR.url(avatarId(cfg.avatar)); };
+  wireAvatarPicker(cfg);
+  if (cfg.code) setTimeout(() => { const n = $('#on'); if (n) n.focus(); }, 50);
   $('#bk').onclick = () => { netReset(); go(screenOnline); };
   $('#go').onclick = () => {
     const code = $('#oc').value.toUpperCase().replace(/[^A-Z0-9]/g, ''); if (code.length !== 4) { $('#st').innerHTML = '<div class="feedback soft">O código tem 4 letras ou números.</div>'; return; }
@@ -202,12 +215,20 @@ function renderLobby() {
   box.innerHTML = `<h2>${host ? 'Sua sala está aberta!' : 'Você entrou na sala!'}</h2>
     <div class="panel stage" style="max-width:760px;margin:0 auto;text-align:center">
       ${host ? `<p style="font-weight:800;margin:0">Mande este código para seus amigos:</p><div class="code big" style="margin:0 auto">${NET.peer && NET.peer.open ? NET.code : '····'}</div>
-        <p class="muted" style="font-weight:700;margin:0">Eles abrem o jogo, tocam em <b>Jogar online</b> › <b>Entrar numa sala</b> e digitam o código.</p>` : `<p style="font-weight:800;margin:0">Sala <span class="code">${esc(NET.code)}</span>. Esperando o anfitrião começar…</p>`}
+        <div class="row center"><button class="btn primary" id="invite" data-local>${SPR.img('carta')} Convidar amigo</button><button class="btn" id="cpcode" data-local>Copiar código</button></div>
+        <p class="muted" style="font-weight:700;margin:0">Seu amigo abre o link, digita o apelido e <b>monta o personagem dele</b>. Depois é só você tocar em Começar.</p>` : `<p style="font-weight:800;margin:0">Sala <span class="code">${esc(NET.code)}</span>. Esperando o anfitrião começar…</p>`}
       <div class="row center" style="gap:18px;margin-top:10px">${NET.players.map((p, i) => `<div style="display:grid;justify-items:center;gap:4px"><img class="px" src="${SPR.url(avatarId(p.avatar))}" style="width:56px;height:84px" alt=""><span class="tag" style="background:${p.color}">${esc(p.name)}${i === NET.me ? ' (você)' : ''}</span></div>`).join('')}</div>
       <p style="font-weight:700;margin:0">${NET.players.length} de 4 jogadores</p>
       <div class="row center">${host ? `<button class="btn primary big" id="start" ${NET.players.length < 2 ? 'disabled' : ''}>Começar a aventura</button>` : ''}<button class="btn" id="leave">Sair da sala</button></div>
       ${host && NET.players.length < 2 ? '<p class="muted" style="font-weight:700;margin:0">O botão de começar libera quando alguém entrar.</p>' : ''}
     </div>`;
+  const inv = $('#invite'); if (inv) inv.onclick = async () => {
+    const link = location.href.split(/[?#]/)[0] + '?sala=' + NET.code + (new URLSearchParams(location.search).get('peer') ? '&peer=' + new URLSearchParams(location.search).get('peer') : '');
+    const text = `Bora jogar "A Cidade que Esqueceu" comigo? Toque no link e entre na sala ${NET.code}:`;
+    try { if (navigator.share) { await navigator.share({ title: 'A Cidade que Esqueceu', text, url: link }); return; } } catch (e) { return; }
+    try { await navigator.clipboard.writeText(text + ' ' + link); toast('Link copiado! Cole no WhatsApp do seu amigo.', 'carta'); } catch (e) { toast('Mande este link: ' + link); }
+  };
+  const cp = $('#cpcode'); if (cp) cp.onclick = async () => { try { await navigator.clipboard.writeText(NET.code); toast('Código copiado!', 'carta'); } catch (e) { toast('Código: ' + NET.code); } };
   const st = $('#start'); if (st) st.onclick = () => {
     newGame({ mode: 'juntos', players: NET.players, diff: NET.cfg.diff, length: NET.cfg.length, clueMode: 'online' });
     NET.started = true; netSend({ t: 'start' }); go(screenPrologue);

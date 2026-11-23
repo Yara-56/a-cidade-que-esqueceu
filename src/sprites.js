@@ -223,6 +223,7 @@ const PROPS = {
   chip: { ops: [['ink', 4, 4, 8, 8], ['greyD', 5, 5, 6, 6], ['yellow', 2, 5, 2, 1], ['yellow', 2, 8, 2, 1], ['yellow', 12, 5, 2, 1], ['yellow', 12, 8, 2, 1], ['yellow', 5, 2, 1, 2], ['yellow', 9, 2, 1, 2], ['yellow', 5, 12, 1, 2], ['yellow', 9, 12, 1, 2], ['white', 6, 6, 2, 1]] },
   porquinho: { ops: [['pink', 2, 5, 12, 8], ['pink', 12, 6, 3, 4], ['pinkD', 14, 7, 2, 2], ['pink', 4, 3, 3, 3], ['ink', 10, 7, 1, 1], ['pinkD', 3, 13, 2, 2], ['pinkD', 10, 13, 2, 2], ['ink', 6, 5, 4, 1], ['pinkD', 0, 7, 2, 1]] },
   moeda: { ops: [['yellowD', 3, 3, 10, 10], ['yellow', 4, 4, 8, 8], ['yellowL', 5, 5, 2, 3], ['yellowD', 7, 6, 2, 4]] },
+  mao: { ops: [['s2', 6, 0, 3, 8], ['s2', 3, 7, 10, 7], ['s2', 1, 8, 2, 4], ['s3', 4, 9, 1, 3], ['s3', 7, 9, 1, 3], ['s3', 10, 9, 1, 3], ['white', 6, 1, 1, 2], ['white', 4, 14, 9, 2]] },
   /* cozinha: receita de arroz */
   arroz: { ops: [['white', 3, 4, 10, 11], ['cream', 3, 12, 10, 3], ['yellow', 4, 7, 8, 4], ['yellowD', 4, 10, 8, 1], ['white', 5, 8, 2, 2], ['white', 8, 8, 1, 1], ['brownL', 5, 2, 6, 2], ['brown', 6, 1, 4, 1]] },
   copoagua: { ops: [['glass', 4, 3, 8, 12], ['blueL', 4, 7, 8, 8], ['blue', 4, 13, 8, 2], ['white', 5, 4, 1, 3]] },

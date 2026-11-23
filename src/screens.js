@@ -86,7 +86,8 @@ function screenSetup() {
     const dots = `<div class="steps-dots" aria-hidden="true">${V.map((_, i) => `<i class="${i <= st ? 'on' : ''}"></i>`).join('')}</div>`;
     let body = '';
     if (view === 'mode') body = `<h2>Como vocês vão jogar?</h2><p class="sub">Escolha um jeito de jogar. Dá para mudar numa próxima partida.</p>
-      <div class="choices">${Object.entries(MODES).map(([k, m]) => `<button class="panel choice-card" data-v="${k}" aria-pressed="${cfg.mode === k}"><div class="art">${modeArt[k].map(c => SPR.img(c)).join('')}</div><h3>${m.label}</h3><p>${m.desc}</p></button>`).join('')}</div>`;
+      <div class="choices">${Object.entries(MODES).map(([k, m]) => `<button class="panel choice-card" data-v="${k}" aria-pressed="${cfg.mode === k}"><div class="art">${modeArt[k].map(c => SPR.img(c)).join('')}</div><h3>${m.label}</h3><p>${m.desc}</p></button>`).join('')}
+        <button class="panel choice-card online-card" id="gonline"><div class="art">${SPR.img('casa')}${SPR.img('carta')}${SPR.img('casa')}</div><h3>Online: cada um na sua casa</h3><p>Você cria uma sala e manda um link. Seu amigo entra e cria o personagem dele no celular dele.</p></button></div>`;
     if (view === 'players') body = `<h2>Quem vai jogar?</h2><p class="sub">Quantas pessoas? Os apelidos são opcionais.</p>
       <div class="panel"><div class="count-pick" role="group" aria-label="Quantidade de jogadores">${[2, 3, 4, 5, 6].map(n => `<button class="btn" data-n="${n}" aria-pressed="${cfg.count === n}">${n}</button>`).join('')}</div>
       <div class="players">${Array.from({ length: cfg.count }, (_, i) => `<div class="player-row"><span class="pdot" style="background:${PLAYER_COLORS[i]};width:42px;height:42px">${i + 1}</span><label class="sr" for="pn${i}">Apelido do jogador ${i + 1}</label><input id="pn${i}" maxlength="18" value="${esc(cfg.names[i])}" autocomplete="off"></div>`).join('')}</div>
@@ -113,6 +114,7 @@ function screenSetup() {
       <div class="choices">${Object.entries(PLANS).map(([k, p]) => { const n = Object.values(p.regions).flat().length, r = Object.keys(p.regions).length; return `<button class="panel choice-card" data-v="${k}" aria-pressed="${cfg.length === k}"><div class="art">${Object.values(p.regions).flat().slice(0, 6).map(c => SPR.img(c, 'sil')).join('')}</div><h3>${p.label} · ${p.time}</h3><p>${r} regiões, ${n} ${n > 1 ? 'missões' : 'missão'} e o grande final.</p></button>`; }).join('')}</div>`;
     app().innerHTML = `<div class="screen setup">${dots}${body}<div class="row" style="margin-top:20px;justify-content:space-between"><button class="btn" id="back">${ICON.back} Voltar</button><button class="btn primary big" id="fwd">${st === steps - 1 ? 'Começar!' : 'Próximo'} ${ICON.next}</button></div></div>`;
     $$('[data-v]').forEach(b => b.onclick = () => { Audio8.sfx('select'); cfg[view] = b.dataset.v; draw(); $(`[data-v="${b.dataset.v}"]`).focus(); });
+    if ($('#gonline')) $('#gonline').onclick = () => { Audio8.sfx('select'); go(screenOnlineHost); };
     $$('[data-n]').forEach(b => b.onclick = () => { saveNames(); cfg.count = +b.dataset.n; Audio8.sfx('select'); draw(); $(`[data-n="${b.dataset.n}"]`).focus(); });
     $$('[data-cm]').forEach(b => b.onclick = () => { saveNames(); cfg.clueMode = b.dataset.cm; Audio8.sfx('select'); draw(); $(`[data-cm="${b.dataset.cm}"]`).focus(); });
     $$('[data-who]').forEach(b => b.onclick = () => { cfg.who = +b.dataset.who; Audio8.sfx('select'); draw(); });

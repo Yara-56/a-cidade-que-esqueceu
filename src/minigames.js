@@ -10,6 +10,31 @@ function mgSay(box, html, kind = 'ok') {
   box.innerHTML = html; box.className = 'mgsay on ' + kind;
   clearTimeout(box._t); box._t = setTimeout(() => box.className = 'mgsay', 2400);
 }
+/* mãozinha que ensina o gesto (some no primeiro toque da criança) */
+function handEl() { const h = document.createElement('div'); h.className = 'ghand'; h.innerHTML = SPR.img('mao'); document.body.appendChild(h); onCleanup(() => h.remove()); return h; }
+const centerOf = el => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; };
+function stopOnTouch(fn) { const f = e => { if (e.isTrusted) { fn(); document.removeEventListener('pointerdown', f, true); } }; document.addEventListener('pointerdown', f, true); onCleanup(() => document.removeEventListener('pointerdown', f, true)); }
+function demoTap(el, delay = 700) {
+  if (!el || S.reduceMotion || window.__noDemo) return;
+  const h = handEl(); let alive = true; stopOnTouch(() => { alive = false; h.remove(); });
+  const go = n => { if (!alive || !document.body.contains(el)) return h.remove(); const [x, y] = centerOf(el); h.style.left = x + 'px'; h.style.top = y + 'px'; h.style.opacity = 1;
+    h.animate([{ transform: 'translate(-30%, 30%) scale(1)' }, { transform: 'translate(-30%, 5%) scale(.82)' }, { transform: 'translate(-30%, 30%) scale(1)' }], { duration: 650, iterations: 2 }).onfinish = () => { if (n > 1) setTimeout(() => go(n - 1), 900); else h.remove(); }; };
+  setTimeout(() => go(3), delay);
+}
+function demoDrag(from, to, src, delay = 700) {
+  if (!from || !to || S.reduceMotion || window.__noDemo) return;
+  const h = handEl(), gh = document.createElement('img'); gh.className = 'gdrag px'; gh.src = src; document.body.appendChild(gh); onCleanup(() => gh.remove());
+  let alive = true; const end = () => { alive = false; h.remove(); gh.remove(); }; stopOnTouch(end);
+  const run = n => {
+    if (!alive || !document.body.contains(from)) return end();
+    const [x0, y0] = centerOf(from), [x1, y1] = centerOf(to), w = from.getBoundingClientRect().width;
+    gh.style.width = w + 'px'; [h, gh].forEach(e => { e.style.left = x0 + 'px'; e.style.top = y0 + 'px'; e.style.opacity = 1; });
+    const kf = [{ transform: 'translate(-50%, -50%) scale(1)', offset: 0 }, { transform: 'translate(-50%, -60%) scale(1.2)', offset: .15 }, { transform: `translate(calc(-50% + ${x1 - x0}px), calc(-50% + ${y1 - y0}px)) scale(1.1)`, offset: .8 }, { transform: `translate(calc(-50% + ${x1 - x0}px), calc(-50% + ${y1 - y0}px)) scale(.3)`, offset: 1 }];
+    gh.animate(kf, { duration: 1700, easing: 'ease-in-out' });
+    h.style.marginLeft = '10px'; h.style.marginTop = '16px'; h.animate(kf, { duration: 1700, easing: 'ease-in-out' }).onfinish = () => { gh.style.opacity = 0; h.style.opacity = 0; if (n > 1) setTimeout(() => run(n - 1), 900); else end(); };
+  };
+  setTimeout(() => run(3), delay);
+}
 function floatText(root, html, x = 50, y = 40) {
   if (!root) return;
   const e = document.createElement('div'); e.className = 'floattx'; e.innerHTML = html;
@@ -36,7 +61,7 @@ STEPS.tidy = function (step, ctx) {
   let sel = null, combo = 0, lastOk = 0, phase = 'tidy', folds = [0, 0, 0], left = items.length;
 
   ctx.stage.innerHTML = `<div class="mg tidy">
-    <div class="mghead"><img class="px" src="${SPR.url('cida')}" alt=""><b id="mgt">Arruma-arruma! Toque num objeto e depois no lugar dele.</b>
+    <div class="mghead"><img class="px" src="${SPR.url('cida')}" alt=""><b id="mgt">Arruma-arruma! <b>Arraste</b> cada coisa para o lugar certo.</b>
       <button class="ibtn" data-say data-local aria-label="Ouvir">${ICON.voice}</button></div>
     <div class="scene tidyroom" id="room"><img class="bg px" src="${composeScene('sala').toDataURL()}" alt="Sala bagunçada">
       <div class="dust" id="dust"></div><div class="layer" id="lay"></div><div class="mgsay" id="say"></div></div>
@@ -51,13 +76,13 @@ STEPS.tidy = function (step, ctx) {
     b.style.animationDelay = (it.k * .07) + 's';
     b.innerHTML = SPR.img(it.prop); b.setAttribute('aria-label', 'Objeto bagunçado');
     lay.appendChild(b); it.el = b;
-    b.onclick = () => { if (it.done || phase !== 'tidy') return; ctx.activity(); Audio8.sfx('select'); if (sel) sel.el.classList.remove('sel'); sel = it; b.classList.add('sel'); $('#bins', ctx.stage).classList.add('ready'); };
+    b.onclick = () => { if (it.done || phase !== 'tidy' || (b._dragged && Date.now() - b._dragged < 400)) return; ctx.activity(); Audio8.sfx('select'); if (sel) sel.el.classList.remove('sel'); sel = it; b.classList.add('sel'); $('#bins', ctx.stage).classList.add('ready'); };
   });
   const upd = () => {
     const p = left / items.length; $('#mess', ctx.stage).style.width = (p * 100) + '%';
     $('#dust', ctx.stage).style.opacity = .55 * p;
   };
-  $$('.tbin', ctx.stage).forEach(b => b.onclick = () => {
+  const tryPut = b => {
     if (phase !== 'tidy') return; ctx.activity();
     if (!sel) { mgSay(say, 'Primeiro toque num objeto bagunçado!', 'info'); b.classList.add('shake'); setTimeout(() => b.classList.remove('shake'), 400); return; }
     const it = sel;
@@ -75,10 +100,31 @@ STEPS.tidy = function (step, ctx) {
       const nm = BINS.find(x => x.id === it.bin).label;
       mgSay(say, ctx.colored || G.diff === 'exp' ? `Ops! Esse vai em <b>${nm}</b>.` : 'Ops! Não é aí. Tente outro lugar!', 'soft');
     }
+  };
+  $$('.tbin', ctx.stage).forEach(b => b.onclick = () => tryPut(b));
+  /* arrastar com o dedo (no online, só tocar, para os aparelhos ficarem iguais) */
+  items.forEach(it => {
+    it.el.addEventListener('pointerdown', e => {
+      if (it.done || phase !== 'tidy' || (typeof NET !== 'undefined' && NET.started)) return;
+      const x0 = e.clientX, y0 = e.clientY; let gh = null;
+      const mv = ev => {
+        if (!gh && Math.hypot(ev.clientX - x0, ev.clientY - y0) > 8) { gh = document.createElement('img'); gh.className = 'gdrag px'; gh.src = SPR.url(it.prop); gh.style.width = it.el.getBoundingClientRect().width * 1.3 + 'px'; document.body.appendChild(gh); it.el.style.opacity = .3; it.el.click(); }
+        if (gh) { gh.style.left = ev.clientX + 'px'; gh.style.top = ev.clientY + 'px'; gh.style.transform = 'translate(-50%, -60%) rotate(-6deg)'; const t = document.elementFromPoint(ev.clientX, ev.clientY); $$('.tbin', ctx.stage).forEach(b => b.classList.toggle('over', !!t && b.contains(t))); ev.preventDefault(); }
+      };
+      const up = ev => {
+        document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up);
+        if (!gh) return; gh.remove(); it.el.style.opacity = ''; $$('.tbin', ctx.stage).forEach(b => b.classList.remove('over'));
+        const t = document.elementFromPoint(ev.clientX, ev.clientY), b = t && t.closest('.tbin'); if (b) tryPut(b);
+        it.el._dragged = Date.now();
+      };
+      document.addEventListener('pointermove', mv, { passive: false }); document.addEventListener('pointerup', up);
+    });
   });
+  { const f = items[0]; setTimeout(() => demoDrag(f.el, $(`.tbin[data-bin="${f.bin}"]`, ctx.stage), SPR.url(f.prop)), 400); }
   const foldPhase = () => {
     phase = 'fold'; Audio8.sfx('ok'); confetti(20);
     $('#mgt', ctx.stage).textContent = 'Sala arrumada! Agora dobre as camisetas: toque 3 vezes em cada uma.';
+    setTimeout(() => demoTap($('.shirt', ctx.stage)), 300);
     $('#bins', ctx.stage).hidden = true; $('.mgbar', ctx.stage).hidden = true;
     const f = $('#folds', ctx.stage); room.appendChild(f); f.hidden = false;
     f.innerHTML = folds.map((_, i) => `<button class="shirt" data-f="${i}">${SPR.img('camiseta')}<span class="dots"><i></i><i></i><i></i></span></button>`).join('') + `<div class="drawer">${SPR.img('roupa')}<span>Gaveta</span></div>`;
@@ -186,7 +232,7 @@ STEPS.cook = function (step, ctx) {
     tray.innerHTML = `<p class="traylab">Ferramentas e ingredientes</p>` + TOOLS.concat(Object.keys(ING)).map(id => btn(id, id === 'fogo' ? 'Fogo' : id === 'colher' ? 'Mexer' : id === 'escorredor' ? 'Escorredor' : id === 'tampa' ? 'Tampa' : LABEL[id])).join('');
     $$('.ing', tray).forEach(b => b.onclick = () => act(b.dataset.ing, b));
     cv.onclick = () => act('colher', $('[data-ing="colher"]', tray));
-    showStep();
+    showStep(); setTimeout(() => demoTap($('[data-ing="escorredor"]', tray)), 300);
   };
   const showStep = () => {
     const s = PLAN[k]; $('#mgt', ctx.stage).textContent = s.say; stirs = 0; wrongInRow = 0;
@@ -238,7 +284,7 @@ STEPS.cook = function (step, ctx) {
     addMedal('curiosidade', 1, 'cook:' + ctx.id);
     ctx.complete();
   };
-  renderShop();
+  renderShop(); setTimeout(() => demoTap($('[data-ing="arroz"]', tray)), 500);
   return {
     speak: () => phase === 'shop' ? 'Pegue só o que vai na receita de arroz.' : PLAN[k] ? PLAN[k].say : 'Arroz pronto!',
     hint() {

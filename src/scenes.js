@@ -84,6 +84,56 @@ function road(ctx, y, h, zebra) {
 function lamp(ctx, x, y, h = 26) { R(ctx, 'ink', x - 1, y, 3, h); R(ctx, 'greyD', x, y, 1, h); R(ctx, 'ink', x - 1, y - 1, 8, 3); R(ctx, 'greyD', x, y, 6, 1); R(ctx, '#fff1a8', x + 4, y + 1, 3, 2); }
 function busStop(ctx, x, y) { R(ctx, 'ink', x - 1, y - 1, 22, 4); R(ctx, 'tealD', x, y, 20, 2); R(ctx, 'ink', x + 1, y + 2, 1, 14); R(ctx, 'ink', x + 18, y + 2, 1, 14); R(ctx, 'glass', x + 2, y + 3, 15, 7); R(ctx, 'brownL', x + 3, y + 11, 13, 2); R(ctx, 'ink', x + 4, y + 13, 1, 3); R(ctx, 'ink', x + 14, y + 13, 1, 3); R(ctx, 'yellow', x + 19, y - 6, 4, 4); R(ctx, 'ink', x + 20, y - 2, 1, 4); }
 
+/* ---- cidade brasileira: letreiros, morro, caixa d'água azul, fiação, orelhão, banca, ipê ---- */
+const FONT3 = { A: '010101111101101', B: '110101110101110', C: '011100100100011', D: '110101101101110', E: '111100110100111', F: '111100110100100', G: '011100101101011', H: '101101111101101', I: '111010010010111', L: '100100100100111', M: '101111111101101', N: '110101101101101', O: '010101101101010', P: '110101110100100', R: '110101110101101', S: '011100010001110', T: '111010010010010', U: '101101101101111', V: '101101101101010', Ç: '011100100011010', ' ': '000000000000000' };
+function pxText(ctx, txt, x, y, c = 'ink') { let cx = x; for (const ch of txt) { const g = FONT3[ch] || FONT3[' ']; for (let i = 0; i < 15; i++) if (g[i] === '1') R(ctx, c, cx + (i % 3), y + Math.floor(i / 3), 1, 1); cx += 4; } return cx - x; }
+function sign(ctx, x, y, w, txt, bg, fg) { R(ctx, 'ink', x - 1, y - 1, w + 2, 9); R(ctx, bg, x, y, w, 7); const tw = txt.length * 4 - 1; pxText(ctx, txt, x + Math.max(1, (w - tw) >> 1), y + 1, fg); }
+function morro(ctx, base = 50) {
+  for (let x = 0; x < SW; x++) { const h = Math.round(24 + 7 * Math.sin(x / 17) + 4 * Math.sin(x / 7 + 1)); R(ctx, '#6fa86a', x, h, 1, base - h); R(ctx, '#86bd7a', x, h, 1, 1); }
+  const cols = ['#f3c6a0', '#e98bb0', '#f4c542', '#8fd6cf', '#fff8ef', '#c3a3e0', '#f08a3c', '#9cc1ef'];
+  for (let i = 0; i < 46; i++) { const x = (i * 29) % 156, top = Math.round(24 + 7 * Math.sin(x / 17) + 4 * Math.sin(x / 7 + 1)) + 2 + (i * 5) % 14; if (top > base - 6) continue;
+    R(ctx, '#00000033', x + 1, top + 1, 6, 5); R(ctx, cols[i % 8], x, top, 6, 5); R(ctx, '#2b223388', x + 2, top + 2, 1, 2); R(ctx, '#ffffff66', x, top, 6, 1); if (i % 3 === 0) R(ctx, '#4a78c9', x + 4, top - 2, 2, 2); }
+}
+function caixaAgua(ctx, x, y) { R(ctx, 'ink', x - 1, y - 1, 9, 7); R(ctx, '#3f8fd9', x, y, 7, 5); R(ctx, '#7fbcf0', x + 1, y, 5, 1); R(ctx, '#2c64a8', x, y + 4, 7, 1); }
+function predioBR(ctx, x, y, w, base, c, shade, k, loja) {
+  const h = base - y;
+  R(ctx, '#00000026', x + 2, y + 2, w, h); /* sombra no chão/parede de trás */
+  R(ctx, 'ink', x - 1, y - 1, w + 2, h + 1); R(ctx, c, x, y, w, h); R(ctx, shade, x + w - 2, y, 2, h);
+  for (let j = y + 2; j < base; j += 3) R(ctx, '#0000000c', x, j, w - 2, 1);
+  R(ctx, '#ffffff55', x, y, w, 1);
+  caixaAgua(ctx, x + 2 + (k % 2) * (w - 11), y - 6);
+  if (k % 3 === 1) { R(ctx, 'ink', x + w - 4, y - 8, 1, 8); R(ctx, 'ink', x + w - 6, y - 7, 5, 1); }
+  /* andares com sacada de grade, janelas e ar-condicionado */
+  let n = 0;
+  for (let wy = y + 3; wy < base - 15; wy += 7) {
+    for (let wx = x + 2; wx < x + w - 5; wx += 6) {
+      const v = (k * 5 + n++ * 3) % 6;
+      R(ctx, 'ink', wx, wy, 4, 5); R(ctx, v === 0 ? '#ffd65e' : v === 1 ? 'navy' : 'glass', wx + 1, wy + 1, 2, 3);
+      if (v === 2) R(ctx, 'pink', wx + 1, wy + 1, 1, 3);
+      if (v === 4) { R(ctx, 'ink', wx + 4, wy + 3, 3, 2); R(ctx, 'greyL', wx + 4, wy + 3, 2, 1); }
+    }
+    /* sacada: piso + grade */
+    R(ctx, shade, x, wy + 5, w - 2, 1); for (let gx = x + 1; gx < x + w - 2; gx += 2) R(ctx, '#2b223366', gx, wy + 3, 1, 2);
+    if ((k + wy) % 3 === 0) { R(ctx, 'ink', x + 3, wy + 2, w - 8, 1); R(ctx, ['red', 'yellow', 'blue', 'white'][(wy + k) % 4], x + 4, wy + 3, 2, 2); R(ctx, ['white', 'pink', 'green'][k % 3], x + 8, wy + 3, 2, 2); }
+  }
+  /* térreo: loja com letreiro, porta de aço e vitrine */
+  R(ctx, 'ink', x - 1, base - 15, w + 2, 15);
+  R(ctx, '#e9e3d6', x, base - 14, w, 14);
+  if (loja) sign(ctx, x + 1, base - 14, w - 2, loja[0], loja[1], loja[2]);
+  R(ctx, 'ink', x + 2, base - 6, w - 4, 6); R(ctx, '#9aa3ad', x + 3, base - 5, w - 6, 5); for (let j = base - 5; j < base; j += 2) R(ctx, '#7c8591', x + 3, j, w - 6, 1);
+  if (loja && loja[0] === 'FARMA') { R(ctx, 'white', x + w - 6, base - 22, 5, 5); R(ctx, 'green', x + w - 5, base - 21, 3, 3); R(ctx, 'white', x + w - 4, base - 21, 1, 3); R(ctx, 'white', x + w - 5, base - 20, 3, 1); }
+}
+function posteBR(ctx, x, top, base) { R(ctx, '#00000033', x + 1, base - 1, 5, 1); R(ctx, 'ink', x - 1, top, 4, base - top); R(ctx, '#b9b6ad', x, top, 2, base - top); R(ctx, 'ink', x - 4, top + 2, 10, 1); R(ctx, 'ink', x - 2, top + 6, 6, 3); R(ctx, '#5d6573', x - 1, top + 7, 4, 1); R(ctx, 'ink', x + 2, top - 1, 6, 2); R(ctx, '#fff1a8', x + 5, top + 1, 2, 1); }
+function fios(ctx, xs, y) { for (let w = 0; w < 3; w++) for (let i = 0; i < xs.length - 1; i++) { const a = xs[i], b = xs[i + 1]; for (let x = a; x <= b; x++) { const t = (x - a) / (b - a), sag = Math.sin(t * Math.PI) * (3 + w); R(ctx, '#2b2233aa', x, Math.round(y + w * 2 + sag), 1, 1); } } }
+function orelhao(ctx, x, base) { R(ctx, 'ink', x + 3, base - 13, 2, 13); R(ctx, '#00000033', x, base - 1, 8, 1); R(ctx, 'ink', x - 1, base - 20, 10, 9); R(ctx, '#2f7fd0', x, base - 19, 8, 7); R(ctx, '#f08a3c', x, base - 19, 8, 2); R(ctx, 'greyD', x + 3, base - 16, 2, 3); }
+function banca(ctx, x, base) { R(ctx, '#00000033', x + 1, base - 1, 22, 1); R(ctx, 'ink', x - 1, base - 19, 24, 19); R(ctx, '#2e8b57', x, base - 18, 22, 18); R(ctx, '#3cae6e', x, base - 18, 22, 3); sign(ctx, x + 1, base - 17, 20, 'BANCA', 'yellow', 'ink');
+  for (let i = 0; i < 4; i++) { R(ctx, ['red', 'white', 'blue', 'yellow'][i], x + 2 + i * 4, base - 9, 3, 4); R(ctx, '#2b223355', x + 2 + i * 4, base - 6, 3, 1); } R(ctx, 'ink', x, base - 3, 20, 1); }
+function ipe(ctx, x, base) { R(ctx, '#00000030', x - 2, base - 1, 18, 2); R(ctx, 'ink', x + 5, base - 14, 4, 14); R(ctx, 'brown', x + 6, base - 14, 2, 14); R(ctx, 'ink', x - 2, base - 28, 18, 15);
+  R(ctx, '#f4c542', x - 1, base - 27, 16, 13); R(ctx, '#ffd84d', x + 1, base - 29, 12, 3); for (let i = 0; i < 18; i++) R(ctx, i % 3 ? '#fff1a8' : '#d9a520', x - 1 + (i * 7) % 16, base - 27 + (i * 5) % 12, 1, 1); }
+function calcadaPortuguesa(ctx, y, h) { R(ctx, '#f3efe6', 0, y, SW, h); for (let x = 0; x < SW; x++) { const yy = Math.round(y + h / 2 + Math.sin(x / 4) * (h / 2 - 1)); R(ctx, '#2b2233', x, yy, 1, 1); } R(ctx, 'white', 0, y + h, SW, 1); R(ctx, '#d3d0c6', 0, y + h + 1, SW, 1); }
+function muroGrafite(ctx, x, y, w, h) { R(ctx, 'ink', x - 1, y - 1, w + 2, h + 1); R(ctx, '#e9e3d6', x, y, w, h); const c = ['#e0705a', '#f4c542', '#3fa7a0', '#8f5fb8', '#4a78c9'];
+  for (let i = 0; i < w; i += 6) { R(ctx, c[(i / 6) % 5], x + i, y + 3 + (i % 4), 5, h - 6 - (i % 4)); R(ctx, '#ffffff88', x + i + 1, y + 4 + (i % 4), 2, 1); } R(ctx, '#b9b2a4', x, y, w, 1); }
+
 const SCENES = {
   sala(ctx) {
     R(ctx, 'cream', 0, 0, SW, 64); stripes(ctx, '#ead8b8', 0, 0, SW, 64, 6);
@@ -144,13 +194,19 @@ const SCENES = {
     }
   },
   ruacasas(ctx) {
-    sky(ctx, 'sky', 58);
-    house(ctx, 6, 28, 34, 30, 'yellowL', 'red'); house(ctx, 50, 22, 30, 36, 'tealL', 'blueD'); house(ctx, 92, 30, 28, 28, 'pink', 'brown'); house(ctx, 128, 26, 30, 32, 'greenL', 'redD');
-    sidewalk(ctx, 58, 7);
+    sky(ctx, 'sky', 58); morro(ctx, 46);
+    house(ctx, 6, 28, 34, 30, 'yellowL', 'orangeD'); house(ctx, 50, 22, 30, 36, 'tealL', 'orangeD'); house(ctx, 92, 30, 28, 28, 'pink', 'red'); house(ctx, 128, 26, 30, 32, 'greenL', 'orangeD');
+    caixaAgua(ctx, 30, 14); caixaAgua(ctx, 70, 8); caixaAgua(ctx, 146, 12);
+    for (const x of [0, 44, 84, 124]) { R(ctx, 'ink', x, 50, 4, 8); R(ctx, '#e9e3d6', x + 1, 51, 2, 7); }
+    for (let x = 4; x < SW; x += 3) if (!((x > 18 && x < 28) || (x > 60 && x < 70) || (x > 100 && x < 110) || (x > 138 && x < 148))) R(ctx, '#2b223399', x, 51, 1, 7);
+    R(ctx, '#2b223399', 0, 51, SW, 1);
+    sidewalk(ctx, 58, 7); R(ctx, 'white', 0, 65, SW, 2);
     road(ctx, 67, 23, 64);
-    put(ctx, 'vaso', 42, 42); put(ctx, 'vaso', 84, 42); put(ctx, 'hidrante', 122, 42);
-    R(ctx, 'ink', 140, 8, 6, 2); R(ctx, 'pink', 141, 6, 4, 2);
+    posteBR(ctx, 46, 14, 60); posteBR(ctx, 122, 14, 60); fios(ctx, [0, 47, 123, 160], 15);
+    ipe(ctx, 84, 60);
+    put(ctx, 'vaso', 42, 42); put(ctx, 'hidrante', 122, 42);
   },
+
   quarto(ctx) {
     R(ctx, 'purpleL', 0, 0, SW, 64);
     for (let y = 4; y < 60; y += 12) for (let x = (y / 12 % 2) * 8 + 4; x < SW; x += 16) { R(ctx, 'pink', x, y, 3, 3); R(ctx, 'white', x + 1, y + 1, 1, 1); }
@@ -196,15 +252,18 @@ const SCENES = {
     for (const [x, y, c] of [[30, 50, 'pink'], [36, 52, 'yellow'], [84, 46, 'red'], [140, 50, 'pink'], [150, 46, 'yellow']]) { R(ctx, 'green', x, y + 2, 1, 3); R(ctx, c, x - 1, y, 3, 2); }
   },
   rua(ctx) {
-    sky(ctx, '#ffd9a8', 50); R(ctx, '#ffe9c7', 0, 0, SW, 20);
-    house(ctx, 4, 22, 30, 28, 'cream', 'orangeD'); house(ctx, 44, 16, 36, 34, 'blueL', 'navy'); house(ctx, 92, 24, 28, 26, 'yellowL', 'red'); house(ctx, 130, 20, 26, 30, 'pink', 'brownD');
-    sidewalk(ctx, 50, 14); R(ctx, 'grey', 0, 64, SW, 2);
+    sky(ctx, '#ffd9a8', 50); R(ctx, '#ffe9c7', 0, 0, SW, 20); morro(ctx, 44);
+    house(ctx, 4, 22, 30, 28, 'cream', 'orangeD'); house(ctx, 44, 16, 36, 34, 'blueL', 'orangeD'); house(ctx, 92, 24, 28, 26, 'yellowL', 'red'); house(ctx, 130, 20, 26, 30, 'pink', 'brownD');
+    caixaAgua(ctx, 70, 4); caixaAgua(ctx, 22, 10);
+    R(ctx, 'ink', 96, 18, 18, 1); R(ctx, 'red', 99, 19, 3, 3); R(ctx, 'white', 104, 19, 3, 4); R(ctx, 'blue', 109, 19, 3, 3);
+    muroGrafite(ctx, 0, 42, 44, 8); muroGrafite(ctx, 120, 42, 40, 8);
+    sidewalk(ctx, 50, 14); R(ctx, 'white', 0, 64, SW, 2);
     road(ctx, 66, 24, null);
-    R(ctx, 'greyD', 86, 18, 2, 34); R(ctx, 'greyD', 86, 18, 9, 2); R(ctx, 'greyL', 92, 20, 5, 2);
-    /* amarelinha na calçada e detalhes */
+    posteBR(ctx, 86, 18, 52); fios(ctx, [0, 87, 160], 19);
     for (let i = 0; i < 4; i++) { R(ctx, 'white', 112 + i * 7, 56, 6, 1); R(ctx, 'white', 112 + i * 7, 61, 6, 1); R(ctx, 'white', 112 + i * 7, 56, 1, 6); }
     put(ctx, 'hidrante', 2, 40); put(ctx, 'vaso', 36, 38);
   },
+
   ruanoite(ctx) {
     R(ctx, 'night', 0, 0, SW, 50); for (const [x, y] of [[10, 6], [40, 12], [70, 4], [104, 9], [140, 5], [150, 18], [24, 20]]) R(ctx, 'yellowL', x, y, 1, 1);
     R(ctx, 'white', 128, 6, 8, 8); R(ctx, 'night', 131, 5, 8, 7);
@@ -219,14 +278,14 @@ const SCENES = {
     for (let i = 0; i < SW; i += 8) { const y = 18 + Math.round(Math.sin(i / 25) * 3); R(ctx, ['red', 'yellow', 'teal', 'pink', 'green'][(i / 8) % 5], i + 2, y, 4, 4); R(ctx, 'ink', i, y - 1, 8, 1); }
   },
   cidade(ctx) {
-    skyGrad(ctx, 'skyD', 'sky', 62); skyline(ctx, '#9fc7e3', 56);
-    const b = [[2, 26, 21, 'pink', 'pinkD'], [25, 14, 18, 'yellowL', 'yellowD'], [45, 30, 16, 'tealL', 'teal'], [63, 8, 22, 'purpleL', 'purple'], [87, 22, 18, 'greenL', 'green'], [107, 12, 20, 'blueL', 'blue'], [129, 28, 14, 'cream', 'tan'], [145, 18, 15, 'orange', 'orangeD']];
-    b.forEach(([x, y, w, c, sh], k) => building(ctx, x, y, w, 60, c, sh, k));
-    sidewalk(ctx, 60, 6); road(ctx, 67, 23, 72);
-    lamp(ctx, 22, 36, 24); lamp(ctx, 104, 36, 24);
-    tree(ctx, 30, 44, 1); tree(ctx, 118, 46, 1);
-    busStop(ctx, 135, 46);
-    put(ctx, 'hidrante', 66, 46); put(ctx, 'bancoparque', 88, 50);
+    skyGrad(ctx, 'skyD', 'sky', 60); morro(ctx, 52);
+    const lojas = [['PADOCA', 'yellow', 'brownD'], ['FARMA', 'green', 'white'], ['LANCHE', 'red', 'white'], ['BAR', 'blue', 'white'], ['SALAO', 'pink', 'ink'], ['FEIRA', 'orange', 'ink']];
+    const b = [[1, 22, 26, 'cream', 'tan'], [29, 12, 26, 'tealL', 'teal'], [57, 26, 22, 'pink', 'pinkD'], [81, 8, 26, 'yellowL', 'yellowD'], [109, 20, 24, 'blueL', 'blue'], [135, 14, 25, 'greenL', 'green']];
+    b.forEach(([x, y, w, c, sh], k) => predioBR(ctx, x, y, w, 60, c, sh, k, lojas[k]));
+    calcadaPortuguesa(ctx, 60, 5); R(ctx, 'white', 0, 66, SW, 1);
+    road(ctx, 67, 23, 72);
+    posteBR(ctx, 24, 30, 64); posteBR(ctx, 96, 30, 64); posteBR(ctx, 150, 30, 64); fios(ctx, [0, 25, 97, 151, 160], 31);
+    ipe(ctx, 4, 64); orelhao(ctx, 70, 64); banca(ctx, 112, 64);
   }
 };
 

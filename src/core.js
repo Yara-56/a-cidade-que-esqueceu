@@ -70,7 +70,7 @@ const DIFFS = {
 };
 const MODES = {
   solo: { label: 'Aventureiro', desc: 'Uma pessoa joga no próprio ritmo, com dicas aos poucos.' },
-  juntos: { label: 'Juntos na aventura', desc: 'De 2 a 6 pessoas no mesmo aparelho, revezando a vez e dividindo pistas secretas.' },
+  juntos: { label: 'Juntos no mesmo aparelho', desc: 'De 2 a 6 pessoas no mesmo celular ou computador, revezando a vez.' },
   sala: { label: 'Sala de aula', desc: 'Para projetor: letras grandes, a turma conversa e vota, o professor conduz.' }
 };
 
@@ -245,8 +245,9 @@ function ambientHTML(key) {
   }).join('') + '</div>';
 }
 function sceneHTML(key, { items = [], cast = [], faded = true, alt = '', extra = '', cap = false } = {}) {
-  const url = composeScene(key, items, cast).toDataURL();
-  return `<div class="scene ${faded ? 'faded' : ''} ${cap ? 'cap' : ''}"><img class="bg px" src="${url}" alt="${esc(alt)}">${ambientHTML(key)}<div class="fogl"></div>${extra}</div>`;
+  const url = composeScene(key, items, []).toDataURL();
+  const people = cast.map(m => { const c = SPR.canvas(m.id, m.mode); return `<img class="px sprite" src="${SPR.url(m.id, m.mode)}" alt="" style="left:${pct(m.x, SW)};top:${pct(m.y, SH)};width:${pct(c.width, SW)}${m.flip ? ';transform:scaleX(-1)' : ''}">`; }).join('');
+  return `<div class="scene ${faded ? 'faded' : ''} ${cap ? 'cap' : ''}"><img class="bg px" src="${url}" alt="${esc(alt)}">${ambientHTML(key)}<div class="layer castl">${people}</div><div class="fogl"></div>${extra}</div>`;
 }
 const pct = (v, total) => (v / total * 100).toFixed(3) + '%';
 function hotStyle(it) {
