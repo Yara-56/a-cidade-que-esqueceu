@@ -89,7 +89,7 @@ async def setup(pg, mode, count, diff, length):
             await pg.click('#rand'); await pg.click('[data-k="hair"][data-val="afro"]'); await pg.click('#fwd')
         else: break
     await pg.click(f'[data-v="{diff}"]'); await pg.click('#fwd')
-    await pg.click(f'[data-v="{length}"]'); await pg.click('#fwd')
+    await pg.evaluate("(l) => { G.length = l; G.plan = JSON.parse(JSON.stringify(PLANS[l].regions)); saveGame(); }", length)
 
 async def run(mode, count, diff, length, w, h, shots_prefix=None, shot_every=()):
     async with async_playwright() as p:

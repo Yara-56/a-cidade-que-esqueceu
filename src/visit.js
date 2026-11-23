@@ -37,7 +37,7 @@ function cityName() {
 }
 function cityLink() {
   const code = cityCode(); if (!code) return '';
-  const base = location.href.split(/[?#]/)[0];
+  const base = shareBase();
   const nm = encodeURIComponent(cityName());
   return `${base}?visita=${code}&nome=${nm}`;
 }
@@ -69,12 +69,8 @@ function openShareCity() {
     <div class="code big" style="font-size:clamp(1.3rem,6vw,2.2rem);margin:10px auto">${pretty}</div>
     <div class="row center"><button class="btn primary" id="shr">${SPR.img('carta')} Mandar link</button><button class="btn" id="cpy">Copiar código</button></div>
     <p class="muted" style="font-weight:700">O código guarda só o progresso do jogo e o visual do personagem. Nenhum dado pessoal sai daqui.</p></div>`, { label: 'Minha cidade' });
-  $('#shr').onclick = async () => {
-    const text = `Visite minha cidade em "A Cidade que Esqueceu"! Código: ${pretty}`;
-    try { if (navigator.share) { await navigator.share({ title: 'A Cidade que Esqueceu', text, url: link }); return; } } catch (e) { return; }
-    try { await navigator.clipboard.writeText(text + '\n' + link); toast('Link copiado! Cole no WhatsApp.', 'carta'); } catch (e) { toast('Copie o código: ' + pretty); }
-  };
-  $('#cpy').onclick = async () => { try { await navigator.clipboard.writeText(pretty); toast('Código copiado!', 'carta'); } catch (e) { toast('Código: ' + pretty); } };
+  $('#shr').onclick = () => shareOrCopy(`Visite minha cidade em "A Cidade que Esqueceu"! Código: ${pretty}`, link, 'Link copiado! Cole no WhatsApp.');
+  $('#cpy').onclick = () => copyOrShow(pretty, 'Código copiado!', 'Código da minha cidade');
 }
 
 /* ---------- visitar a cidade de alguém ---------- */

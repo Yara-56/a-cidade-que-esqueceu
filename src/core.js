@@ -49,7 +49,7 @@ function applySettings() {
   const H = document.documentElement;
   try { H.style.setProperty('--lit', G ? progress().toFixed(2) : 0); } catch (e) {}
   H.classList.toggle('hc', !!S.contrast);
-  H.classList.toggle('bt', !!S.bigText);
+  H.classList.toggle('bt', !!S.bigText); H.classList.toggle('arrows', !!S.arrows);
   H.classList.toggle('rm', !!S.reduceMotion);
   H.classList.toggle('sala', !!(G && G.mode === 'sala'));
   H.classList.toggle('easy', !!(G && G.diff === 'exp'));
@@ -64,9 +64,9 @@ const PLANS = {
   full: { label: 'Completa', time: '35 a 50 min', regions: Object.fromEntries(REGIONS.map(r => [r.id, r.missions.slice()])) }
 };
 const DIFFS = {
-  exp: { label: 'Explorador', desc: 'Para começar (7 a 8 anos): pistas claras, menos itens e a Faísca ajuda quando alguém trava.', options: 3, clues: 4, decoys: 0, pairs: 4, star: 4 },
-  inv: { label: 'Investigador', desc: 'O nível padrão (9 a 10 anos): mais itens, opções que confundem, entregas urgentes e dica só quando pedir.', options: 5, clues: 4, decoys: 1, pairs: 6, star: 2 },
-  det: { label: 'Detetive', desc: 'Para quem gosta de desafio (11 a 12 anos): mais suspeitos, menos pistas, sequências sem ajuda e dica só depois de tentar.', options: 6, clues: 3, decoys: 2, pairs: 8, star: 1 }
+  exp: { label: 'Fácil', desc: 'Para começar: pistas claras, menos itens e a Faísca ajuda quando alguém trava.', options: 3, clues: 4, decoys: 0, pairs: 4, star: 4 },
+  inv: { label: 'Médio', desc: 'O nível padrão: mais itens, opções que confundem, entregas urgentes e dica só quando pedir.', options: 5, clues: 4, decoys: 1, pairs: 6, star: 2 },
+  det: { label: 'Difícil', desc: 'Para quem gosta de desafio: mais suspeitos, menos pistas, sequências sem ajuda e dica só depois de tentar.', options: 6, clues: 3, decoys: 2, pairs: 8, star: 1 }
 };
 const MODES = {
   solo: { label: 'Aventureiro', desc: 'Uma pessoa joga no próprio ritmo, com dicas aos poucos.' },
@@ -158,6 +158,7 @@ function go(fn, ...args) {
   const h = a.querySelector('h1, h2'); if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
 }
 function setFoot(html) {
+  document.documentElement.classList.remove('flowfoot');
   let f = $('#foot');
   if (!html) { if (f) f.remove(); return; }
   if (!f) { f = document.createElement('div'); f.id = 'foot'; f.className = 'footbar'; document.body.appendChild(f); }
@@ -168,6 +169,23 @@ function toast(html, prop) {
   const d = document.createElement('div'); d.className = 'toast';
   d.innerHTML = (prop ? SPR.img(prop) : '') + `<span>${html}</span>`;
   t.appendChild(d); setTimeout(() => d.remove(), 3500);
+}
+/* copiar texto em qualquer lugar (inclusive dentro de iframe): API nova, depois o jeito antigo, depois uma caixinha para copiar na mão */
+const PUBLIC_URL = 'https://yara-56.github.io/a-cidade-que-esqueceu/';
+function shareBase() { return /^(localhost|127\.0\.0\.1)$/.test(location.hostname) || location.protocol === 'file:' || location.hostname.endsWith('github.io') ? location.href.split(/[?#]/)[0] : PUBLIC_URL; }
+async function copyText(t) {
+  try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(t); return true; } } catch (e) { }
+  try { const ta = document.createElement('textarea'); ta.value = t; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;left:0;top:0;opacity:0;pointer-events:none'; document.body.appendChild(ta); ta.focus(); ta.select(); ta.setSelectionRange(0, t.length); const ok = document.execCommand('copy'); ta.remove(); if (ok) return true; } catch (e) { }
+  return false;
+}
+async function copyOrShow(t, okMsg, label = 'Copie e mande para seu amigo') {
+  if (await copyText(t)) { toast(okMsg, 'carta'); Audio8.sfx('select'); return; }
+  modal(`<h2 style="margin:0 0 8px">${esc(label)}</h2><textarea class="txt" id="cpbox" readonly rows="3" style="width:100%;font-weight:800">${esc(t)}</textarea><p class="muted" style="font-weight:700">Toque e segure no texto para copiar.</p>`, { label });
+  const b = $('#cpbox'); b.focus(); b.select();
+}
+async function shareOrCopy(text, url, okMsg) {
+  if (navigator.share) { try { await navigator.share({ title: 'A Cidade que Esqueceu', text, url }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+  copyOrShow(text + ' ' + url, okMsg, 'Mande este convite');
 }
 function modal(html, { onClose, label = 'Janela' } = {}) {
   closeModal();
@@ -225,6 +243,7 @@ function confetti(n = 60) {
 }
 function speakerInfo(who) {
   if (who === 'faisca') return { img: SPR.url('faisca'), name: NAMES.faisca };
+  if (who === 'you') return { img: SPR.url(avatarOf()), name: (player() && player().name && player().name !== 'Você') ? player().name : 'Você' };
   if (who === 'nevoa') return { img: SPR.url('nevoa'), name: NAMES.nevoa };
   if (who === 'nevoaFeliz') return { img: SPR.url('nevoaFeliz'), name: 'Nuvem das Lembranças' };
   if (who[0] === '?') { const id = who.slice(1); return G.album.includes(id) ? { img: SPR.url(id), name: CHARACTERS[id].name } : { img: SPR.url(id, 'sil'), name: '???' }; }

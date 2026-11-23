@@ -221,9 +221,13 @@ const MISSIONS = {
   ] },
   /* ===== BAIRRO DAS CASAS ===== */
   cida: { title: 'A casa que se arruma sozinha?', char: 'cida', steps: [
-    { t: 'dialog', scene: 'sala', cast: [{ id: 'theo', x: 70, y: 52 }], lines: [
-      { who: 'theo', text: 'A casa fica arrumadinha sozinha?!' },
-      { who: 'faisca', text: 'Sozinha? Hmm... Vamos investigar!' }] },
+    { t: 'dialog', scene: 'ruacasas', cast: [{ id: 'you', x: 96, y: 34 }], lines: [
+      { who: 'faisca', text: 'Corre! Os Fumacinhas estão vindo atrás da gente!' },
+      { who: 'you', text: 'Por aqui! Aquela ali é a minha casa!' }] },
+    { t: 'dialog', scene: 'sala', cast: [{ id: 'you', x: 70, y: 52 }], lines: [
+      { who: 'faisca', text: 'Ufa! Na sua casa a gente está segura.' },
+      { who: 'you', text: 'Ué... a casa fica arrumadinha sozinha?!' },
+      { who: 'faisca', text: 'Sozinha? Alguém cuida dela todo dia... e a Névoa fez todo mundo esquecer quem!' }] },
     { t: 'investigate', scene: 'sala', need: 4, prompt: 'Ache as pistas: quem trabalhou aqui?',
       items: [
         { prop: 'roupa', x: 56, y: 35, clue: true, label: 'Roupas dobradas', text: 'Lavadas, secas e dobradas: horas de trabalho!' },
@@ -785,10 +789,10 @@ for (const mid in DAYS) {
 
 /* ---------------- INTERLÚDIOS DA NÉVOA (entre regiões) ---------------- */
 const INTERLUDES = [
-  [{ who: 'nevoa', text: 'Hmm? Uma luz acendeu lá embaixo... Por que vocês se importam tanto com essas pessoas?' }, { who: 'faisca', text: 'Sem elas, nada funciona!' }],
-  [{ who: 'nevoa', text: 'Sabe... antigamente eu era só uma nuvenzinha do tamanho de uma pipoca.' }, { who: 'nevoa', text: 'Quando ninguém olha um trabalhador, eu cresço.' }],
-  [{ who: 'nevoa', text: 'Quando vocês sorriem para quem trabalha... eu sinto um calorzinho estranho. Parece que eu encolho.' }, { who: 'faisca', text: 'Ela está diminuindo! Vamos!' }],
-  [{ who: 'nevoa', text: 'Vocês estão me deixando pequena... e eu não sei se isso é ruim.' }, { who: 'nevoa', text: 'Ninguém nunca me agradeceu...' }],
+  [{ who: 'nevoa', text: 'Hmm? Uma luz acendeu lá embaixo... Por que vocês se importam tanto com essas pessoas?' }, { who: 'faisca', text: 'Sem elas, nada funciona! E olha: minha luz ficou mais forte!' }],
+  [{ who: 'nevoa', text: 'Sabe... antigamente eu era só uma nuvenzinha do tamanho de uma pipoca.' }, { who: 'nevoa', text: 'Quando ninguém olha um trabalhador, eu cresço.' }, { who: 'faisca', text: 'Eu sei como é ser esquecida... Na cidade, quase ninguém repara numa vaga-lume.' }],
+  [{ who: 'nevoa', text: 'Quando vocês sorriem para quem trabalha... eu sinto um calorzinho estranho. Parece que eu encolho.' }, { who: 'faisca', text: 'Ela está diminuindo! Se a gente continuar, quem sabe minha família volta pro parque?' }],
+  [{ who: 'nevoa', text: 'Vocês estão me deixando pequena... e eu não sei se isso é ruim.' }, { who: 'nevoa', text: 'Ninguém nunca me agradeceu...' }, { who: 'faisca', text: 'Obrigada por enxergar quem ninguém vê. Inclusive eu.' }],
   [{ who: 'nevoa', text: 'Eu vi vocês ajudando, conversando, agradecendo... Eu queria saber fazer isso também.' }, { who: 'faisca', text: 'Ainda dá tempo, Névoa!' }],
   [{ who: 'nevoa', text: 'Me encontrem na praça. Quero ver as luzes!' }]
 ];

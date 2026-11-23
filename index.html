@@ -1247,6 +1247,104 @@ body::before { will-change: transform; }
   .mg.wout .wcard { min-width: 0; padding: 2px 4px; } .mg.wout .wcard small { display: none; } .mg.wout .wcard b { font-size: .72rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
   .mg.wout .wcard img.px { width: 22px; height: 33px; }
 }
+/* final: provocação da Névoa e heróis tocáveis */
+.btaunt { position: absolute; left: 50%; top: 30%; transform: translate(-50%, -10px) scale(.9); opacity: 0; z-index: 9; background: #2b2233; color: #fff; border: 3px solid #c3a3e0; border-radius: 16px; padding: 6px 14px; font-weight: 800; font-size: 1.05rem; max-width: 82%; text-align: center; box-shadow: 0 0 18px #8f5fb8aa; pointer-events: none; transition: .35s cubic-bezier(.2,.9,.3,1.3); }
+.btaunt b { color: #fff1a8; } .btaunt.on { opacity: 1; transform: translate(-50%, 0) scale(1); }
+.scene .layer .pick { pointer-events: auto; cursor: pointer; }
+.pick:hover { filter: drop-shadow(0 0 8px #fff1a8) brightness(1.1); }
+.pick.nope { animation: nope .4s; } @keyframes nope { 25% { transform: translateX(-8%) rotate(-4deg); } 75% { transform: translateX(8%) rotate(4deg); } }
+@media (orientation: landscape) and (max-height: 520px) { .btaunt { font-size: .8rem; top: 26%; } }
+/* dica do herói: chip compacto no alto, desliza e some, sem cobrir a cena */
+.herotip { left: auto !important; right: max(12px, env(safe-area-inset-right)); top: 64px; bottom: auto !important; max-width: min(380px, 46vw) !important; align-items: center !important; }
+.herotip > img.px { width: 34px !important; height: 51px !important; }
+.herotip .htb { font-size: .92rem; }
+@media (orientation: landscape) and (max-height: 520px) { .herotip { top: 8px; right: 150px; max-width: 40vw !important; } .herotip > img.px { width: 24px !important; height: 36px !important; } .herotip .htb { font-size: .75rem; } }
+/* transições mais suaves entre telas e botões */
+.screen { animation: enter .45s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes enter { from { opacity: 0; transform: translateY(10px) scale(.99); } to { opacity: 1; transform: none; } }
+.btn { transition: transform .15s ease, box-shadow .15s ease, background .2s; }
+.btn:active:not(:disabled) { transform: translate(2px, 2px) scale(.98); }
+.mghead #mgt, .mghead b { transition: opacity .3s; }
+/* setas na tela só para quem liga nas configurações (dá para tocar, arrastar ou usar o teclado) */
+html:not(.arrows) .dpad, html:not(.arrows) .cbtns, html:not(.arrows) .route-side .arrows { display: none !important; }
+html:not(.arrows) .mg.catchg { grid-template-columns: minmax(0, 1fr); }
+/* epílogo: a família da Faísca volta */
+.epi { display: flex; gap: 14px; align-items: center; background: #0f1630; border: var(--bw) solid var(--ink); border-radius: 18px; padding: 10px 16px; box-shadow: 5px 5px 0 #0008; color: #fff; }
+.epi p { margin: 0; font-weight: 800; font-size: 1.1rem; } .epi b { color: var(--glow); }
+.ffly { position: relative; width: 150px; height: 110px; flex: none; }
+.ffly img.px { position: absolute; left: 50%; top: 50%; width: 56px; transform: translate(-50%, -50%); filter: drop-shadow(0 0 12px #fff1a8) drop-shadow(0 0 22px #f4c542); animation: fly 4s ease-in-out infinite; }
+.ffly i { position: absolute; left: var(--x); top: var(--y); width: 8px; height: 8px; border-radius: 50%; background: #fff1a8; box-shadow: 0 0 10px 4px #f4c542aa; animation: blink 1.8s var(--d) ease-in-out infinite, drift 5s var(--d) ease-in-out infinite; }
+@keyframes blink { 0%, 100% { opacity: .15; } 50% { opacity: 1; } }
+.teaser { background: var(--paper); color: var(--ink); border: var(--bw) solid var(--ink); border-radius: 18px; padding: 12px 16px; box-shadow: 5px 5px 0 #0008; text-align: center; }
+.teaser h2 { margin: 6px 0; } .teaser p { font-weight: 700; margin: 0 0 8px; }
+.mystery { display: grid; justify-items: center; gap: 4px; width: 130px; } .mystery small { font-weight: 800; font-size: .85rem; }
+.mystery .sil { position: relative; } .mystery .sil img.px { width: 48px; height: 72px; opacity: .85; } .mystery .sil b { position: absolute; left: 50%; top: 38%; transform: translate(-50%, -50%); color: var(--glow); font-family: var(--title); font-size: 1.6rem; text-shadow: 2px 2px 0 var(--ink); }
+@media (orientation: landscape) and (max-height: 520px) { .ffly { width: 100px; height: 72px; } .ffly img.px { width: 36px; } .epi p { font-size: .9rem; } .mystery { width: 96px; } .mystery .sil img.px { width: 32px; height: 48px; } }
+/* ===== diálogos novos: balão fofinho por cima da cena ===== */
+.screen.stage:has(> .cut), #stage:has(> .scene.cap) { display: grid !important; grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: auto; position: relative; }
+.screen.stage:has(> .cut) > .mhead { grid-row: 1; grid-column: 1; }
+.screen.stage:has(> .cut) > .cut, #stage:has(> .scene.cap) > .scene.cap { grid-row: 2; grid-column: 1; width: min(100%, calc((100dvh - 150px) * 16 / 9)); justify-self: center; }
+.screen.stage:has(> .cut) > #cb, #stage:has(> .scene.cap) > #bub { grid-row: 2; grid-column: 1; align-self: end; justify-self: center; width: min(92%, 860px); margin-bottom: 3%; z-index: 8; pointer-events: none; }
+#cb .bubble, #bub .bubble { pointer-events: auto; }
+.bubble { position: relative; display: flex !important; flex-direction: row !important; align-items: center; gap: 14px !important; background: #fffdf7 !important; background-image: none !important; border: 3px solid var(--ink); border-radius: 26px; padding: 14px 20px 14px 14px; box-shadow: 0 6px 0 rgba(43, 34, 51, .35), 0 14px 34px rgba(0, 0, 0, .28); animation: bubpop .35s cubic-bezier(.2, .9, .3, 1.35) both; }
+@keyframes bubpop { from { transform: translateY(14px) scale(.94); opacity: 0; } }
+.bubble .who { width: auto !important; flex: none; text-align: center; }
+.bubble .who .face { width: 62px !important; height: 62px !important; border-radius: 50% !important; border: 3px solid var(--ink); background: radial-gradient(circle at 35% 30%, #fff8d6, #f4c542 75%) !important; overflow: hidden; display: grid; place-items: center; animation: facebob 2.2s ease-in-out infinite; }
+.bubble .who .face img { width: 42px !important; image-rendering: pixelated; }
+@keyframes facebob { 50% { transform: translateY(-3px) rotate(-3deg); } }
+.bubble .who b { position: absolute; top: -15px; left: 22px; background: var(--ink); color: var(--glow) !important; border-radius: 99px; padding: 2px 12px; font-size: .82rem !important; margin: 0 !important; letter-spacing: .02em; }
+.bubble .text { background: none !important; background-image: none !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; min-height: 0 !important; font-size: 1.2rem; font-weight: 800; color: var(--ink); line-height: 1.35; }
+.bubble .text::before { display: none !important; }
+.bubble .text p { margin: 0 !important; animation: wordsin .45s ease both; }
+@keyframes wordsin { from { opacity: 0; filter: blur(3px); transform: translateY(4px); } }
+.screen.stage:has(> .cut) > #cb .row, .screen.stage:has(> .cut) > #cb .btn { pointer-events: auto; }
+@media (orientation: landscape) and (max-height: 520px) {
+  .screen.stage:has(> .cut) > .cut, #stage:has(> .scene.cap) > .scene.cap { width: min(100%, calc((100dvh - 70px) * 16 / 9)); }
+  .bubble { padding: 8px 14px 8px 8px; border-radius: 20px; gap: 10px !important; }
+  .bubble .who .face { width: 44px !important; height: 44px !important; } .bubble .who .face img { width: 30px !important; }
+  .bubble .text { font-size: .95rem !important; } .bubble .text p { font-size: .95rem !important; }
+  .bubble .who b { font-size: .7rem !important; top: -12px; left: 14px; }
+}
+/* ===== foco total no jogo: menos moldura, cena maior ===== */
+.screen.mission { position: relative; }
+.screen.mission > .hud.mini { position: absolute; top: 4px; left: 4px; z-index: 40; padding: 0; margin: 0; background: none; border: 0; box-shadow: none; width: auto; pointer-events: none; }
+.screen.mission > .hud.mini > * { pointer-events: auto; }
+.screen.mission > .hud.mini .energy, .screen.mission > .hud.mini .grow { display: none; }
+.screen.mission > .hud.mini .btn.round { opacity: .85; }
+.screen.mission #stage { padding-left: 48px; }
+.screen.mission #stage:has(> .scene.cap) { padding-left: 0; }
+.scene.cap { max-width: min(100%, calc(72vh * 16 / 9)); }
+.screen.stage:has(> .cut) > .cut, #stage:has(> .scene.cap) > .scene.cap { max-width: none !important; width: min(100%, calc((100dvh - 130px) * 16 / 9)) !important; }
+.mg .scene.jobscene, .mg .scene.tidyroom { max-width: min(100%, calc((100dvh - 200px) * 16 / 9)); margin-inline: auto; }
+@media (orientation: landscape) and (max-height: 520px) {
+  :root { --sw: calc((100dvh - 64px) * 16 / 9); }
+  .scene, .mapwrap, .title-art { max-width: calc((100dvh - 64px) * 16 / 9); }
+  .screen.stage:has(> .cut) > .cut, #stage:has(> .scene.cap) > .scene.cap { width: min(100%, calc((100dvh - 24px) * 16 / 9)) !important; }
+  .screen.stage:has(> .cut) > .mhead { display: none; }
+  .mg .scene.jobscene, .mg .scene.tidyroom { max-width: calc((100dvh - 64px) * 16 / 9); }
+  .screen.mission #stage { padding-left: 40px; }
+  .screen.mission #stage:has(> .scene.cap) { padding-left: 0; }
+}
+.herotip { top: auto !important; bottom: 92px !important; right: 24px !important; }
+@media (orientation: landscape) and (max-height: 520px) { .herotip { display: none !important; } }
+/* ===== modo fluido: sem barra embaixo/lateral; só botões redondos flutuando ===== */
+html.flowfoot #app { padding: 8px 10px 10px !important; }
+.footbar.flow { top: auto !important; left: auto !important; right: max(14px, env(safe-area-inset-right)) !important; bottom: max(14px, env(safe-area-inset-bottom)) !important; width: auto !important; background: none !important; border: 0 !important; padding: 0 !important; display: flex !important; flex-direction: row !important; align-items: center; gap: 10px; pointer-events: none; z-index: 45; }
+.footbar.flow > * { pointer-events: auto; }
+.footbar.flow .grow, .footbar.flow .lbl { display: none !important; }
+.footbar.flow #hint { width: 50px; height: 50px; min-height: 0; padding: 0; border-radius: 50%; display: grid; place-items: center; opacity: .9; }
+.footbar.flow #hint:disabled { display: none; }
+.footbar.flow #prim { width: 66px !important; height: 66px !important; min-height: 0 !important; min-width: 0 !important; padding: 0 !important; border-radius: 50% !important; display: grid; place-items: center; font-size: 0 !important; box-shadow: 0 0 0 4px #fff1a855, 4px 4px 0 var(--ink); }
+.footbar.flow #prim svg { width: 30px; height: 30px; }
+.footbar.flow #prim:disabled { display: none !important; }
+.footbar.flow #prim.ready { animation: pulse 1s infinite; }
+@media (orientation: landscape) and (max-height: 520px) {
+  html.flowfoot #app { padding: 4px 8px 6px !important; }
+  .footbar.flow #prim { width: 54px !important; height: 54px !important; } .footbar.flow #hint { width: 42px; height: 42px; }
+}
+.footbar.cutfoot #nx { width: 62px; height: 62px; min-height: 0; padding: 0; border-radius: 50%; display: grid; place-items: center; }
+.footbar.cutfoot #nx.lastbtn { width: auto; height: auto; border-radius: 99px; padding: 10px 22px; display: inline-flex; font-size: 1.15rem; animation: pulse 1s infinite; }
+.footbar.cutfoot #skip { background: #1b2142cc; border-radius: 99px; padding: 6px 14px; font-size: .9rem; min-height: 0; }
 </style>
 </head>
 <body>
@@ -2264,9 +2362,13 @@ const MISSIONS = {
   ] },
   /* ===== BAIRRO DAS CASAS ===== */
   cida: { title: 'A casa que se arruma sozinha?', char: 'cida', steps: [
-    { t: 'dialog', scene: 'sala', cast: [{ id: 'theo', x: 70, y: 52 }], lines: [
-      { who: 'theo', text: 'A casa fica arrumadinha sozinha?!' },
-      { who: 'faisca', text: 'Sozinha? Hmm... Vamos investigar!' }] },
+    { t: 'dialog', scene: 'ruacasas', cast: [{ id: 'you', x: 96, y: 34 }], lines: [
+      { who: 'faisca', text: 'Corre! Os Fumacinhas estão vindo atrás da gente!' },
+      { who: 'you', text: 'Por aqui! Aquela ali é a minha casa!' }] },
+    { t: 'dialog', scene: 'sala', cast: [{ id: 'you', x: 70, y: 52 }], lines: [
+      { who: 'faisca', text: 'Ufa! Na sua casa a gente está segura.' },
+      { who: 'you', text: 'Ué... a casa fica arrumadinha sozinha?!' },
+      { who: 'faisca', text: 'Sozinha? Alguém cuida dela todo dia... e a Névoa fez todo mundo esquecer quem!' }] },
     { t: 'investigate', scene: 'sala', need: 4, prompt: 'Ache as pistas: quem trabalhou aqui?',
       items: [
         { prop: 'roupa', x: 56, y: 35, clue: true, label: 'Roupas dobradas', text: 'Lavadas, secas e dobradas: horas de trabalho!' },
@@ -2828,10 +2930,10 @@ for (const mid in DAYS) {
 
 /* ---------------- INTERLÚDIOS DA NÉVOA (entre regiões) ---------------- */
 const INTERLUDES = [
-  [{ who: 'nevoa', text: 'Hmm? Uma luz acendeu lá embaixo... Por que vocês se importam tanto com essas pessoas?' }, { who: 'faisca', text: 'Sem elas, nada funciona!' }],
-  [{ who: 'nevoa', text: 'Sabe... antigamente eu era só uma nuvenzinha do tamanho de uma pipoca.' }, { who: 'nevoa', text: 'Quando ninguém olha um trabalhador, eu cresço.' }],
-  [{ who: 'nevoa', text: 'Quando vocês sorriem para quem trabalha... eu sinto um calorzinho estranho. Parece que eu encolho.' }, { who: 'faisca', text: 'Ela está diminuindo! Vamos!' }],
-  [{ who: 'nevoa', text: 'Vocês estão me deixando pequena... e eu não sei se isso é ruim.' }, { who: 'nevoa', text: 'Ninguém nunca me agradeceu...' }],
+  [{ who: 'nevoa', text: 'Hmm? Uma luz acendeu lá embaixo... Por que vocês se importam tanto com essas pessoas?' }, { who: 'faisca', text: 'Sem elas, nada funciona! E olha: minha luz ficou mais forte!' }],
+  [{ who: 'nevoa', text: 'Sabe... antigamente eu era só uma nuvenzinha do tamanho de uma pipoca.' }, { who: 'nevoa', text: 'Quando ninguém olha um trabalhador, eu cresço.' }, { who: 'faisca', text: 'Eu sei como é ser esquecida... Na cidade, quase ninguém repara numa vaga-lume.' }],
+  [{ who: 'nevoa', text: 'Quando vocês sorriem para quem trabalha... eu sinto um calorzinho estranho. Parece que eu encolho.' }, { who: 'faisca', text: 'Ela está diminuindo! Se a gente continuar, quem sabe minha família volta pro parque?' }],
+  [{ who: 'nevoa', text: 'Vocês estão me deixando pequena... e eu não sei se isso é ruim.' }, { who: 'nevoa', text: 'Ninguém nunca me agradeceu...' }, { who: 'faisca', text: 'Obrigada por enxergar quem ninguém vê. Inclusive eu.' }],
   [{ who: 'nevoa', text: 'Eu vi vocês ajudando, conversando, agradecendo... Eu queria saber fazer isso também.' }, { who: 'faisca', text: 'Ainda dá tempo, Névoa!' }],
   [{ who: 'nevoa', text: 'Me encontrem na praça. Quero ver as luzes!' }]
 ];
@@ -3046,7 +3148,7 @@ function applySettings() {
   const H = document.documentElement;
   try { H.style.setProperty('--lit', G ? progress().toFixed(2) : 0); } catch (e) {}
   H.classList.toggle('hc', !!S.contrast);
-  H.classList.toggle('bt', !!S.bigText);
+  H.classList.toggle('bt', !!S.bigText); H.classList.toggle('arrows', !!S.arrows);
   H.classList.toggle('rm', !!S.reduceMotion);
   H.classList.toggle('sala', !!(G && G.mode === 'sala'));
   H.classList.toggle('easy', !!(G && G.diff === 'exp'));
@@ -3061,9 +3163,9 @@ const PLANS = {
   full: { label: 'Completa', time: '35 a 50 min', regions: Object.fromEntries(REGIONS.map(r => [r.id, r.missions.slice()])) }
 };
 const DIFFS = {
-  exp: { label: 'Explorador', desc: 'Para começar (7 a 8 anos): pistas claras, menos itens e a Faísca ajuda quando alguém trava.', options: 3, clues: 4, decoys: 0, pairs: 4, star: 4 },
-  inv: { label: 'Investigador', desc: 'O nível padrão (9 a 10 anos): mais itens, opções que confundem, entregas urgentes e dica só quando pedir.', options: 5, clues: 4, decoys: 1, pairs: 6, star: 2 },
-  det: { label: 'Detetive', desc: 'Para quem gosta de desafio (11 a 12 anos): mais suspeitos, menos pistas, sequências sem ajuda e dica só depois de tentar.', options: 6, clues: 3, decoys: 2, pairs: 8, star: 1 }
+  exp: { label: 'Fácil', desc: 'Para começar: pistas claras, menos itens e a Faísca ajuda quando alguém trava.', options: 3, clues: 4, decoys: 0, pairs: 4, star: 4 },
+  inv: { label: 'Médio', desc: 'O nível padrão: mais itens, opções que confundem, entregas urgentes e dica só quando pedir.', options: 5, clues: 4, decoys: 1, pairs: 6, star: 2 },
+  det: { label: 'Difícil', desc: 'Para quem gosta de desafio: mais suspeitos, menos pistas, sequências sem ajuda e dica só depois de tentar.', options: 6, clues: 3, decoys: 2, pairs: 8, star: 1 }
 };
 const MODES = {
   solo: { label: 'Aventureiro', desc: 'Uma pessoa joga no próprio ritmo, com dicas aos poucos.' },
@@ -3155,6 +3257,7 @@ function go(fn, ...args) {
   const h = a.querySelector('h1, h2'); if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
 }
 function setFoot(html) {
+  document.documentElement.classList.remove('flowfoot');
   let f = $('#foot');
   if (!html) { if (f) f.remove(); return; }
   if (!f) { f = document.createElement('div'); f.id = 'foot'; f.className = 'footbar'; document.body.appendChild(f); }
@@ -3165,6 +3268,23 @@ function toast(html, prop) {
   const d = document.createElement('div'); d.className = 'toast';
   d.innerHTML = (prop ? SPR.img(prop) : '') + `<span>${html}</span>`;
   t.appendChild(d); setTimeout(() => d.remove(), 3500);
+}
+/* copiar texto em qualquer lugar (inclusive dentro de iframe): API nova, depois o jeito antigo, depois uma caixinha para copiar na mão */
+const PUBLIC_URL = 'https://yara-56.github.io/a-cidade-que-esqueceu/';
+function shareBase() { return /^(localhost|127\.0\.0\.1)$/.test(location.hostname) || location.protocol === 'file:' || location.hostname.endsWith('github.io') ? location.href.split(/[?#]/)[0] : PUBLIC_URL; }
+async function copyText(t) {
+  try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(t); return true; } } catch (e) { }
+  try { const ta = document.createElement('textarea'); ta.value = t; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;left:0;top:0;opacity:0;pointer-events:none'; document.body.appendChild(ta); ta.focus(); ta.select(); ta.setSelectionRange(0, t.length); const ok = document.execCommand('copy'); ta.remove(); if (ok) return true; } catch (e) { }
+  return false;
+}
+async function copyOrShow(t, okMsg, label = 'Copie e mande para seu amigo') {
+  if (await copyText(t)) { toast(okMsg, 'carta'); Audio8.sfx('select'); return; }
+  modal(`<h2 style="margin:0 0 8px">${esc(label)}</h2><textarea class="txt" id="cpbox" readonly rows="3" style="width:100%;font-weight:800">${esc(t)}</textarea><p class="muted" style="font-weight:700">Toque e segure no texto para copiar.</p>`, { label });
+  const b = $('#cpbox'); b.focus(); b.select();
+}
+async function shareOrCopy(text, url, okMsg) {
+  if (navigator.share) { try { await navigator.share({ title: 'A Cidade que Esqueceu', text, url }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+  copyOrShow(text + ' ' + url, okMsg, 'Mande este convite');
 }
 function modal(html, { onClose, label = 'Janela' } = {}) {
   closeModal();
@@ -3222,6 +3342,7 @@ function confetti(n = 60) {
 }
 function speakerInfo(who) {
   if (who === 'faisca') return { img: SPR.url('faisca'), name: NAMES.faisca };
+  if (who === 'you') return { img: SPR.url(avatarOf()), name: (player() && player().name && player().name !== 'Você') ? player().name : 'Você' };
   if (who === 'nevoa') return { img: SPR.url('nevoa'), name: NAMES.nevoa };
   if (who === 'nevoaFeliz') return { img: SPR.url('nevoaFeliz'), name: 'Nuvem das Lembranças' };
   if (who[0] === '?') { const id = who.slice(1); return G.album.includes(id) ? { img: SPR.url(id), name: CHARACTERS[id].name } : { img: SPR.url(id, 'sil'), name: '???' }; }
@@ -4000,9 +4121,9 @@ function screenTitle() {
       ${has ? `<button class="btn primary big" id="cont">${ICON.next} Continuar a aventura</button>` : ''}
       <button class="mychar" id="mych">${S.avatar ? `<img class="px" src="${SPR.url(avatarId(S.avatar))}" alt=""><span><small>Meu personagem</small><b>${esc(S.myName || 'Você')}</b></span><i>trocar</i>` : `${SPR.img('faisca')}<span><small>Primeiro passo</small><b>Criar meu personagem</b></span>`}</button>
       <div class="quick"><p>${has ? 'Ou comece de novo:' : 'Escolha e jogue!'}</p>
-        <button class="btn big qk" data-q="exp" style="--qc:#a5d97f"><b>Fácil</b><small>~10 min</small></button>
-        <button class="btn big qk" data-q="inv" style="--qc:#f4c542"><b>Médio</b><small>~15 min</small></button>
-        <button class="btn big qk" data-q="det" style="--qc:#e98bb0"><b>Difícil</b><small>~30 min</small></button></div>
+        <button class="btn big qk" data-q="exp" style="--qc:#a5d97f"><b>Fácil</b></button>
+        <button class="btn big qk" data-q="inv" style="--qc:#f4c542"><b>Médio</b></button>
+        <button class="btn big qk" data-q="det" style="--qc:#e98bb0"><b>Difícil</b></button></div>
       <div class="row" style="justify-content:stretch"><button class="btn grow" id="online">${SPR.img('casa')} Jogar com amigos</button><button class="btn grow" id="new">${ICON.gear} Mais opções</button></div>
       <div class="row" style="justify-content:stretch"><button class="btn grow small" id="guide">${ICON.book} Como jogar</button><button class="btn grow small" id="phone">${SPR.img('caderno')} Código</button><button class="btn grow small" id="cfg">${ICON.gear} Som</button></div>
     </div>
@@ -4014,7 +4135,7 @@ function screenTitle() {
     else go(screenSetup);
   };
   /* início rápido: um toque e já começa (personagem sorteado, pode trocar depois) */
-  const QK = { exp: 'medium', inv: 'medium', det: 'full' };
+  const QK = { exp: 'medium', inv: 'medium', det: 'medium' };
   const start = d => { newGame({ mode: 'solo', players: [{ name: S.myName || 'Você', color: PLAYER_COLORS[0], avatar: JSON.parse(JSON.stringify(S.avatar)) }], diff: d, length: QK[d] }); go(screenPrologue, 0); };
   const quick = d => S.avatar ? start(d) : openMyChar(() => start(d));
   $('#mych').onclick = () => { Audio8.init(); Audio8.sfx('select'); openMyChar(() => go(screenTitle)); };
@@ -4057,7 +4178,7 @@ function screenSetup() {
   const cfg = { mode: 'solo', count: 2, names: PLAYER_DEFAULT.slice(), diff: 'inv', length: 'medium', clueMode: 'pass', avatars: PLAYER_DEFAULT.map((_, i) => i === 0 && S.avatar ? JSON.parse(JSON.stringify(S.avatar)) : randomAvatar()), who: 0 };
   let st = 0;
   const modeArt = { solo: ['theo'], juntos: ['bia', 'theo', 'iara'], sala: ['davi', 'bia', 'iara', 'theo', 'sono'] };
-  const views = () => cfg.mode === 'juntos' ? ['mode', 'players', 'avatar', 'diff', 'length'] : cfg.mode === 'solo' ? ['mode', 'avatar', 'diff', 'length'] : ['mode', 'diff', 'length'];
+  const views = () => cfg.mode === 'juntos' ? ['mode', 'players', 'avatar', 'diff'] : cfg.mode === 'solo' ? (S.avatar ? ['mode', 'diff'] : ['mode', 'avatar', 'diff']) : ['mode', 'diff'];
   const draw = () => {
     const V = views(), steps = V.length, view = V[st];
     const dots = `<div class="steps-dots" aria-hidden="true">${V.map((_, i) => `<i class="${i <= st ? 'on' : ''}"></i>`).join('')}</div>`;
@@ -4360,19 +4481,20 @@ function renderMission(id, idx) {
     <div class="stage" id="stage"></div></div>`;
   wireHud();
   const sala = G.mode === 'sala';
-  setFoot(`${sala ? `<div class="teacher"><span>Professor</span><button class="btn small" id="tback">${ICON.back} Etapa anterior</button><button class="btn small" id="tpause">${ICON.pause} Pausar</button><button class="btn small" id="trep">${ICON.repeat} Repetir</button></div>` : `<button class="btn" id="say" data-local aria-label="Ouvir">${ICON.voice}<span class="lbl">Ouvir</span></button>`}
+  setFoot(`${sala ? `<div class="teacher"><span>Professor</span><button class="btn small" id="tback">${ICON.back} Etapa anterior</button><button class="btn small" id="tpause">${ICON.pause} Pausar</button><button class="btn small" id="trep">${ICON.repeat} Repetir</button></div>` : flowOn() ? '' : `<button class="btn" id="say" data-local aria-label="Ouvir">${ICON.voice}<span class="lbl">Ouvir</span></button>`}
     <button class="btn" id="hint" aria-label="Dica">${ICON.hint}<span class="lbl">Dica</span></button><span class="grow"></span>
     ${sala ? `<button class="btn small" id="tskip">Pular ${ICON.next}</button>` : ''}
     <button class="btn primary big" id="prim" disabled>Continuar ${ICON.next}</button>`);
+  if (flowOn()) { $('#foot').classList.add('flow'); document.documentElement.classList.add('flowfoot'); }
   RUN = { id, idx, mistakes: 0, done: false, ctrl: null, idle: null, hinted: false, turnFns: [], auto: false };
   const prim = $('#prim'), hintBtn = $('#hint');
   const ctx = {
     stage: $('#stage'), id, idx, step, colored: idx > revealIdx,
     complete() { RUN.done = true; prim.disabled = false; prim.classList.add('ready');
       if (['tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift', 'catch'].includes(step.t)) { addMedal('criatividade', 1, 'mg:' + id); if (!G.seen['eg:' + id]) { G.seen['eg:' + id] = 1; G.energy = (G.energy || 0) + 1; saveGame(); updEnergy(); } }
-      const ms = { dialog: 0, choice: 5200, reveal: 9000, thanks: 5000, mirror: 0, reflect: 0, days: 3200 }[step.t] ?? 2600;
+      const ms = { dialog: flowOn() ? 1400 : 0, choice: 5200, reveal: flowOn() ? 6500 : 9000, thanks: 5000, mirror: 0, reflect: 0, days: 3200 }[step.t] ?? 2600;
       if (ms) autoNext(prim, ms, () => prim.click()); },
-    setPrimary(t) { prim.innerHTML = `${esc(t)} ${ICON.next}`; },
+    setPrimary(t) { prim.innerHTML = flowOn() ? `${ICON.next}` : `${esc(t)} ${ICON.next}`; prim.title = t; },
     mistake() { RUN.mistakes++; G.current.mistakes++; saveGame(); refreshHint(); heroTip(id, step, true); },
     usedHint() { if (!RUN.auto) { G.current.hints++; saveGame(); } },
     onTurn(fn) { RUN.turnFns.push(fn); },
@@ -4409,7 +4531,7 @@ function renderMission(id, idx) {
   if ($('#say')) $('#say').onclick = () => { Audio8.init(); if (!S.voice) toast('A leitura em voz alta está desligada nas configurações.'); say(); };
   hintBtn.onclick = () => { if (RUN.ctrl.hint) { Audio8.sfx('select'); RUN.ctrl.hint(); } };
   /* rede de segurança: se travar numa etapa, aparece "Pular" (nunca fica preso) */
-  const skipT = setTimeout(() => { if (RUN.done || !prim.isConnected) return; RUN.skipOk = true; prim.disabled = false; prim.classList.add('skip'); prim.innerHTML = `Pular ${ICON.next}`; }, step.t === 'dialog' || step.t === 'reveal' ? 25000 : 75000);
+  const skipT = setTimeout(() => { if (RUN.done || !prim.isConnected) return; RUN.skipOk = true; prim.disabled = false; prim.classList.add('skip'); prim.innerHTML = flowOn() ? `${ICON.next}` : `Pular ${ICON.next}`; prim.title = 'Pular'; }, step.t === 'dialog' || step.t === 'reveal' ? 25000 : 75000);
   onCleanup(() => clearTimeout(skipT));
   prim.onclick = () => {
     if (!RUN.done && RUN.skipOk) { Audio8.sfx('step'); G.current.hints++; saveGame(); advance(id, idx); return; }
@@ -4536,7 +4658,7 @@ function openSettings() {
   const rng = (k, label) => `<div class="set-row"><label for="r-${k}">${label}</label><input type="range" id="r-${k}" min="0" max="1" step=".05" value="${S[k]}" data-r="${k}"></div>`;
   modal(`<h2>Configurações</h2>
     <h3>Som</h3>${rng('music', 'Volume da música')}${rng('sfx', 'Volume dos efeitos')}${sw('mute', 'Silenciar todos os sons')}
-    <h3 style="margin-top:14px">Leitura e visual</h3>${sw('voice', 'Leitura em voz alta (botão Ouvir)')}${sw('autoRead', 'Ler automaticamente cada etapa')}${sw('bigText', 'Letras maiores')}${sw('contrast', 'Alto contraste')}${sw('reduceMotion', 'Reduzir animações')}
+    <h3 style="margin-top:14px">Leitura e visual</h3>${sw('voice', 'Leitura em voz alta (botão Ouvir)')}${sw('autoRead', 'Ler automaticamente cada etapa')}${sw('bigText', 'Letras maiores')}${sw('contrast', 'Alto contraste')}${sw('reduceMotion', 'Reduzir animações')}${sw('arrows', 'Mostrar setas na tela (para quem prefere botões)')}
     ${G ? `<h3 style="margin-top:14px">Partida (para o adulto ou professor)</h3>
       <div class="set-row"><label for="diffSel">Nível de desafio</label><select class="sel" id="diffSel">${Object.entries(DIFFS).map(([k, d]) => `<option value="${k}" ${G.diff === k ? 'selected' : ''}>${d.label}</option>`).join('')}</select></div>
       <div class="set-row"><label>Modo: <b>${MODES[G.mode].label}</b> · Duração: <b>${PLANS[G.length].label}</b></label><button class="btn small" id="reset">Apagar progresso</button></div>` : ''}
@@ -4668,6 +4790,8 @@ function screenEnding() {
   app().innerHTML = `<div class="screen stage">
     <div class="logo"><h1>Lumiara está acesa!</h1><p>Uma cidade só funciona porque muitas pessoas fazem a sua parte. Ninguém deveria ser invisível.</p></div>
     <div class="scene cap"><img class="bg px" src="${composeScene('festa', [], [{ id: 'nevoaFeliz', x: 62, y: 2 }, ...G.album.slice(0, 6).map((id, i) => ({ id, x: 8 + i * 25, y: 60 }))]).toDataURL()}" alt="Festa em Lumiara com os trabalhadores lembrados"></div>
+    <div class="epi"><div class="ffly">${Array.from({ length: 9 }, (_, i) => `<i style="--d:${i * .37}s;--x:${8 + (i * 11) % 84}%;--y:${10 + (i * 23) % 60}%"></i>`).join('')}<img class="px" src="${SPR.url('faisca')}" alt="Faísca"></div>
+      <p><b>Faísca:</b> Olha!! Minha família voltou pro parque! Quando a cidade lembra de quem cuida dela, cuida melhor da natureza também. Obrigada por me enxergar.</p></div>
     <div class="cert"><span class="tag">Certificado</span><h2>Guardiões da Memória de Lumiara</h2>
       <div class="row center">${G.players.map(p => `<img class="px" style="width:48px;height:72px" src="${SPR.url(avatarOf(p))}" alt="">`).join('')}</div><p class="names">${esc(names)}</p>
       <p style="font-weight:800;font-size:1.2rem;margin:0">${starsHTML(1, 1)} ${totalStars()} estrelas conquistadas</p>
@@ -4675,10 +4799,14 @@ function screenEnding() {
       <div class="medal-row">${medalsHTML()}</div>
       ${G.challenges.length ? `<h3 style="margin-top:16px">Desafios da vida real aceitos</h3><ul style="text-align:left;font-weight:700;max-width:640px;margin:0 auto">${G.challenges.map(c => `<li>${esc(c)}</li>`).join('')}</ul>` : ''}
       <p style="font-weight:800;margin-top:16px">Agora é com vocês: olhem em volta. Quem faz a sua escola, a sua rua e a sua casa funcionarem?</p></div>
-    ${met < total ? `<p style="color:#fff;font-weight:800;text-align:center;margin:0">Ainda há ${total - met} pessoas para conhecer em Lumiara. Que tal jogar a versão Completa?</p>` : ''}
-    <div class="row center"><button class="btn big" id="alb">${ICON.book} Ver o álbum</button><button class="btn big" id="map">${ICON.map} Passear pelo mapa</button><button class="btn primary big" id="again">Jogar de novo</button></div></div>`;
+    <div class="teaser"><span class="tag">Continua...</span><h2>Só no Brasil, são mais de 2.600 ocupações reconhecidas.</h2>
+      <p>Quantas você conhece? Lumiara ainda guarda muita gente esperando para ser lembrada:</p>
+      <div class="row center">${[['costureira', 'Quem costurou a sua roupa?'], ['motorista', 'Quem dirige o seu ônibus?'], ['pedreiro', 'Quem levantou a sua casa?'], ['caixa', 'Quem passa as suas compras?']].map(([k, q], i) => `<div class="mystery"><div class="sil">${SPR.img(['theo', 'bia', 'davi', 'iara'][i], 'sil')}<b>?</b></div><small>${q}</small></div>`).join('')}</div>
+      ${met < total ? `<p style="font-weight:800;margin:6px 0 0">E ainda faltam ${total - met} pessoas desta cidade no seu álbum. Que tal a versão Difícil?</p>` : ''}</div>
+    <div class="row center"><button class="btn big" id="alb">${ICON.book} Ver o álbum</button><button class="btn big" id="map">${ICON.map} Passear pelo mapa</button>${G.plan && Object.values(G.plan).flat().length < 15 ? `<button class="btn primary big" id="more">${ICON.map} Conhecer mais gente da cidade</button>` : ''}<button class="btn big" id="again">Jogar de novo</button></div></div>`;
   $('#alb').onclick = openAlbum;
   $('#map').onclick = () => go(screenMap);
+  if ($('#more')) $('#more').onclick = () => { G.plan = JSON.parse(JSON.stringify(PLANS.full.regions)); G.extended = true; saveGame(); toast('Novos bairros acordaram! A Faísca vai te mostrar o caminho.', 'faisca'); go(screenMap); };
   $('#again').onclick = () => confirmBox('Começar uma nova aventura? O álbum desta partida será apagado.', 'Começar de novo', () => go(screenSetup));
 }
 
@@ -4708,6 +4836,7 @@ finishMission = function (id) {
 
 /* ---------- camada de sprites por cima de um cenário ---------- */
 function spriteEl(name, x, y, { mode = null, w = null, cls = '' } = {}) {
+  if (name === 'you') name = avatarOf();
   const c = SPR.canvas(name, mode), img = document.createElement('img');
   img.className = 'px sprite ' + cls; img.alt = ''; img.src = SPR.url(name, mode);
   img.style.left = pct(x, SW); img.style.top = pct(y, SH); img.style.width = pct(w || c.width, SW);
@@ -4759,8 +4888,10 @@ function playCutscene(frames, { title = 'Lumiara', where = 'História', onDone }
     $('#cb').innerHTML = bubbleHTML(f.who || 'faisca', f.text);
     if (f.who === 'nevoa') Audio8.sfx('villain');
     if (S.autoRead) Voice.speak(f.text);
-    setFoot(`<button class="btn" id="say" data-local aria-label="Ouvir">${ICON.voice}<span class="lbl">Ouvir</span></button><span class="grow"></span><button class="btn ghost" id="skip" style="color:#fff">Pular</button><button class="btn primary big" id="nx">${i < frames.length - 1 ? 'Continuar' : (f.last || 'Vamos lá!')} ${ICON.next}</button>`);
-    $('#say').onclick = () => { Audio8.init(); Voice.speak(f.text); };
+    const fl = G && G.mode !== 'sala', last = i >= frames.length - 1;
+    setFoot(`${fl ? '' : `<button class="btn" id="say" data-local aria-label="Ouvir">${ICON.voice}<span class="lbl">Ouvir</span></button>`}<span class="grow"></span><button class="btn ghost" id="skip" style="color:#fff">Pular</button><button class="btn primary big ${last ? 'lastbtn' : ''}" id="nx">${!last ? (fl ? '' : 'Continuar') : (f.last || 'Vamos lá!')} ${ICON.next}</button>`);
+    if (fl) { $('#foot').classList.add('flow', 'cutfoot'); document.documentElement.classList.add('flowfoot'); }
+    if ($('#say')) $('#say').onclick = () => { Audio8.init(); Voice.speak(f.text); };
     $('#skip').onclick = () => onDone();
     $('#nx').onclick = () => { Audio8.sfx('page'); if (i < frames.length - 1) { i++; show(); } else onDone(); };
     /* minifilme: passa sozinho; tocar na cena adianta */
@@ -4773,19 +4904,19 @@ function playCutscene(frames, { title = 'Lumiara', where = 'História', onDone }
 /* ---------- prólogo animado ---------- */
 const PROLOGUE_FRAMES = [
   { scene: 'cidade', text: 'Lumiara: a cidade mais colorida do mundo!',
-    actors: { denise: { s: 'denise', from: [-18, 60], x: 26, y: 60, walk: true }, rafa: { s: 'rafa', from: [170, 62], x: 112, y: 62, walk: true, flip: true }, lucia: { s: 'lucia', from: [-30, 62], x: 60, y: 62, walk: true, ms: 1800 } } },
-  { scene: 'cidade', text: 'Cheirinho de pão, ônibus passando, gente trabalhando...',
-    actors: { denise: { s: 'denise', x: 40, y: 60, walk: true }, rafa: { s: 'rafa', x: 92, y: 62, walk: true, flip: true }, ze: { s: 'ze', from: [170, 58], x: 132, y: 58, walk: true, flip: true } } },
+    actors: { denise: { s: 'denise', from: [-18, 34], x: 26, y: 34, walk: true }, rafa: { s: 'rafa', from: [170, 36], x: 112, y: 36, walk: true, flip: true }, lucia: { s: 'lucia', from: [-30, 36], x: 60, y: 36, walk: true, ms: 1800 } } },
+  { scene: 'cidade', who: 'faisca', sparkle: true, text: 'Oi! Eu sou a Faísca, uma vaga-lume. Minha família morava na mata que existia aqui, antes dos prédios.',
+    actors: { faisca: { s: 'faisca', from: [150, 20], x: 72, y: 30, w: 16, glow: true, ms: 1600 } } },
+  { scene: 'cidade', who: 'faisca', text: 'Hoje tem tanta luz forte que quase ninguém me vê. Igual a muita gente que trabalha pra cidade funcionar...',
+    actors: { faisca: { s: 'faisca', x: 72, y: 30, w: 12, glow: true }, denise: { s: 'denise', x: 30, y: 34, walk: true }, ze: { s: 'ze', from: [170, 32], x: 122, y: 32, walk: true, flip: true } } },
   { scene: 'cidade', fog: .35, who: 'nevoa', text: 'MUAHAHA! Eu sou a Névoa do Esquecimento!',
     actors: { nevoa: { s: 'nevoa', from: [175, 0], x: 58, y: 0, w: 44, ms: 1600 } } },
-  { scene: 'cidade', gray: .6, fog: .45, who: 'nevoa', text: 'Fumacinhas! Roubem as cores!',
+  { scene: 'cidade', gray: .6, fog: .45, who: 'nevoa', text: 'Fumacinhas! Roubem as cores de quem ninguém agradece!',
     actors: { f1: { s: 'fumacinha', from: [70, 8], x: 14, y: 30, w: 14, ms: 900 }, f2: { s: 'fumacinha', from: [80, 8], x: 128, y: 24, w: 14, ms: 1000 }, f3: { s: 'fumacinha', from: [76, 8], x: 92, y: 44, w: 12, ms: 1100 }, f4: { s: 'fumacinha', from: [74, 8], x: 40, y: 46, w: 12, ms: 1200 } } },
-  { scene: 'cidade', gray: 1, dark: .5, fog: .55, who: 'faisca', text: 'Agora ninguém lembra quem faz a cidade funcionar!',
-    actors: { denise: { s: 'denise', mode: 'sil', x: 40, y: 60 }, rafa: { s: 'rafa', mode: 'sil', x: 92, y: 62, flip: true }, lucia: { s: 'lucia', mode: 'sil', x: 60, y: 62 }, ze: { s: 'ze', mode: 'sil', x: 132, y: 58, flip: true }, nevoa: { s: 'nevoa', x: 34, y: -2, w: 92, ms: 1800 } } },
-  { scene: 'cidade', gray: 1, dark: .55, fog: .5, sparkle: true, text: 'Mas eu escapei! Eu sou a Faísca!',
-    actors: { faisca: { s: 'faisca', from: [76, 80], x: 72, y: 34, w: 16, glow: true, ms: 1400 } } },
-  { scene: 'cidade', gray: .8, dark: .35, fog: .4, last: 'Vamos juntos!', text: 'Ei... você consegue me ver? Então me ajuda a espantar a Névoa e devolver as cores de Lumiara!',
-    actors: { you: { s: 'avatar', from: [-18, 62], x: 56, y: 62, walk: true, ms: 1600 }, faisca: { s: 'faisca', x: 74, y: 44, w: 14, glow: true } } }
+  { scene: 'cidade', gray: 1, dark: .5, fog: .55, who: 'faisca', text: 'Agora ninguém lembra quem faz a cidade funcionar... e a minha luz está quase apagando.',
+    actors: { denise: { s: 'denise', mode: 'sil', x: 40, y: 34 }, rafa: { s: 'rafa', mode: 'sil', x: 92, y: 36, flip: true }, lucia: { s: 'lucia', mode: 'sil', x: 60, y: 36 }, ze: { s: 'ze', mode: 'sil', x: 132, y: 32, flip: true }, nevoa: { s: 'nevoa', x: 34, y: -2, w: 92, ms: 1800 }, faisca: { s: 'faisca', x: 74, y: 40, w: 8 } } },
+  { scene: 'cidade', gray: .8, dark: .35, fog: .4, last: 'Vamos juntos!', text: 'Ei... você consegue me ver? Então me ajuda: cada pessoa que a gente lembrar acende a minha luz de novo!',
+    actors: { you: { s: 'avatar', from: [-18, 36], x: 56, y: 36, walk: true, ms: 1600 }, faisca: { s: 'faisca', x: 74, y: 44, w: 14, glow: true } } }
 ];
 
 /* ---------- interlúdio entre regiões ---------- */
@@ -5858,10 +5989,10 @@ STEPS.boss = function (step, ctx) {
   let phase = 1, cleared = 0, smogs = [], tick = 0, done = false, hp = 100, helper = null, helperT = 0, me = { x: 74 };
   ctx.stage.innerHTML = `<div class="mg job bossg">${mgHead('faisca', 'A Névoa está soltando <b>poluição</b>! Toque na fumaça para <b>aspirar</b> e salvar os moradores!')}
     <div class="scene jobscene bossscene" id="js"><img class="bg px" src="${composeScene('festa').toDataURL()}" alt="Praça à noite com a Névoa"><div class="bossdark" id="bd"></div><div class="layer" id="lay"></div>
-      <div class="bosshp"><span id="bl">Poluição</span><div class="bar"><i id="hp" style="width:0%"></i></div><b id="bc">0/${goal}</b></div><div class="mgsay" id="say"></div></div>
-    <div class="bossbar"><button class="btn big primary throw" id="throw" hidden>${SPR.img('coracao')} OBRIGADO!</button><p class="bosstip" id="btip">${SPR.img('faisca')} Toque na fumaça!</p></div></div>`;
-  wireSay(ctx.stage, () => phase < 3 ? 'Toque na fumaça para aspirar a poluição e salvar os moradores!' : 'Todos juntos! Toque em obrigado sem parar!');
-  const lay = $('#lay', ctx.stage), sc = $('#js', ctx.stage), say = $('#say', ctx.stage), thr = $('#throw', ctx.stage);
+      <div class="bosshp"><span id="bl">Poluição</span><div class="bar"><i id="hp" style="width:0%"></i></div><b id="bc">0/${goal}</b></div><div class="mgsay" id="say"></div><div class="btaunt" id="bt"></div></div>
+    <div class="bossbar"><p class="bosstip" id="btip">${SPR.img('faisca')} Toque na fumaça!</p></div></div>`;
+  wireSay(ctx.stage, () => phase < 3 ? 'Toque na fumaça para aspirar a poluição e salvar os moradores!' : 'Toque na pessoa que a Névoa diz que ninguém lembra!');
+  const lay = $('#lay', ctx.stage), sc = $('#js', ctx.stage), say = $('#say', ctx.stage);
   const nev = spriteEl('nevoa', 52, 0, { w: 50, cls: 'bossnev' }); lay.appendChild(nev);
   folks.forEach(f => { f.e = spriteEl(f.id, f.x - 6, 63, { w: 12 }); f.e.classList.add('folk'); lay.appendChild(f.e); });
   const hero = spriteEl(avatarOf(), me.x - 7, 60, { w: 14 }); hero.classList.add('bosshero'); lay.appendChild(hero);
@@ -5910,21 +6041,36 @@ STEPS.boss = function (step, ctx) {
     const he = spriteEl(helperId, 140, 60, { w: 14 }); he.classList.add('bosshero', 'arrive'); lay.appendChild(he); helper = { x: 146, y: 64, e: he };
     $('#btip', ctx.stage).innerHTML = `${SPR.img(helperId)} ${esc(name)} está ajudando!`;
   };
-  /* ato 3: todo mundo junto */
+  /* ato 3: a Névoa diz que ninguém lembra de alguém; você mostra que lembra, e essa pessoa manda o golpe de luz */
+  const DOES = { cida: 'cuida da casa e das roupas', jorge: 'guarda o prédio e as encomendas', ze: 'faz a merenda da escola', katia: 'deixa a escola limpinha', lucia: 'visita as casas cuidando da saúde',
+    benedito: 'cuida de quem precisa de ajuda', zefa: 'planta a comida da feira', rafa: 'entrega tudo na sua porta', marina: 'separa o lixo para reciclar', joaquim: 'cuida das plantas da praça',
+    denise: 'deixa a rua limpa', pedro: 'leva luz para as casas', tania: 'faz a água chegar limpa', joana: 'apaga incêndios e salva vidas', carlos: 'protege a travessia das crianças' };
+  let order = [], ask = null, rounds = 3;
+  const taunt = $('#bt', ctx.stage);
+  const nextAsk = () => {
+    if (done) return; if (!order.length) return win();
+    ask = order.shift(); taunt.dataset.ask = ask;
+    taunt.innerHTML = `<b>Névoa:</b> Ninguém lembra de quem <b>${esc(DOES[ask])}</b>!`; taunt.classList.remove('on'); void taunt.offsetWidth; taunt.classList.add('on');
+    if (S.autoRead) Voice.speak(`Ninguém lembra de quem ${DOES[ask]}!`);
+  };
   const finale = () => {
     phase = 3; smogs.forEach(s => { if (!s.gone) { s.gone = true; s.el.classList.add('sucked'); setTimeout(() => s.el.remove(), 380); } }); folks.forEach(f => { f.smog = null; f.e.classList.remove('sad'); f.e.classList.add('home'); }); hero.classList.add('home'); vac.classList.add('home'); if (helper) helper.e.classList.add('home');
-    heroes.forEach((id, i) => { const e = spriteEl(id, 8 + i * (128 / Math.max(1, heroes.length - 1)), 60, { w: 13 }); e.classList.add('herorow', 'arrive'); e.style.animationDelay = (i * .1) + 's'; lay.appendChild(e); });
-    $('#bl', ctx.stage).textContent = 'Névoa'; thr.hidden = false; $('#btip', ctx.stage).hidden = true; Audio8.sfx('villain');
-    setHead(ctx, '<b>TODOS JUNTOS!</b> Toque em <b>OBRIGADO</b> sem parar!'); upd(); demoTap(thr, 200);
-  };
-  thr.onclick = () => {
-    if (done || phase !== 3) return; ctx.activity();
-    hp = Math.max(0, hp - (D === 'exp' ? 8 : D === 'inv' ? 6 : 4.5));
-    const hs = $$('.herorow', lay), h = hs[Math.floor(RNG.next() * hs.length)];
-    if (h) { h.classList.remove('jump'); void h.offsetWidth; h.classList.add('jump'); const x = parseFloat(h.style.left) / 100 * SW; const ball = spriteEl('coracao', x + 3, 56, { w: 8, cls: 'heartball' }); lay.appendChild(ball); setTimeout(() => moveEl(ball, 76, 8, 380), 20); setTimeout(() => ball.remove(), 420); }
-    nev.classList.remove('hit'); void nev.offsetWidth; nev.classList.add('hit'); Audio8.sfx('ok');
-    if (RNG.next() < .35) floatText(sc, pick(['OBRIGADO!', 'VALEU!', 'GRATIDÃO!', 'VOCÊ IMPORTA!']), 50 + RNG.next() * 30, 20);
-    upd(); if (hp <= 0) win();
+    const team = heroes.filter(id => DOES[id]);
+    team.forEach((id, i) => {
+      const x = 8 + i * (128 / Math.max(1, team.length - 1)), e = spriteEl(id, x, 58, { w: 14, cls: 'herorow arrive pick' }); e.style.animationDelay = (i * .1) + 's'; e.dataset.h = id; lay.appendChild(e);
+      e.onclick = () => {
+        if (done || phase !== 3 || !ask) return; ctx.activity();
+        if (id !== ask) { ctx.mistake(); Audio8.sfx('soft'); e.classList.remove('nope'); void e.offsetWidth; e.classList.add('nope'); floatText(sc, 'Hmm, não é...', (x + 6) / SW * 100, 50); return; }
+        const C = CHARACTERS[id]; e.classList.remove('jump'); void e.offsetWidth; e.classList.add('jump');
+        beam(x + 7, 60, parseFloat(nev.style.left) / 100 * SW + 25, 14, 'help'); Audio8.sfx('reveal');
+        floatText(sc, `Obrigado, ${C.name}!`, (x + 6) / SW * 100, 46); hp = Math.max(0, hp - 100 / rounds); nev.classList.remove('hit'); void nev.offsetWidth; nev.classList.add('hit'); sparkle(nev, 10);
+        ask = null; taunt.classList.remove('on'); ctx.nextTurn(); upd(); setTimeout(nextAsk, 1100);
+      };
+    });
+    rounds = Math.min(team.length, D === 'exp' ? 3 : D === 'inv' ? 4 : 5); order = shuffle(team).slice(0, rounds);
+    $('#bl', ctx.stage).textContent = 'Névoa'; $('#btip', ctx.stage).hidden = true; Audio8.sfx('villain'); hp = 100;
+    setHead(ctx, 'A Névoa diz que ninguém lembra deles. <b>Mostre que você lembra!</b>'); upd();
+    setTimeout(nextAsk, 900);
   };
   const loop = setInterval(() => {
     if (done) return; tick++;
@@ -5940,12 +6086,12 @@ STEPS.boss = function (step, ctx) {
       }
       if (helper && tick - helperT > (D === 'det' ? 55 : 42)) { const t = smogs.filter(x => !x.gone).sort((a, b) => b.y - a.y)[0]; if (t) { helperT = tick; zap(t, true); helper.e.classList.remove('jump'); void helper.e.offsetWidth; helper.e.classList.add('jump'); } }
       smogs = smogs.filter(x => !x.gone || document.body.contains(x.el));
-    } else { hp = Math.min(100, hp + (D === 'det' ? .22 : .15)); if (tick % 5 === 0) upd(); }
+    }
   }, 40);
   onCleanup(() => clearInterval(loop));
   const win = () => {
     done = true; clearInterval(loop);
-    nev.src = SPR.url('nevoaFeliz'); nev.classList.add('saved'); $('#bd', ctx.stage).style.opacity = 0; thr.hidden = true;
+    nev.src = SPR.url('nevoaFeliz'); nev.classList.add('saved'); $('#bd', ctx.stage).style.opacity = 0; taunt.classList.remove('on');
     Audio8.sfx('win'); confetti(90); $$('.herorow, .folk, .bosshero', lay).forEach((e, i) => setTimeout(() => { e.classList.remove('jump'); void e.offsetWidth; e.classList.add('jump'); }, i * 70));
     setHead(ctx, '<b>VOCÊS VENCERAM JUNTOS!</b> Heróis de verdade não usam capa!');
     if (S.autoRead) Voice.speak('Vocês venceram juntos! Heróis de verdade não usam capa!');
@@ -5953,9 +6099,9 @@ STEPS.boss = function (step, ctx) {
   };
   placeMe(); upd(); Audio8.sfx('villain'); setTimeout(spawn, 500); setTimeout(() => { const s = smogs.find(x => !x.gone); if (s) demoTap(s.el, 0); }, 1500);
   return {
-    speak: () => phase < 3 ? 'Toque na fumaça para aspirar a poluição e salvar os moradores!' : 'Todos juntos! Toque em obrigado sem parar!',
-    hint() { ctx.usedHint(); const s = phase < 3 ? (smogs.find(x => !x.gone) || {}).el : thr; if (s) { s.classList.add('glow'); setTimeout(() => s.classList.remove('glow'), 1500); } },
-    autoStep() { if (done) return; if (phase === 3) thr.click(); else { const s = smogs.filter(x => !x.gone).sort((a, b) => b.y - a.y)[0]; if (s) s.el.click(); } }
+    speak: () => phase < 3 ? 'Toque na fumaça para aspirar a poluição e salvar os moradores!' : (ask ? `Quem ${DOES[ask]}? Toque nessa pessoa!` : 'Mostre que você lembra!'),
+    hint() { ctx.usedHint(); const s = phase < 3 ? (smogs.find(x => !x.gone) || {}).el : $(`.pick[data-h="${ask}"]`, ctx.stage); if (s) { s.classList.add('glow'); setTimeout(() => s.classList.remove('glow'), 1500); } },
+    autoStep() { if (done) return; if (phase === 3) { const e = ask && $(`.pick[data-h="${ask}"]`, ctx.stage); if (e) e.click(); } else { const s = smogs.filter(x => !x.gone).sort((a, b) => b.y - a.y)[0]; if (s) s.el.click(); } }
   };
 };
 
@@ -6135,7 +6281,6 @@ function screenOnlineHost() {
         <label for="on" style="font-weight:800">Seu apelido</label><input class="txt" id="on" maxlength="18" value="${esc(cfg.name)}" placeholder="Ex.: Yara">
         ${avatarPickerHTML(cfg.avatar)}
         <b>Nível</b><div class="chips">${Object.entries(DIFFS).map(([k, d]) => `<button class="chip" data-d="${k}" aria-pressed="${cfg.diff === k}">${d.label}</button>`).join('')}</div>
-        <b>Duração</b><div class="chips">${Object.entries(PLANS).map(([k, p]) => `<button class="chip" data-l="${k}" aria-pressed="${cfg.length === k}">${p.label} · ${p.time}</button>`).join('')}</div>
         <div class="row"><button class="btn" id="bk">${ICON.back} Voltar</button><span class="grow"></span><button class="btn primary big" id="go">Criar sala</button></div>
       </div></div>`;
     $('#on').oninput = e => cfg.name = e.target.value;
@@ -6214,13 +6359,11 @@ function renderLobby() {
       <div class="row center">${host ? `<button class="btn primary big" id="start" ${NET.players.length < 2 ? 'disabled' : ''}>Começar a aventura</button>` : ''}<button class="btn" id="leave">Sair da sala</button></div>
       ${host && NET.players.length < 2 ? '<p class="muted" style="font-weight:700;margin:0">O botão de começar libera quando alguém entrar.</p>' : ''}
     </div>`;
-  const inv = $('#invite'); if (inv) inv.onclick = async () => {
-    const link = location.href.split(/[?#]/)[0] + '?sala=' + NET.code + (new URLSearchParams(location.search).get('peer') ? '&peer=' + new URLSearchParams(location.search).get('peer') : '');
-    const text = `Bora jogar "A Cidade que Esqueceu" comigo? Toque no link e entre na sala ${NET.code}:`;
-    try { if (navigator.share) { await navigator.share({ title: 'A Cidade que Esqueceu', text, url: link }); return; } } catch (e) { return; }
-    try { await navigator.clipboard.writeText(text + ' ' + link); toast('Link copiado! Cole no WhatsApp do seu amigo.', 'carta'); } catch (e) { toast('Mande este link: ' + link); }
+  const inv = $('#invite'); if (inv) inv.onclick = () => {
+    const pr = new URLSearchParams(location.search).get('peer'), link = shareBase() + '?sala=' + NET.code + (pr ? '&peer=' + pr : '');
+    shareOrCopy(`Bora jogar "A Cidade que Esqueceu" comigo? Toque no link e entre na sala ${NET.code}:`, link, 'Convite copiado! Cole no WhatsApp do seu amigo.');
   };
-  const cp = $('#cpcode'); if (cp) cp.onclick = async () => { try { await navigator.clipboard.writeText(NET.code); toast('Código copiado!', 'carta'); } catch (e) { toast('Código: ' + NET.code); } };
+  const cp = $('#cpcode'); if (cp) cp.onclick = () => copyOrShow(NET.code, `Código ${NET.code} copiado!`, 'Código da sala');
   const st = $('#start'); if (st) st.onclick = () => {
     newGame({ mode: 'juntos', players: NET.players, diff: NET.cfg.diff, length: NET.cfg.length, clueMode: 'online' });
     NET.started = true; netSend({ t: 'start' }); go(screenPrologue);
@@ -6267,7 +6410,7 @@ function cityName() {
 }
 function cityLink() {
   const code = cityCode(); if (!code) return '';
-  const base = location.href.split(/[?#]/)[0];
+  const base = shareBase();
   const nm = encodeURIComponent(cityName());
   return `${base}?visita=${code}&nome=${nm}`;
 }
@@ -6299,12 +6442,8 @@ function openShareCity() {
     <div class="code big" style="font-size:clamp(1.3rem,6vw,2.2rem);margin:10px auto">${pretty}</div>
     <div class="row center"><button class="btn primary" id="shr">${SPR.img('carta')} Mandar link</button><button class="btn" id="cpy">Copiar código</button></div>
     <p class="muted" style="font-weight:700">O código guarda só o progresso do jogo e o visual do personagem. Nenhum dado pessoal sai daqui.</p></div>`, { label: 'Minha cidade' });
-  $('#shr').onclick = async () => {
-    const text = `Visite minha cidade em "A Cidade que Esqueceu"! Código: ${pretty}`;
-    try { if (navigator.share) { await navigator.share({ title: 'A Cidade que Esqueceu', text, url: link }); return; } } catch (e) { return; }
-    try { await navigator.clipboard.writeText(text + '\n' + link); toast('Link copiado! Cole no WhatsApp.', 'carta'); } catch (e) { toast('Copie o código: ' + pretty); }
-  };
-  $('#cpy').onclick = async () => { try { await navigator.clipboard.writeText(pretty); toast('Código copiado!', 'carta'); } catch (e) { toast('Código: ' + pretty); } };
+  $('#shr').onclick = () => shareOrCopy(`Visite minha cidade em "A Cidade que Esqueceu"! Código: ${pretty}`, link, 'Link copiado! Cole no WhatsApp.');
+  $('#cpy').onclick = () => copyOrShow(pretty, 'Código copiado!', 'Código da minha cidade');
 }
 
 /* ---------- visitar a cidade de alguém ---------- */

@@ -66,9 +66,9 @@ function screenTitle() {
       ${has ? `<button class="btn primary big" id="cont">${ICON.next} Continuar a aventura</button>` : ''}
       <button class="mychar" id="mych">${S.avatar ? `<img class="px" src="${SPR.url(avatarId(S.avatar))}" alt=""><span><small>Meu personagem</small><b>${esc(S.myName || 'Você')}</b></span><i>trocar</i>` : `${SPR.img('faisca')}<span><small>Primeiro passo</small><b>Criar meu personagem</b></span>`}</button>
       <div class="quick"><p>${has ? 'Ou comece de novo:' : 'Escolha e jogue!'}</p>
-        <button class="btn big qk" data-q="exp" style="--qc:#a5d97f"><b>Fácil</b><small>~10 min</small></button>
-        <button class="btn big qk" data-q="inv" style="--qc:#f4c542"><b>Médio</b><small>~15 min</small></button>
-        <button class="btn big qk" data-q="det" style="--qc:#e98bb0"><b>Difícil</b><small>~30 min</small></button></div>
+        <button class="btn big qk" data-q="exp" style="--qc:#a5d97f"><b>Fácil</b></button>
+        <button class="btn big qk" data-q="inv" style="--qc:#f4c542"><b>Médio</b></button>
+        <button class="btn big qk" data-q="det" style="--qc:#e98bb0"><b>Difícil</b></button></div>
       <div class="row" style="justify-content:stretch"><button class="btn grow" id="online">${SPR.img('casa')} Jogar com amigos</button><button class="btn grow" id="new">${ICON.gear} Mais opções</button></div>
       <div class="row" style="justify-content:stretch"><button class="btn grow small" id="guide">${ICON.book} Como jogar</button><button class="btn grow small" id="phone">${SPR.img('caderno')} Código</button><button class="btn grow small" id="cfg">${ICON.gear} Som</button></div>
     </div>
@@ -80,7 +80,7 @@ function screenTitle() {
     else go(screenSetup);
   };
   /* início rápido: um toque e já começa (personagem sorteado, pode trocar depois) */
-  const QK = { exp: 'medium', inv: 'medium', det: 'full' };
+  const QK = { exp: 'medium', inv: 'medium', det: 'medium' };
   const start = d => { newGame({ mode: 'solo', players: [{ name: S.myName || 'Você', color: PLAYER_COLORS[0], avatar: JSON.parse(JSON.stringify(S.avatar)) }], diff: d, length: QK[d] }); go(screenPrologue, 0); };
   const quick = d => S.avatar ? start(d) : openMyChar(() => start(d));
   $('#mych').onclick = () => { Audio8.init(); Audio8.sfx('select'); openMyChar(() => go(screenTitle)); };
@@ -123,7 +123,7 @@ function screenSetup() {
   const cfg = { mode: 'solo', count: 2, names: PLAYER_DEFAULT.slice(), diff: 'inv', length: 'medium', clueMode: 'pass', avatars: PLAYER_DEFAULT.map((_, i) => i === 0 && S.avatar ? JSON.parse(JSON.stringify(S.avatar)) : randomAvatar()), who: 0 };
   let st = 0;
   const modeArt = { solo: ['theo'], juntos: ['bia', 'theo', 'iara'], sala: ['davi', 'bia', 'iara', 'theo', 'sono'] };
-  const views = () => cfg.mode === 'juntos' ? ['mode', 'players', 'avatar', 'diff', 'length'] : cfg.mode === 'solo' ? ['mode', 'avatar', 'diff', 'length'] : ['mode', 'diff', 'length'];
+  const views = () => cfg.mode === 'juntos' ? ['mode', 'players', 'avatar', 'diff'] : cfg.mode === 'solo' ? (S.avatar ? ['mode', 'diff'] : ['mode', 'avatar', 'diff']) : ['mode', 'diff'];
   const draw = () => {
     const V = views(), steps = V.length, view = V[st];
     const dots = `<div class="steps-dots" aria-hidden="true">${V.map((_, i) => `<i class="${i <= st ? 'on' : ''}"></i>`).join('')}</div>`;
@@ -426,19 +426,20 @@ function renderMission(id, idx) {
     <div class="stage" id="stage"></div></div>`;
   wireHud();
   const sala = G.mode === 'sala';
-  setFoot(`${sala ? `<div class="teacher"><span>Professor</span><button class="btn small" id="tback">${ICON.back} Etapa anterior</button><button class="btn small" id="tpause">${ICON.pause} Pausar</button><button class="btn small" id="trep">${ICON.repeat} Repetir</button></div>` : `<button class="btn" id="say" data-local aria-label="Ouvir">${ICON.voice}<span class="lbl">Ouvir</span></button>`}
+  setFoot(`${sala ? `<div class="teacher"><span>Professor</span><button class="btn small" id="tback">${ICON.back} Etapa anterior</button><button class="btn small" id="tpause">${ICON.pause} Pausar</button><button class="btn small" id="trep">${ICON.repeat} Repetir</button></div>` : flowOn() ? '' : `<button class="btn" id="say" data-local aria-label="Ouvir">${ICON.voice}<span class="lbl">Ouvir</span></button>`}
     <button class="btn" id="hint" aria-label="Dica">${ICON.hint}<span class="lbl">Dica</span></button><span class="grow"></span>
     ${sala ? `<button class="btn small" id="tskip">Pular ${ICON.next}</button>` : ''}
     <button class="btn primary big" id="prim" disabled>Continuar ${ICON.next}</button>`);
+  if (flowOn()) { $('#foot').classList.add('flow'); document.documentElement.classList.add('flowfoot'); }
   RUN = { id, idx, mistakes: 0, done: false, ctrl: null, idle: null, hinted: false, turnFns: [], auto: false };
   const prim = $('#prim'), hintBtn = $('#hint');
   const ctx = {
     stage: $('#stage'), id, idx, step, colored: idx > revealIdx,
     complete() { RUN.done = true; prim.disabled = false; prim.classList.add('ready');
       if (['tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift', 'catch'].includes(step.t)) { addMedal('criatividade', 1, 'mg:' + id); if (!G.seen['eg:' + id]) { G.seen['eg:' + id] = 1; G.energy = (G.energy || 0) + 1; saveGame(); updEnergy(); } }
-      const ms = { dialog: 0, choice: 5200, reveal: 9000, thanks: 5000, mirror: 0, reflect: 0, days: 3200 }[step.t] ?? 2600;
+      const ms = { dialog: flowOn() ? 1400 : 0, choice: 5200, reveal: flowOn() ? 6500 : 9000, thanks: 5000, mirror: 0, reflect: 0, days: 3200 }[step.t] ?? 2600;
       if (ms) autoNext(prim, ms, () => prim.click()); },
-    setPrimary(t) { prim.innerHTML = `${esc(t)} ${ICON.next}`; },
+    setPrimary(t) { prim.innerHTML = flowOn() ? `${ICON.next}` : `${esc(t)} ${ICON.next}`; prim.title = t; },
     mistake() { RUN.mistakes++; G.current.mistakes++; saveGame(); refreshHint(); heroTip(id, step, true); },
     usedHint() { if (!RUN.auto) { G.current.hints++; saveGame(); } },
     onTurn(fn) { RUN.turnFns.push(fn); },
@@ -475,7 +476,7 @@ function renderMission(id, idx) {
   if ($('#say')) $('#say').onclick = () => { Audio8.init(); if (!S.voice) toast('A leitura em voz alta está desligada nas configurações.'); say(); };
   hintBtn.onclick = () => { if (RUN.ctrl.hint) { Audio8.sfx('select'); RUN.ctrl.hint(); } };
   /* rede de segurança: se travar numa etapa, aparece "Pular" (nunca fica preso) */
-  const skipT = setTimeout(() => { if (RUN.done || !prim.isConnected) return; RUN.skipOk = true; prim.disabled = false; prim.classList.add('skip'); prim.innerHTML = `Pular ${ICON.next}`; }, step.t === 'dialog' || step.t === 'reveal' ? 25000 : 75000);
+  const skipT = setTimeout(() => { if (RUN.done || !prim.isConnected) return; RUN.skipOk = true; prim.disabled = false; prim.classList.add('skip'); prim.innerHTML = flowOn() ? `${ICON.next}` : `Pular ${ICON.next}`; prim.title = 'Pular'; }, step.t === 'dialog' || step.t === 'reveal' ? 25000 : 75000);
   onCleanup(() => clearTimeout(skipT));
   prim.onclick = () => {
     if (!RUN.done && RUN.skipOk) { Audio8.sfx('step'); G.current.hints++; saveGame(); advance(id, idx); return; }
@@ -602,7 +603,7 @@ function openSettings() {
   const rng = (k, label) => `<div class="set-row"><label for="r-${k}">${label}</label><input type="range" id="r-${k}" min="0" max="1" step=".05" value="${S[k]}" data-r="${k}"></div>`;
   modal(`<h2>Configurações</h2>
     <h3>Som</h3>${rng('music', 'Volume da música')}${rng('sfx', 'Volume dos efeitos')}${sw('mute', 'Silenciar todos os sons')}
-    <h3 style="margin-top:14px">Leitura e visual</h3>${sw('voice', 'Leitura em voz alta (botão Ouvir)')}${sw('autoRead', 'Ler automaticamente cada etapa')}${sw('bigText', 'Letras maiores')}${sw('contrast', 'Alto contraste')}${sw('reduceMotion', 'Reduzir animações')}
+    <h3 style="margin-top:14px">Leitura e visual</h3>${sw('voice', 'Leitura em voz alta (botão Ouvir)')}${sw('autoRead', 'Ler automaticamente cada etapa')}${sw('bigText', 'Letras maiores')}${sw('contrast', 'Alto contraste')}${sw('reduceMotion', 'Reduzir animações')}${sw('arrows', 'Mostrar setas na tela (para quem prefere botões)')}
     ${G ? `<h3 style="margin-top:14px">Partida (para o adulto ou professor)</h3>
       <div class="set-row"><label for="diffSel">Nível de desafio</label><select class="sel" id="diffSel">${Object.entries(DIFFS).map(([k, d]) => `<option value="${k}" ${G.diff === k ? 'selected' : ''}>${d.label}</option>`).join('')}</select></div>
       <div class="set-row"><label>Modo: <b>${MODES[G.mode].label}</b> · Duração: <b>${PLANS[G.length].label}</b></label><button class="btn small" id="reset">Apagar progresso</button></div>` : ''}

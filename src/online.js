@@ -143,7 +143,6 @@ function screenOnlineHost() {
         <label for="on" style="font-weight:800">Seu apelido</label><input class="txt" id="on" maxlength="18" value="${esc(cfg.name)}" placeholder="Ex.: Yara">
         ${avatarPickerHTML(cfg.avatar)}
         <b>Nível</b><div class="chips">${Object.entries(DIFFS).map(([k, d]) => `<button class="chip" data-d="${k}" aria-pressed="${cfg.diff === k}">${d.label}</button>`).join('')}</div>
-        <b>Duração</b><div class="chips">${Object.entries(PLANS).map(([k, p]) => `<button class="chip" data-l="${k}" aria-pressed="${cfg.length === k}">${p.label} · ${p.time}</button>`).join('')}</div>
         <div class="row"><button class="btn" id="bk">${ICON.back} Voltar</button><span class="grow"></span><button class="btn primary big" id="go">Criar sala</button></div>
       </div></div>`;
     $('#on').oninput = e => cfg.name = e.target.value;
@@ -222,13 +221,11 @@ function renderLobby() {
       <div class="row center">${host ? `<button class="btn primary big" id="start" ${NET.players.length < 2 ? 'disabled' : ''}>Começar a aventura</button>` : ''}<button class="btn" id="leave">Sair da sala</button></div>
       ${host && NET.players.length < 2 ? '<p class="muted" style="font-weight:700;margin:0">O botão de começar libera quando alguém entrar.</p>' : ''}
     </div>`;
-  const inv = $('#invite'); if (inv) inv.onclick = async () => {
-    const link = location.href.split(/[?#]/)[0] + '?sala=' + NET.code + (new URLSearchParams(location.search).get('peer') ? '&peer=' + new URLSearchParams(location.search).get('peer') : '');
-    const text = `Bora jogar "A Cidade que Esqueceu" comigo? Toque no link e entre na sala ${NET.code}:`;
-    try { if (navigator.share) { await navigator.share({ title: 'A Cidade que Esqueceu', text, url: link }); return; } } catch (e) { return; }
-    try { await navigator.clipboard.writeText(text + ' ' + link); toast('Link copiado! Cole no WhatsApp do seu amigo.', 'carta'); } catch (e) { toast('Mande este link: ' + link); }
+  const inv = $('#invite'); if (inv) inv.onclick = () => {
+    const pr = new URLSearchParams(location.search).get('peer'), link = shareBase() + '?sala=' + NET.code + (pr ? '&peer=' + pr : '');
+    shareOrCopy(`Bora jogar "A Cidade que Esqueceu" comigo? Toque no link e entre na sala ${NET.code}:`, link, 'Convite copiado! Cole no WhatsApp do seu amigo.');
   };
-  const cp = $('#cpcode'); if (cp) cp.onclick = async () => { try { await navigator.clipboard.writeText(NET.code); toast('Código copiado!', 'carta'); } catch (e) { toast('Código: ' + NET.code); } };
+  const cp = $('#cpcode'); if (cp) cp.onclick = () => copyOrShow(NET.code, `Código ${NET.code} copiado!`, 'Código da sala');
   const st = $('#start'); if (st) st.onclick = () => {
     newGame({ mode: 'juntos', players: NET.players, diff: NET.cfg.diff, length: NET.cfg.length, clueMode: 'online' });
     NET.started = true; netSend({ t: 'start' }); go(screenPrologue);

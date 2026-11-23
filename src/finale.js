@@ -93,6 +93,8 @@ function screenEnding() {
   app().innerHTML = `<div class="screen stage">
     <div class="logo"><h1>Lumiara está acesa!</h1><p>Uma cidade só funciona porque muitas pessoas fazem a sua parte. Ninguém deveria ser invisível.</p></div>
     <div class="scene cap"><img class="bg px" src="${composeScene('festa', [], [{ id: 'nevoaFeliz', x: 62, y: 2 }, ...G.album.slice(0, 6).map((id, i) => ({ id, x: 8 + i * 25, y: 60 }))]).toDataURL()}" alt="Festa em Lumiara com os trabalhadores lembrados"></div>
+    <div class="epi"><div class="ffly">${Array.from({ length: 9 }, (_, i) => `<i style="--d:${i * .37}s;--x:${8 + (i * 11) % 84}%;--y:${10 + (i * 23) % 60}%"></i>`).join('')}<img class="px" src="${SPR.url('faisca')}" alt="Faísca"></div>
+      <p><b>Faísca:</b> Olha!! Minha família voltou pro parque! Quando a cidade lembra de quem cuida dela, cuida melhor da natureza também. Obrigada por me enxergar.</p></div>
     <div class="cert"><span class="tag">Certificado</span><h2>Guardiões da Memória de Lumiara</h2>
       <div class="row center">${G.players.map(p => `<img class="px" style="width:48px;height:72px" src="${SPR.url(avatarOf(p))}" alt="">`).join('')}</div><p class="names">${esc(names)}</p>
       <p style="font-weight:800;font-size:1.2rem;margin:0">${starsHTML(1, 1)} ${totalStars()} estrelas conquistadas</p>
@@ -100,10 +102,14 @@ function screenEnding() {
       <div class="medal-row">${medalsHTML()}</div>
       ${G.challenges.length ? `<h3 style="margin-top:16px">Desafios da vida real aceitos</h3><ul style="text-align:left;font-weight:700;max-width:640px;margin:0 auto">${G.challenges.map(c => `<li>${esc(c)}</li>`).join('')}</ul>` : ''}
       <p style="font-weight:800;margin-top:16px">Agora é com vocês: olhem em volta. Quem faz a sua escola, a sua rua e a sua casa funcionarem?</p></div>
-    ${met < total ? `<p style="color:#fff;font-weight:800;text-align:center;margin:0">Ainda há ${total - met} pessoas para conhecer em Lumiara. Que tal jogar a versão Completa?</p>` : ''}
-    <div class="row center"><button class="btn big" id="alb">${ICON.book} Ver o álbum</button><button class="btn big" id="map">${ICON.map} Passear pelo mapa</button><button class="btn primary big" id="again">Jogar de novo</button></div></div>`;
+    <div class="teaser"><span class="tag">Continua...</span><h2>Só no Brasil, são mais de 2.600 ocupações reconhecidas.</h2>
+      <p>Quantas você conhece? Lumiara ainda guarda muita gente esperando para ser lembrada:</p>
+      <div class="row center">${[['costureira', 'Quem costurou a sua roupa?'], ['motorista', 'Quem dirige o seu ônibus?'], ['pedreiro', 'Quem levantou a sua casa?'], ['caixa', 'Quem passa as suas compras?']].map(([k, q], i) => `<div class="mystery"><div class="sil">${SPR.img(['theo', 'bia', 'davi', 'iara'][i], 'sil')}<b>?</b></div><small>${q}</small></div>`).join('')}</div>
+      ${met < total ? `<p style="font-weight:800;margin:6px 0 0">E ainda faltam ${total - met} pessoas desta cidade no seu álbum. Que tal a versão Difícil?</p>` : ''}</div>
+    <div class="row center"><button class="btn big" id="alb">${ICON.book} Ver o álbum</button><button class="btn big" id="map">${ICON.map} Passear pelo mapa</button>${G.plan && Object.values(G.plan).flat().length < 15 ? `<button class="btn primary big" id="more">${ICON.map} Conhecer mais gente da cidade</button>` : ''}<button class="btn big" id="again">Jogar de novo</button></div></div>`;
   $('#alb').onclick = openAlbum;
   $('#map').onclick = () => go(screenMap);
+  if ($('#more')) $('#more').onclick = () => { G.plan = JSON.parse(JSON.stringify(PLANS.full.regions)); G.extended = true; saveGame(); toast('Novos bairros acordaram! A Faísca vai te mostrar o caminho.', 'faisca'); go(screenMap); };
   $('#again').onclick = () => confirmBox('Começar uma nova aventura? O álbum desta partida será apagado.', 'Começar de novo', () => go(screenSetup));
 }
 
