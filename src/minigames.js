@@ -18,6 +18,7 @@ function floatText(root, html, x = 50, y = 40) {
 
 /* ---------------- ARRUMA-ARRUMA (Dona Cida) ---------------- */
 STEPS.tidy = function (step, ctx) {
+  Audio8.energy = 1; onCleanup(() => { Audio8.energy = 0; });
   const BINS = [
     { id: 'cesto', prop: 'cesto', label: 'Roupa suja' },
     { id: 'pia', prop: 'pia', label: 'Pia' },
@@ -113,6 +114,7 @@ STEPS.tidy = function (step, ctx) {
 
 /* ---------------- COZINHA DO SEU ZÉ: arroz de verdade ---------------- */
 STEPS.cook = function (step, ctx) {
+  Audio8.energy = 1; onCleanup(() => { Audio8.energy = 0; });
   const ING = { arroz: '1 copo de arroz', copoagua: '2 copos de água', oleo: '1 colher de óleo', alho: '1 dente de alho', sal: '1 pitada de sal' };
   const SILLY = { chocolate: 'Arroz de chocolate? Hoje não!', meia: 'Eca! Meia não é comida!', sorvete: 'Sorvete derrete na panela!' };
   const LABEL = { arroz: 'Arroz', copoagua: 'Água', oleo: 'Óleo', alho: 'Alho', sal: 'Sal', chocolate: 'Chocolate', meia: 'Meia', sorvete: 'Sorvete' };

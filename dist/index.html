@@ -798,6 +798,246 @@ html.rm *, html.rm *::before, html.rm *::after { animation-duration: .001ms !imp
 .vcompare .fact p { margin: 0; }
 @media (max-width: 700px) { .vgrid { grid-template-columns: repeat(4, 1fr); } .vcard img.px { width: 26px; height: 39px; } }
 @media (min-width: 701px) { .visit .vcity { width: min(100%, calc(50vh * 16 / 9)); justify-self: center; } }
+
+/* =====================================================================
+   CELULAR NA HORIZONTAL — tela dividida: jogo à esquerda, botões à direita
+   ===================================================================== */
+@media (orientation: landscape) and (max-height: 520px) {
+  :root { --rail: 118px; }
+  html, body { overscroll-behavior: none; }
+  #app { max-width: none; padding: 6px calc(var(--rail) + 10px + env(safe-area-inset-right)) 8px calc(10px + env(safe-area-inset-left)); min-height: 100dvh; }
+  /* barra de botões vira um trilho vertical na direita, perto do polegar */
+  .footbar { top: 0; bottom: 0; left: auto; right: 0; width: calc(var(--rail) + env(safe-area-inset-right)); border-top: 0; border-left: var(--bw) solid var(--ink); padding: 8px calc(8px + env(safe-area-inset-right)) 8px 8px; background: linear-gradient(180deg, #232b57f5, #1b2142f5); }
+  .footbar .in { flex-direction: column; flex-wrap: nowrap; height: 100%; align-items: stretch; gap: 8px; max-width: none; }
+  .footbar .in > .grow { flex: 1; }
+  .footbar .btn { justify-content: center; padding: 6px 8px; min-height: 44px; font-size: .9rem; }
+  .footbar .btn.primary.big { min-height: 96px; font-size: 1.05rem; flex-direction: column; gap: 2px; }
+  .footbar .teacher { flex-direction: column; align-items: stretch; gap: 6px; }
+  .footbar .teacher .btn { font-size: .75rem; min-height: 36px; }
+  /* topo compacto */
+  .hud { flex-wrap: nowrap; gap: 6px; margin-bottom: 4px; }
+  .hud .lbl { display: none; }
+  .hud .btn.small { min-height: 32px; padding: 0 8px; box-shadow: 2px 2px 0 var(--ink); }
+  .hud .lights { flex: 1; min-width: 0; gap: 6px; }
+  .hud .bar { height: 12px; }
+  .hud .turn { font-size: .72rem; padding: 1px 8px 1px 2px; white-space: nowrap; max-width: 30vw; overflow: hidden; }
+  .hud .turn .dot { width: 22px; height: 22px; }
+  .mhead { margin-bottom: 4px; gap: 8px; flex-wrap: nowrap; }
+  .mhead .where { display: none; }
+  .mhead h2 { font-size: 1rem; text-shadow: 2px 2px 0 var(--ink); }
+  .dots i { width: 9px; height: 9px; border-width: 2px; }
+  .prompt { padding: 3px 8px; gap: 8px; border-radius: 10px; box-shadow: 3px 3px 0 var(--ink); }
+  .prompt img.px { width: 24px; height: 24px; }
+  .prompt p { font-size: .88rem; line-height: 1.2; }
+  .ibtn { width: 32px; height: 32px; }
+  .stage { gap: 6px; }
+  .feedback { padding: 5px 8px; font-size: .82rem; }
+  .feedback img.px { width: 24px; }
+  /* a cena sempre cabe na altura da tela */
+  .scene, .mapwrap, .title-art { max-width: calc((100dvh - 112px) * 16 / 9); margin-inline: auto; }
+  .mapwrap { max-width: calc((100dvh - 58px) * 200 / 120); }
+  .two { grid-template-columns: minmax(0, auto) minmax(150px, 1fr); gap: 8px; }
+  .two > div:first-child { min-width: 0; }
+  .notebook { display: none; }
+  .nbmini { display: block; color: #fff; font-weight: 800; margin: 4px 0 0; text-align: center; font-size: .85rem; }
+  .walk-help { display: none; }
+  .dpad { grid-template-columns: repeat(3, 44px); grid-template-rows: repeat(3, 38px); gap: 3px; margin-top: 4px; }
+  /* mapa: controle ao lado do mapa */
+  .screen:has(> .mapwrap) { display: grid; grid-template-columns: minmax(0, 1fr) 150px; grid-template-rows: auto 1fr; gap: 6px 8px; }
+  .screen:has(> .mapwrap) > .hud { grid-column: 1 / -1; }
+  .screen:has(> .mapwrap) > .mapwrap { grid-column: 1; }
+  .screen:has(> .mapwrap) > .map-ctrl { grid-column: 2; grid-row: 2; align-self: center; }
+  .map-ctrl .near-msg { font-size: .78rem; }
+  /* história: cena à esquerda, fala à direita */
+  #stage:has(> .scene.cap), .screen.stage:has(> .cut) { display: grid; grid-template-columns: minmax(0, auto) minmax(180px, 1fr); align-items: center; gap: 10px; }
+  .screen.stage:has(> .cut) > .mhead { grid-column: 1 / -1; }
+  .bubble { flex-direction: column; gap: 6px; }
+  .bubble .text p { font-size: 1.05rem; }
+  /* título: arte à esquerda, botões à direita */
+  .title-wrap { grid-template-columns: minmax(0, 1.25fr) minmax(220px, 1fr); grid-template-rows: auto 1fr; align-items: start; gap: 8px 14px; padding-top: 0; }
+  .title-wrap .logo { grid-column: 1 / -1; }
+  .logo h1 { font-size: 1.9rem; } .logo p { font-size: .85rem; }
+  .title-art { max-width: calc((100dvh - 90px) * 16 / 9); }
+  .title-btns { width: 100%; gap: 7px; }
+  .title-btns .btn { min-height: 40px; padding: 6px 10px; font-size: .9rem; }
+  .title-btns .btn.big { min-height: 46px; font-size: 1rem; }
+  .title-foot { display: none; }
+  /* etapas */
+  .who-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .clue { padding: 5px 8px; font-size: .82rem; }
+  .sils { grid-template-columns: repeat(5, 1fr); gap: 4px; }
+  .sil img.px { width: 34px; height: 51px; } .sil { font-size: .66rem; padding: 4px 2px; }
+  .match { gap: 8px; } .mcard { min-height: 40px; padding: 4px 8px; font-size: .82rem; } .mcard img.px { width: 28px; height: 28px; }
+  .options { grid-template-columns: 1fr 1fr 1fr; gap: 8px; } .opt { min-height: 0; padding: 6px 8px; font-size: .82rem; } .opt .l { width: 26px; height: 26px; }
+  .reflect { gap: 8px; } .rcard { padding: 10px; gap: 6px; } .rcard p { font-size: .85rem; } .rcard h3 { font-size: 1rem; }
+  .slots { gap: 6px; } .slot { min-height: 86px; } .scard { min-height: 80px; font-size: .72rem; padding: 14px 4px 4px; } .scard img.px { width: 32px; height: 32px; }
+  .sort-item img.px { width: 60px; height: 60px; } .bin { min-height: 70px; font-size: .75rem; } .bin img.px { width: 30px; height: 30px; }
+  .cons { padding: 8px; font-size: .85rem; } .cons h3 { font-size: 1rem; margin: 0; }
+  .daycount { font-size: .85rem; }
+  .route-wrap { gap: 8px; } .arrows { display: none; }
+  /* descoberta: cabeçalho compacto + mini-vídeo ao lado dos fatos */
+  .reveal.rv { grid-template-columns: 1fr; gap: 6px; }
+  .reveal.rv .cardbig { max-width: none; }
+  .reveal.rv .cardbig .portrait { display: none; }
+  .reveal.rv .cardbig .inner { background: var(--rc, #e0705a); padding: 4px 10px; display: flex; gap: 2px 10px; align-items: center; justify-content: center; animation: none; }
+  .reveal.rv .cardbig h3 { font-size: 1.05rem; margin: 0; } .reveal.rv .cardbig .job { font-size: .82rem; }
+  .reveal.rv .cardbig .tag, .reveal.rv .cardbig .quote { display: none; }
+  .reveal.rv .facts { display: grid; grid-template-columns: minmax(0, 1.3fr) 1fr; gap: 6px 8px; }
+  .reveal.rv .facts .vid { grid-column: 1; grid-row: 1 / span 3; max-width: calc((100dvh - 150px) * 16 / 9); }
+  .reveal.rv .fact.big1 { padding: 6px 10px; } .reveal.rv .fact.big1 h4 { font-size: .8rem; margin: 0; } .reveal.rv .fact.big1 p { font-size: .88rem; }
+  .reveal.rv .row { gap: 4px; } .reveal.rv .row .btn.small { padding: 4px 8px; font-size: .78rem; }
+  .reveal.rv .vtag { display: none; } .reveal.rv .vcap { font-size: .75rem; padding: 2px 8px; bottom: 4%; }
+  /* minijogos */
+  .mghead { padding: 4px 8px; gap: 8px; box-shadow: 2px 2px 0 var(--ink); } .mghead b { font-size: .88rem; } .mghead img.px { width: 20px; height: 30px; }
+  .mg { gap: 6px; }
+  .mg.tidy { grid-template-columns: minmax(0, 1fr) 110px; }
+  .mg.tidy .tidyroom { width: min(100%, calc((100dvh - 120px) * 16 / 9)); max-width: none; }
+  .mg.tidy .bins { gap: 5px; } .tbin { padding: 3px; font-size: .7rem; } .tbin img.px { width: 30px; height: 30px; }
+  .mgbar { font-size: .8rem; } .mgbar .bar { height: 10px; }
+  .mg.cook .kitchen { min-height: 0; padding: 6px; } .kitchen canvas { width: min(92%, calc((100dvh - 130px) * 4 / 3)); }
+  .tray { grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 5px; } .ing { padding: 3px 2px; font-size: .68rem; } .ing img.px { width: 28px; height: 28px; }
+  .traylab { font-size: .8rem; } .chipi { font-size: .7rem; } .chipi img.px { width: 16px; height: 16px; }
+  .recipe { padding: 8px; font-size: .8rem; }
+  .shirt img.px { width: 48px; height: 48px; }
+  .visit .vgrid { grid-template-columns: repeat(6, 1fr); } .vcard img.px { width: 24px; height: 36px; }
+  .modal { max-height: 92dvh; }
+}
+/* aviso para girar o celular */
+#rotate { display: none; }
+@media (orientation: portrait) and (max-width: 700px) and (pointer: coarse) {
+  html.needrot:not(.rotok) #rotate { display: grid; }
+}
+#rotate { position: fixed; inset: 0; z-index: 200; place-items: center; background: radial-gradient(circle at 50% 35%, #3a4590, #1b2142 70%); color: #fff; text-align: center; padding: 24px; }
+#rotate .in { display: grid; gap: 16px; justify-items: center; max-width: 320px; }
+#rotate .phone { width: 74px; height: 126px; border: 6px solid #fff; border-radius: 16px; position: relative; animation: rot 2.4s ease-in-out infinite; box-shadow: 0 0 30px #f4c54266; }
+#rotate .phone::after { content: ''; position: absolute; inset: 10px 8px; border-radius: 6px; background: linear-gradient(180deg, #8fd6cf, #f4c542); }
+@keyframes rot { 0%, 20% { transform: rotate(0); } 55%, 80% { transform: rotate(-90deg); } 100% { transform: rotate(0); } }
+#rotate h2 { margin: 0; font-size: 1.6rem; color: var(--glow); text-shadow: 3px 3px 0 var(--ink); }
+#rotate p { margin: 0; font-weight: 700; opacity: .9; }
+#rotate .skip { background: none; border: 0; color: #fff9; font-weight: 800; text-decoration: underline; font-size: .9rem; padding: 8px; }
+@media (orientation: landscape) and (max-height: 520px) {
+  :root { --sw: calc((100dvh - 112px) * 16 / 9); }
+  .two { grid-template-columns: minmax(0, min(var(--sw), calc(100% - 158px))) minmax(140px, 1fr); }
+  #stage:has(> .scene.cap), .screen.stage:has(> .cut) { grid-template-columns: minmax(0, min(var(--sw), calc(100% - 190px))) minmax(180px, 1fr); }
+  .two .dpad, #stage .dpad { display: none; }
+  .two > div:first-child > .scene { max-width: none; }
+  .route-wrap { grid-template-columns: auto 1fr; }
+  .cell { width: calc((100dvh - 128px) / var(--gh, 5)); }
+  .reflect { display: grid; grid-template-columns: repeat(3, 1fr); overflow: visible; }
+  .rcard { flex: none; }
+  .sortbox { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 8px; align-items: center; }
+  .sort-item { padding: 6px 10px; }
+  .bins { grid-template-columns: repeat(3, 1fr); }
+  .who-grid .clues { max-height: calc(100dvh - 120px); overflow-y: auto; }
+  .match { max-height: calc(100dvh - 116px); overflow-y: auto; }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  .two .options { grid-template-columns: 1fr; gap: 6px; }
+  .two .opt { font-size: .85rem; }
+}
+
+/* ===== cores fluidas: fundo vivo que esquenta conforme a cidade acende ===== */
+body::before { content: ''; position: fixed; inset: -20%; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(40% 35% at 20% 15%, hsl(calc(230 - var(--lit, 0) * 40) 60% 38% / .9), transparent 70%),
+    radial-gradient(35% 40% at 85% 85%, hsl(calc(275 - var(--lit, 0) * 60) 45% 36% / .85), transparent 70%),
+    radial-gradient(30% 30% at 70% 20%, hsl(calc(185 + var(--lit, 0) * 0) 55% 34% / calc(.35 + var(--lit, 0) * .3)), transparent 70%),
+    radial-gradient(30% 30% at 15% 80%, hsl(40 90% 55% / calc(var(--lit, 0) * .35)), transparent 70%);
+  animation: skyflow 28s ease-in-out infinite alternate; transition: filter 1.5s; }
+@keyframes skyflow { 0% { transform: translate(0, 0) rotate(0); } 50% { transform: translate(3%, -2%) rotate(3deg); } 100% { transform: translate(-3%, 2%) rotate(-2deg); } }
+@keyframes enter { from { opacity: 0; transform: translateY(10px) scale(.985); filter: saturate(.5) brightness(.9); } to { opacity: 1; transform: none; filter: none; } }
+.screen { animation: enter .45s cubic-bezier(.2, .8, .2, 1) both; }
+.btn, .opt, .mcard, .ing, .tbin, .bin, .sil, .chip, .acard { transition: transform .12s ease, box-shadow .12s ease, background-color .25s ease, filter .2s; }
+.btn:not(:disabled):active, .opt:active, .ing:active, .tbin:active, .bin:active, .sil:not(:disabled):active { transform: translate(2px, 2px) scale(.98); box-shadow: 1px 1px 0 var(--ink); }
+@media (hover: hover) { .btn:not(:disabled):hover, .opt:hover, .ing:hover, .tbin:hover { filter: brightness(1.06); transform: translateY(-1px); } }
+.btn.primary:not(:disabled) { background-image: linear-gradient(180deg, #ffe17a, var(--gold) 55%, #e8b42e); }
+.lights .bar i, .hud .bar i { background-image: linear-gradient(90deg, #f4c542, #fff1a8, #f4c542); background-size: 200% 100%; animation: shimmer 3s linear infinite; transition: width .8s cubic-bezier(.2, .8, .2, 1); }
+@keyframes shimmer { to { background-position: -200% 0; } }
+.prompt, .panel, .fact, .mghead, .bubble .text { background-image: linear-gradient(180deg, #fffaf0, var(--paper)); }
+.scene img.bg { transition: filter 1.2s ease; }
+html.rm body::before { animation: none; }
+
+/* ============ PROFISSÕES: minijogos de ação ============ */
+.jobscene { position: relative; }
+.jobscene canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+.jhot { position: absolute; z-index: 3; background: transparent; border: 3px dashed transparent; border-radius: 10px; padding: 0; cursor: pointer; }
+.jhot.glow { border-color: #fff1a8; box-shadow: 0 0 0 3px #f4c54288, 0 0 18px 4px #f4c542aa !important; animation: pulse 1s infinite; }
+.firetint { position: absolute; inset: 0; background: radial-gradient(circle at 50% 30%, #ff7a1f88, #7a1f0066 70%); mix-blend-mode: multiply; transition: opacity .6s; pointer-events: none; z-index: 1; }
+.flame { position: absolute; z-index: 4; padding: 0; border: 0; background: none; cursor: pointer; transform-origin: 50% 100%; transition: transform .2s; animation: popin .3s both; }
+.flame img { width: 100%; display: block; animation: flick .35s steps(2) infinite; filter: drop-shadow(0 0 4px #ffb347); }
+.flame .smoke { position: absolute; left: 10%; bottom: 90%; width: 80%; aspect-ratio: 1; border-radius: 50%; background: #5a5560aa; animation: smoke 1.6s ease-out infinite; pointer-events: none; }
+@keyframes flick { 50% { transform: scaleY(1.12) translateY(-4%); } }
+@keyframes smoke { from { transform: translateY(0) scale(.6); opacity: .8; } to { transform: translateY(-120%) scale(1.5); opacity: 0; } }
+.flame.poof { animation: gone .4s forwards; }
+.spray { position: absolute; z-index: 5; width: 4%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(#e8f7ff, #5fb8ff 60%, transparent 70%); animation: spray .5s ease-out forwards; pointer-events: none; }
+@keyframes spray { from { transform: scale(.4); opacity: 1; } to { transform: scale(2.4); opacity: 0; } }
+.hose { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
+.hose path { fill: none; stroke: #c0392b; stroke-width: 1.6; stroke-dasharray: 3 1.5; animation: hoseflow 1s linear infinite; }
+@keyframes hoseflow { to { stroke-dashoffset: -9; } }
+.trashit { position: absolute; z-index: 4; padding: 0; border: 0; background: none; animation: bob 1.4s ease-in-out infinite; }
+.trashit img { width: 100%; display: block; filter: drop-shadow(0 0 3px #fff); }
+.trashit.gone { animation: gone .4s forwards; }
+.wsteps { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; justify-content: center; color: #fff9; font-weight: 800; font-size: .8rem; }
+.wsteps span { padding: 2px 8px; border-radius: 99px; background: #ffffff14; transition: background .3s, color .3s; }
+.wsteps span.now { background: var(--glow); color: var(--ink); transform: scale(1.08); }
+.wsteps span.ok { background: #5fb8ff; color: var(--ink); }
+.crossbar { display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+.crossbar .stopb { background: #d9534f; color: #fff; min-width: 130px; font-size: 1.2rem; }
+.crossbar .stopb img.px { width: 26px; }
+.crossbar .gob { background: #3d9a55; color: #fff; min-width: 130px; font-size: 1.2rem; }
+.crossbar .btn:disabled { opacity: .45; }
+.kidsok { color: #fff; font-weight: 800; text-align: center; }
+.kidsok b { color: var(--glow); font-family: var(--title); font-size: 1.2rem; }
+/* reciclagem */
+.recarea { position: relative; background: linear-gradient(180deg, #e8f1e4, #cfe3c9); border: var(--bw) solid var(--ink); border-radius: 16px; box-shadow: var(--shadow); padding: 12px; min-height: 260px; display: grid; gap: 10px; align-content: start; overflow: hidden; }
+.belt { position: relative; height: 110px; display: grid; place-items: center; }
+.beltline { position: absolute; left: 0; right: 0; bottom: 8px; height: 16px; background: repeating-linear-gradient(90deg, #4a4058 0 14px, #6b6178 14px 28px); border: 3px solid var(--ink); border-radius: 99px; animation: belt .6s linear infinite; }
+@keyframes belt { to { background-position: 28px 0; } }
+.ritem { position: relative; z-index: 1; margin-bottom: 18px; animation: slidein .45s cubic-bezier(.2, .8, .2, 1) both; }
+.ritem img.px { width: 84px; height: 84px; filter: drop-shadow(3px 3px 0 #0003); }
+.ritem.gone { animation: gone .35s forwards; }
+@keyframes slidein { from { transform: translateX(-180px) rotate(-20deg); opacity: 0; } }
+.rbins { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.rbin { position: relative; background: var(--bc); color: #fff; border: var(--bw) solid var(--ink); border-radius: 12px 12px 16px 16px; box-shadow: 3px 3px 0 var(--ink); padding: 18px 4px 8px; display: grid; gap: 2px; justify-items: center; font-weight: 800; text-shadow: 1px 1px 0 #0006; cursor: pointer; }
+.rbin .lid { position: absolute; top: 4px; left: 10%; right: 10%; height: 8px; background: #0003; border-radius: 99px; }
+.rbin small { font-size: .78rem; opacity: .95; }
+.rbin.gulp { animation: gulp .35s; }
+.rcount { margin: 0; text-align: center; font-weight: 800; color: var(--ink2); }
+.wallet { display: flex; align-items: center; gap: 8px; justify-content: center; background: var(--paper); border: var(--bw) solid var(--ink); border-radius: 99px; padding: 4px 16px; box-shadow: 3px 3px 0 var(--ink); justify-self: center; }
+.wallet img.px { width: 30px; } .wallet b { font-family: var(--title); font-size: 1.4rem; } .wallet small { font-weight: 700; color: var(--ink2); }
+.wallet.pop { animation: gulp .35s; }
+.ewaste { display: flex; gap: 14px; align-items: center; justify-content: center; flex-wrap: wrap; }
+.dev { background: var(--paper); border: var(--bw) solid var(--ink); border-radius: 14px; box-shadow: 3px 3px 0 var(--ink); padding: 8px 14px; display: grid; justify-items: center; font-weight: 800; cursor: pointer; animation: wiggle 1s ease-in-out infinite; }
+.dev img.px { width: 96px; height: 96px; } .dev.open { animation: none; opacity: .6; transform: rotate(-8deg); }
+.parts { display: flex; gap: 8px; }
+.part { background: #fffdf5; border: var(--bw) solid var(--ink); border-radius: 12px; box-shadow: 3px 3px 0 var(--ink); padding: 6px 10px; display: grid; justify-items: center; font-weight: 800; animation: popin .35s both; cursor: pointer; }
+.part:nth-child(2) { animation-delay: .1s; } .part:nth-child(3) { animation-delay: .2s; }
+.part img.px { width: 54px; height: 54px; } .part small { color: var(--ok); font-weight: 800; }
+.part.got { opacity: .35; transform: scale(.9); pointer-events: none; }
+.fact.mini { margin: 0; padding: 6px 10px; font-size: .85rem; font-weight: 700; text-align: center; }
+.jars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.jar { background: var(--paper); border: var(--bw) solid var(--ink); border-radius: 16px; box-shadow: 3px 3px 0 var(--ink); padding: 10px 6px; display: grid; justify-items: center; gap: 2px; font-weight: 800; cursor: pointer; }
+.jar img.px { width: 56px; height: 56px; } .jar span { font-family: var(--title); font-size: 1.1rem; color: var(--ok); }
+.jar.gulp { animation: gulp .3s; }
+.pile { margin: 0; text-align: center; font-weight: 800; }
+@media (max-width: 700px) { .rbins { grid-template-columns: repeat(2, 1fr); } .ritem img.px { width: 64px; height: 64px; } .belt { height: 86px; } .crossbar .btn { min-width: 0; font-size: 1rem; } .parts { flex-wrap: wrap; justify-content: center; } }
+@media (orientation: landscape) and (max-height: 520px) {
+  .mg.job { grid-template-columns: minmax(0, min(var(--sw), calc(100% - 150px))) minmax(140px, 1fr); align-items: start; gap: 6px 8px; }
+  .mg.job .mghead { grid-column: 1 / -1; }
+  .mg.job .jobscene { grid-column: 1; grid-row: 2 / span 3; }
+  .mg.job .mgbar, .mg.job .wsteps, .mg.job .crossbar { grid-column: 2; }
+  .mg.job .mgbar { flex-wrap: wrap; } .wsteps { justify-content: flex-start; font-size: .68rem; } .wsteps i { display: none; }
+  .crossbar { flex-direction: column; align-items: stretch; } .crossbar .btn { min-width: 0; font-size: 1rem; min-height: 54px; }
+  .mg.job.rec { grid-template-columns: minmax(0, 1fr) 150px; }
+  .mg.job.rec .recarea { grid-column: 1; grid-row: 2; min-height: 0; padding: 6px; gap: 6px; max-height: calc(100dvh - 110px); }
+  .mg.job.rec .wallet { grid-column: 2; grid-row: 2; align-self: start; flex-direction: column; border-radius: 16px; }
+  .belt { height: 70px; } .ritem img.px { width: 52px; height: 52px; } .rbin { padding: 12px 2px 4px; font-size: .8rem; }
+  .dev img.px { width: 60px; height: 60px; } .part img.px { width: 36px; height: 36px; } .part { padding: 4px 6px; font-size: .75rem; }
+  .jar img.px { width: 38px; height: 38px; } .jar { padding: 6px; }
+}
+@media (min-width: 701px) and (min-height: 521px) {
+  .mg.job .jobscene { width: min(100%, calc((100vh - 330px) * 16 / 9)); justify-self: center; }
+}
 </style>
 </head>
 <body>
@@ -882,6 +1122,14 @@ function filtered(src, mode, amount = 1) {
    cada operação: [cor, x, y, largura, altura]
    'top' = desenhado depois do contorno (vapor, água, brilho)
    ============================================================ */
+/* carros com proporção de verdade (32x14) e ônibus (48x22) */
+function carOps(C, CD, CL, glass = 'glass') {
+  return [[C, 1, 6, 30, 5], [C, 7, 2, 15, 4], [C, 6, 4, 1, 2], [C, 22, 3, 2, 3], [C, 24, 5, 3, 1],
+    [glass, 8, 3, 6, 3], [glass, 15, 3, 6, 3], ['white', 9, 3, 2, 1], ['white', 16, 3, 2, 1], [CD, 14, 3, 1, 3],
+    [CL, 2, 6, 27, 1], [CD, 1, 10, 30, 1], [CD, 14, 7, 1, 3], ['white', 11, 8, 2, 1], ['white', 18, 8, 2, 1], [CD, 23, 5, 1, 1],
+    ['yellowL', 29, 7, 2, 2], ['red', 1, 7, 1, 2], ['greyD', 0, 9, 2, 2], ['greyD', 29, 9, 3, 2],
+    ['ink', 4, 9, 6, 5], ['ink', 21, 9, 6, 5], ['ink', 5, 8, 4, 1], ['ink', 22, 8, 4, 1], ['greyL', 6, 10, 2, 2], ['greyL', 23, 10, 2, 2], ['grey', 6, 12, 2, 1], ['grey', 23, 12, 2, 1]];
+}
 const PROPS = {
   roupa: { ops: [['blue', 1, 11, 14, 4], ['blueD', 1, 13, 14, 1], ['pink', 2, 7, 12, 4], ['pinkD', 2, 9, 12, 1], ['yellow', 1, 3, 14, 4], ['yellowD', 1, 5, 14, 1], ['white', 6, 3, 4, 1]] },
   panela: { ops: [['greyD', 3, 7, 10, 7], ['grey', 2, 6, 12, 2], ['greyL', 4, 8, 2, 4], ['greyD', 0, 8, 2, 2], ['greyD', 14, 8, 2, 2], ['brownD', 4, 6, 8, 1]], top: [['white', 5, 0, 1, 2], ['white', 6, 2, 1, 2], ['white', 10, 1, 1, 2], ['white', 9, 3, 1, 2]] },
@@ -992,7 +1240,19 @@ const PROPS = {
   dogsleep: { ops: [['caramel', 2, 9, 12, 5], ['caramel', 10, 7, 5, 5], ['caramelD', 10, 6, 2, 3], ['caramelL', 14, 10, 2, 2], ['caramel', 0, 11, 3, 2], ['ink', 12, 9, 2, 1], ['red', 10, 11, 3, 1]] },
   passaro: { ops: [['blueD', 5, 7, 6, 3], ['blueD', 2, 5, 4, 2], ['blueD', 10, 5, 4, 2], ['orange', 11, 8, 2, 1]] },
   passaro2: { ops: [['blueD', 5, 6, 6, 3], ['blueD', 2, 8, 4, 2], ['blueD', 10, 8, 4, 2], ['orange', 11, 7, 2, 1]] },
-  carro: { ops: [['red', 0, 8, 16, 5], ['red', 3, 4, 9, 4], ['glass', 4, 5, 3, 3], ['glass', 8, 5, 3, 3], ['ink', 2, 12, 4, 4], ['ink', 10, 12, 4, 4], ['grey', 3, 13, 2, 2], ['grey', 11, 13, 2, 2], ['yellow', 15, 9, 1, 2]] },
+  carro: { w: 32, h: 14, ops: carOps('red', 'redD', '#ef8a84') },
+  carro2: { w: 32, h: 14, ops: carOps('blue', 'blueD', 'blueL') },
+  carro3: { w: 32, h: 14, ops: carOps('greyL', 'grey', 'white', 'skyD') },
+  taxi: { w: 32, h: 14, ops: carOps('yellow', 'yellowD', 'yellowL').concat([['ink', 13, 1, 4, 1], ['white', 14, 0, 2, 1]]) },
+  bombeiros: { w: 48, h: 22, ops: [['red', 0, 4, 47, 13], ['redD', 0, 14, 47, 2], ['white', 0, 10, 40, 1], ['greyL', 4, 1, 30, 2], ['greyD', 6, 0, 1, 3], ['greyD', 31, 0, 1, 3],
+    ['glass', 38, 5, 8, 5], ['white', 39, 5, 2, 1], ['ink', 36, 4, 1, 12], ['yellowL', 45, 12, 2, 2], ['blue', 40, 2, 3, 2], ['red', 43, 2, 3, 2], ['yellow', 4, 7, 6, 2], ['yellow', 14, 7, 6, 2], ['yellow', 24, 7, 6, 2],
+    ['ink', 5, 15, 8, 7], ['ink', 33, 15, 8, 7], ['greyL', 7, 17, 4, 3], ['greyL', 35, 17, 4, 3]] },
+  onibus: { w: 48, h: 22, ops: [['teal', 0, 2, 47, 15], ['tealL', 1, 2, 45, 1], ['white', 0, 11, 47, 2], ['tealD', 0, 16, 47, 1],
+    ['glass', 3, 4, 5, 5], ['glass', 10, 4, 5, 5], ['glass', 17, 4, 5, 5], ['glass', 24, 4, 5, 5], ['glass', 31, 4, 3, 5], ['glass', 41, 3, 5, 8],
+    ['white', 4, 4, 2, 1], ['white', 11, 4, 2, 1], ['white', 18, 4, 2, 1], ['white', 25, 4, 2, 1], ['white', 42, 3, 2, 2],
+    ['greyD', 35, 4, 5, 12], ['glass', 36, 5, 3, 5], ['ink', 40, 0, 6, 2], ['yellow', 41, 0, 4, 1],
+    ['yellowL', 45, 13, 2, 2], ['red', 0, 13, 1, 2], ['greyD', 0, 17, 48, 1],
+    ['ink', 6, 15, 8, 7], ['ink', 33, 15, 8, 7], ['greyL', 8, 17, 4, 3], ['greyL', 35, 17, 4, 3]] },
   hidrante: { ops: [['red', 5, 4, 6, 11], ['red', 4, 2, 8, 3], ['redD', 3, 8, 10, 2], ['greyD', 4, 15, 8, 1]] },
   vaso: { ops: [['orangeD', 4, 10, 8, 6], ['orange', 3, 9, 10, 2], ['green', 4, 4, 8, 6], ['pink', 5, 3, 2, 2], ['yellow', 9, 4, 2, 2], ['red', 7, 6, 2, 2]] },
   mosca: { ops: [['ink', 6, 7, 5, 4], ['glass', 3, 4, 4, 3], ['glass', 10, 4, 4, 3], ['red', 6, 7, 1, 1], ['red', 10, 7, 1, 1]] },
@@ -1005,6 +1265,18 @@ const PROPS = {
   murcha: { ops: [['brownL', 4, 11, 8, 5], ['brown', 3, 10, 10, 2], ['brownL', 7, 4, 2, 7], ['tan', 3, 6, 4, 2], ['tan', 9, 5, 4, 2], ['brown', 5, 3, 3, 2]] },
   vazia: { ops: [['tan', 1, 7, 14, 8], ['brownL', 1, 7, 14, 2], ['brown', 3, 10, 10, 4]] },
   carta: { ops: [['white', 1, 3, 14, 11], ['greyL', 1, 3, 14, 1], ['pink', 1, 4, 7, 5], ['pink', 8, 4, 7, 5], ['white', 2, 4, 12, 3], ['red', 6, 8, 4, 3]] },
+  /* novas profissões */
+  extintor: { ops: [['red', 5, 4, 6, 11], ['redD', 9, 4, 2, 11], ['white', 6, 8, 3, 2], ['ink', 6, 1, 4, 3], ['greyD', 9, 1, 4, 1], ['ink', 12, 2, 2, 6]] },
+  apito: { ops: [['greyL', 3, 6, 9, 6], ['white', 4, 7, 3, 2], ['greyD', 11, 7, 4, 3], ['ink', 5, 9, 2, 2], ['yellow', 1, 3, 3, 3]] },
+  placasolar: { ops: [['navy', 1, 4, 14, 8], ['blue', 2, 5, 3, 2], ['blue', 6, 5, 3, 2], ['blue', 10, 5, 4, 2], ['blue', 2, 8, 3, 3], ['blue', 6, 8, 3, 3], ['blue', 10, 8, 4, 3], ['white', 2, 5, 1, 1], ['greyD', 7, 12, 2, 3]] },
+  pare: { ops: [['greyD', 7, 9, 2, 7], ['red', 3, 1, 10, 9], ['red', 2, 3, 12, 5], ['white', 4, 4, 8, 3]] },
+  celularvelho: { ops: [['ink', 4, 1, 8, 14], ['greyD', 5, 2, 6, 12], ['glass', 5, 3, 6, 8], ['white', 6, 4, 2, 1], ['grey', 7, 12, 2, 1], ['red', 9, 9, 2, 2]] },
+  computador: { ops: [['ink', 1, 2, 14, 9], ['greyL', 2, 3, 12, 7], ['blueL', 3, 4, 10, 5], ['white', 4, 5, 2, 1], ['grey', 6, 11, 4, 2], ['greyD', 3, 13, 10, 2]] },
+  bateria: { ops: [['ink', 4, 3, 8, 11], ['green', 5, 4, 6, 9], ['greenL', 5, 4, 6, 2], ['greyL', 6, 1, 4, 2], ['white', 7, 7, 2, 3]] },
+  placa: { ops: [['greenD', 1, 3, 14, 10], ['green', 2, 4, 12, 8], ['yellow', 3, 5, 6, 1], ['yellow', 3, 8, 8, 1], ['ink', 10, 5, 3, 3], ['orange', 4, 10, 2, 1], ['orange', 9, 10, 2, 1]] },
+  chip: { ops: [['ink', 4, 4, 8, 8], ['greyD', 5, 5, 6, 6], ['yellow', 2, 5, 2, 1], ['yellow', 2, 8, 2, 1], ['yellow', 12, 5, 2, 1], ['yellow', 12, 8, 2, 1], ['yellow', 5, 2, 1, 2], ['yellow', 9, 2, 1, 2], ['yellow', 5, 12, 1, 2], ['yellow', 9, 12, 1, 2], ['white', 6, 6, 2, 1]] },
+  porquinho: { ops: [['pink', 2, 5, 12, 8], ['pink', 12, 6, 3, 4], ['pinkD', 14, 7, 2, 2], ['pink', 4, 3, 3, 3], ['ink', 10, 7, 1, 1], ['pinkD', 3, 13, 2, 2], ['pinkD', 10, 13, 2, 2], ['ink', 6, 5, 4, 1], ['pinkD', 0, 7, 2, 1]] },
+  moeda: { ops: [['yellowD', 3, 3, 10, 10], ['yellow', 4, 4, 8, 8], ['yellowL', 5, 5, 2, 3], ['yellowD', 7, 6, 2, 4]] },
   /* cozinha: receita de arroz */
   arroz: { ops: [['white', 3, 4, 10, 11], ['cream', 3, 12, 10, 3], ['yellow', 4, 7, 8, 4], ['yellowD', 4, 10, 8, 1], ['white', 5, 8, 2, 2], ['white', 8, 8, 1, 1], ['brownL', 5, 2, 6, 2], ['brown', 6, 1, 4, 1]] },
   copoagua: { ops: [['glass', 4, 3, 8, 12], ['blueL', 4, 7, 8, 8], ['blue', 4, 13, 8, 2], ['white', 5, 4, 1, 3]] },
@@ -1112,6 +1384,9 @@ const LOOKS = {
   joaquim: { S: 's3', H: '#e6e6ec', T: 'cream', U: 'tan', P: 'greenD', F: 'brownD', A: 'greenD', B: 'green', layers: ['bald', 'cap', 'beard', 'overalls', 'smile'] },
   denise: { S: 's1', H: '#e8c25a', T: 'orange', U: 'orangeD', P: 'orange', F: 'ink', A: 'orange', B: 'orangeD', V: 'vest', G: 'yellow', layers: ['pony', 'cap', 'stripes', 'gloves', 'smile'] },
   pedro: { S: 's4', H: '#1d1418', T: 'blueD', U: 'navy', P: 'navy', F: 'ink', A: 'white', B: 'greyL', V: 'vest', G: 'red', layers: ['helmet', 'stripes', 'gloves', 'smile'] },
+  joana: { S: 's3', H: '#2b2233', T: 'redD', U: 'red', P: 'navy', F: 'ink', A: 'yellow', B: 'yellowD', V: 'yellowL', G: 'ink', layers: ['helmet', 'stripes', 'gloves', 'smile'] },
+  carlos: { S: 's2', H: '#1d1418', T: 'blueD', U: 'navy', P: 'navy', F: 'ink', A: 'navy', B: 'ink', M: 'yellow', layers: ['short', 'cap', 'mustache', 'strap', 'smile'] },
+  tania: { S: 's1', H: '#b5562c', T: 'blue', U: 'blueD', P: 'greyD', F: 'ink', A: 'white', B: 'greyL', V: 'orange', G: 'yellow', layers: ['helmet', 'vest', 'gloves', 'smile'] },
   /* figurantes */
   theo: { S: 's3', H: '#2b2233', T: 'red', U: 'redD', P: 'blue', F: 'white', layers: ['curly', 'smile'] },
   bia: { S: 's1', H: '#6b3e26', T: 'yellow', U: 'yellowD', P: 'purple', F: 'pink', A: 'purple', layers: ['long', 'band', 'skirt', 'smile'] },
@@ -1228,7 +1503,7 @@ const SPR = {
     else if (name === 'nevoaFeliz') c = buildNevoa(true);
     else if (LOOKS[name]) c = buildCharacter(name);
     else if (PROPS[name]) {
-      const p = PROPS[name], b = mkCanvas(16, 16);
+      const p = PROPS[name], b = mkCanvas(p.w || 16, p.h || 16);
       drawOps(b.getContext('2d'), p.ops);
       c = outlined(b);
       if (p.top) drawOps(c.getContext('2d'), p.top, 1, 1);
@@ -1276,12 +1551,60 @@ function tree(ctx, x, y, s = 1, leaf = 'green') {
 }
 function house(ctx, x, y, w, h, wall, roof, lit) {
   R(ctx, 'ink', x - 1, y - 1, w + 2, h + 2); R(ctx, wall, x, y, w, h);
+  for (let j = y + 3; j < y + h; j += 4) R(ctx, '#0000000d', x, j, w, 1);
+  R(ctx, '#00000022', x + w - 2, y, 2, h);
   R(ctx, 'ink', x - 3, y - 6, w + 6, 7); R(ctx, roof, x - 2, y - 5, w + 4, 5);
-  R(ctx, 'brownD', x + (w >> 1) - 3, y + h - 10, 6, 10);
+  for (let i = x - 2; i < x + w + 2; i += 3) R(ctx, '#00000026', i, y - 5, 1, 5); R(ctx, '#ffffff33', x - 2, y - 5, w + 4, 1);
+  if (w > 26) { R(ctx, 'ink', x + w - 8, y - 11, 6, 6); R(ctx, 'brownL', x + w - 7, y - 10, 4, 5); }
+  R(ctx, 'ink', x + (w >> 1) - 4, y + h - 11, 8, 11); R(ctx, 'brownD', x + (w >> 1) - 3, y + h - 10, 6, 10); R(ctx, 'brown', x + (w >> 1) - 2, y + h - 9, 4, 4);
+  R(ctx, 'yellow', x + (w >> 1) + 1, y + h - 5, 1, 1); R(ctx, 'grey', x + (w >> 1) - 5, y + h - 1, 10, 1);
   windowPx(ctx, x + 3, y + 4, 8, 8, lit ? '#ffd65e' : 'sky');
   if (w > 26) windowPx(ctx, x + w - 11, y + 4, 8, 8, lit ? '#ffd65e' : 'sky');
 }
 function sky(ctx, c1 = 'sky', h = 60) { R(ctx, c1, 0, 0, SW, h); R(ctx, 'white', 18, 10, 18, 4); R(ctx, 'white', 22, 7, 9, 3); R(ctx, 'white', 110, 14, 22, 4); R(ctx, 'white', 116, 11, 10, 3); }
+
+/* ---- detalhes de cidade ---- */
+function skyGrad(ctx, top = 'skyD', mid = 'sky', h = 60) { R(ctx, top, 0, 0, SW, h); for (let i = 0; i < 6; i++) R(ctx, mid, 0, Math.round(h * (.2 + i * .12)), SW, h); R(ctx, '#cfeefa', 0, h - 8, SW, 8);
+  R(ctx, 'white', 18, 10, 18, 4); R(ctx, 'white', 22, 7, 9, 3); R(ctx, 'white', 110, 14, 22, 4); R(ctx, 'white', 116, 11, 10, 3); R(ctx, '#eaf7fd', 18, 13, 18, 1); R(ctx, '#eaf7fd', 110, 17, 22, 1); }
+function skyline(ctx, c = '#9fc7e3', base = 52) {
+  const t = [[0, 30, 12], [11, 22, 9], [20, 34, 14], [33, 26, 8], [40, 18, 10], [52, 30, 12], [63, 24, 9], [74, 16, 12], [88, 28, 10], [97, 20, 13], [112, 30, 9], [122, 24, 12], [136, 18, 10], [148, 28, 12]];
+  for (const [x, y, w] of t) { R(ctx, c, x, y, w, base - y); for (let wy = y + 3; wy < base - 2; wy += 5) for (let wx = x + 2; wx < x + w - 1; wx += 4) R(ctx, '#b8d8ee', wx, wy, 2, 2); }
+}
+function building(ctx, x, y, w, base, c, shade, k) {
+  const h = base - y;
+  R(ctx, 'ink', x - 1, y - 1, w + 2, h + 1); R(ctx, c, x, y, w, h); R(ctx, shade, x + w - 2, y, 2, h);
+  R(ctx, 'white', x, y, w, 1); R(ctx, shade, x - 1, y + 2, w + 2, 1);
+  /* telhado: caixa d'água, antena ou ar-condicionado */
+  if (k % 3 === 0) { R(ctx, 'ink', x + 3, y - 5, 7, 5); R(ctx, 'brownL', x + 4, y - 4, 5, 3); R(ctx, 'brown', x + 4, y - 2, 5, 1); }
+  else if (k % 3 === 1) { R(ctx, 'ink', x + w - 5, y - 7, 1, 7); R(ctx, 'ink', x + w - 7, y - 6, 5, 1); }
+  else { R(ctx, 'ink', x + 2, y - 3, 6, 3); R(ctx, 'greyL', x + 3, y - 2, 4, 2); }
+  /* andares e janelas (algumas acesas, algumas com cortina) */
+  let n = 0;
+  for (let wy = y + 4; wy < base - 14; wy += 7) {
+    R(ctx, shade, x, wy + 5, w - 2, 1);
+    for (let wx = x + 2; wx < x + w - 5; wx += 5) {
+      const v = (k * 7 + n++ * 3) % 5;
+      R(ctx, 'ink', wx, wy, 4, 4); R(ctx, v === 0 ? '#ffd65e' : v === 1 ? 'navy' : 'blueL', wx + 1, wy + 1, 2, 2);
+      if (v === 2) R(ctx, 'pink', wx + 1, wy + 1, 1, 2); if (v === 3) R(ctx, 'white', wx + 1, wy + 1, 1, 1);
+    }
+  }
+  /* térreo: loja com toldo listrado, vitrine e porta */
+  const aw = ['red', 'green', 'orange', 'blue', 'purple', 'teal'][k % 6];
+  R(ctx, 'ink', x - 1, base - 13, w + 2, 4);
+  for (let i = 0; i < w; i += 2) R(ctx, i % 4 ? 'white' : aw, x + i, base - 12, 2, 2);
+  R(ctx, 'ink', x + 2, base - 8, w - 10, 6); R(ctx, 'glass', x + 3, base - 7, w - 12, 4); R(ctx, 'white', x + 4, base - 7, 2, 1);
+  R(ctx, 'ink', x + w - 7, base - 9, 5, 9); R(ctx, 'brownD', x + w - 6, base - 8, 3, 8); R(ctx, 'yellow', x + w - 4, base - 4, 1, 1);
+}
+function sidewalk(ctx, y, h) { R(ctx, 'greyL', 0, y, SW, h); for (let i = 0; i < SW; i += 8) R(ctx, '#bfc5cc', i, y, 1, h); R(ctx, '#bfc5cc', 0, y + (h >> 1), SW, 1); R(ctx, 'grey', 0, y + h, SW, 1); R(ctx, 'white', 0, y + h + 1, SW, 1); }
+function road(ctx, y, h, zebra) {
+  R(ctx, '#4f5663', 0, y, SW, h);
+  for (let i = 0; i < 90; i++) R(ctx, i % 2 ? '#585f6d' : '#474d59', (i * 37) % SW, y + 2 + (i * 13) % (h - 3), 1, 1);
+  const mid = y + (h >> 1); for (let i = 4; i < SW; i += 16) { R(ctx, 'yellow', i, mid - 1, 9, 1); R(ctx, 'yellow', i, mid + 1, 9, 1); }
+  if (zebra != null) for (let j = y + 2; j < y + h - 2; j += 4) R(ctx, 'white', zebra, j, 14, 2);
+  R(ctx, 'grey', 0, y + h - 1, SW, 1);
+}
+function lamp(ctx, x, y, h = 26) { R(ctx, 'ink', x - 1, y, 3, h); R(ctx, 'greyD', x, y, 1, h); R(ctx, 'ink', x - 1, y - 1, 8, 3); R(ctx, 'greyD', x, y, 6, 1); R(ctx, '#fff1a8', x + 4, y + 1, 3, 2); }
+function busStop(ctx, x, y) { R(ctx, 'ink', x - 1, y - 1, 22, 4); R(ctx, 'tealD', x, y, 20, 2); R(ctx, 'ink', x + 1, y + 2, 1, 14); R(ctx, 'ink', x + 18, y + 2, 1, 14); R(ctx, 'glass', x + 2, y + 3, 15, 7); R(ctx, 'brownL', x + 3, y + 11, 13, 2); R(ctx, 'ink', x + 4, y + 13, 1, 3); R(ctx, 'ink', x + 14, y + 13, 1, 3); R(ctx, 'yellow', x + 19, y - 6, 4, 4); R(ctx, 'ink', x + 20, y - 2, 1, 4); }
 
 const SCENES = {
   sala(ctx) {
@@ -1345,8 +1668,8 @@ const SCENES = {
   ruacasas(ctx) {
     sky(ctx, 'sky', 58);
     house(ctx, 6, 28, 34, 30, 'yellowL', 'red'); house(ctx, 50, 22, 30, 36, 'tealL', 'blueD'); house(ctx, 92, 30, 28, 28, 'pink', 'brown'); house(ctx, 128, 26, 30, 32, 'greenL', 'redD');
-    R(ctx, 'greyL', 0, 58, SW, 8); stripes(ctx, 'grey', 0, 58, SW, 8, 10);
-    R(ctx, 'greyD', 0, 66, SW, 24); for (let i = 4; i < SW; i += 20) R(ctx, 'white', i, 77, 10, 2);
+    sidewalk(ctx, 58, 7);
+    road(ctx, 67, 23, 64);
     put(ctx, 'vaso', 42, 42); put(ctx, 'vaso', 84, 42); put(ctx, 'hidrante', 122, 42);
     R(ctx, 'ink', 140, 8, 6, 2); R(ctx, 'pink', 141, 6, 4, 2);
   },
@@ -1397,9 +1720,8 @@ const SCENES = {
   rua(ctx) {
     sky(ctx, '#ffd9a8', 50); R(ctx, '#ffe9c7', 0, 0, SW, 20);
     house(ctx, 4, 22, 30, 28, 'cream', 'orangeD'); house(ctx, 44, 16, 36, 34, 'blueL', 'navy'); house(ctx, 92, 24, 28, 26, 'yellowL', 'red'); house(ctx, 130, 20, 26, 30, 'pink', 'brownD');
-    R(ctx, 'greyL', 0, 50, SW, 14); stripes(ctx, 'grey', 0, 50, SW, 14, 12);
-    R(ctx, 'grey', 0, 63, SW, 3);
-    R(ctx, 'greyD', 0, 66, SW, 24); for (let i = 6; i < SW; i += 24) R(ctx, 'white', i, 78, 12, 2);
+    sidewalk(ctx, 50, 14); R(ctx, 'grey', 0, 64, SW, 2);
+    road(ctx, 66, 24, null);
     R(ctx, 'greyD', 86, 18, 2, 34); R(ctx, 'greyD', 86, 18, 9, 2); R(ctx, 'greyL', 92, 20, 5, 2);
     /* amarelinha na calçada e detalhes */
     for (let i = 0; i < 4; i++) { R(ctx, 'white', 112 + i * 7, 56, 6, 1); R(ctx, 'white', 112 + i * 7, 61, 6, 1); R(ctx, 'white', 112 + i * 7, 56, 1, 6); }
@@ -1419,15 +1741,14 @@ const SCENES = {
     for (let i = 0; i < SW; i += 8) { const y = 18 + Math.round(Math.sin(i / 25) * 3); R(ctx, ['red', 'yellow', 'teal', 'pink', 'green'][(i / 8) % 5], i + 2, y, 4, 4); R(ctx, 'ink', i, y - 1, 8, 1); }
   },
   cidade(ctx) {
-    sky(ctx, 'sky', 60);
-    const b = [[2, 30, 20, 'pink'], [24, 18, 18, 'yellowL'], [44, 34, 16, 'tealL'], [62, 10, 22, 'purpleL'], [86, 26, 18, 'greenL'], [106, 16, 20, 'blueL'], [128, 32, 14, 'cream'], [144, 22, 16, 'orange']];
-    for (const [x, y, w, c] of b) {
-      R(ctx, 'ink', x - 1, y - 1, w + 2, 62 - y); R(ctx, c, x, y, w, 61 - y);
-      for (let wy = y + 4; wy < 54; wy += 8) for (let wx = x + 3; wx < x + w - 3; wx += 6) R(ctx, 'yellowL', wx, wy, 3, 4);
-    }
-    R(ctx, 'greyD', 0, 61, SW, 29); for (let i = 6; i < SW; i += 24) R(ctx, 'white', i, 74, 12, 2);
-    tree(ctx, 30, 48, 1); tree(ctx, 118, 50, 1);
-    put(ctx, 'hidrante', 66, 46); put(ctx, 'bancoparque', 90, 50);
+    skyGrad(ctx, 'skyD', 'sky', 62); skyline(ctx, '#9fc7e3', 56);
+    const b = [[2, 26, 21, 'pink', 'pinkD'], [25, 14, 18, 'yellowL', 'yellowD'], [45, 30, 16, 'tealL', 'teal'], [63, 8, 22, 'purpleL', 'purple'], [87, 22, 18, 'greenL', 'green'], [107, 12, 20, 'blueL', 'blue'], [129, 28, 14, 'cream', 'tan'], [145, 18, 15, 'orange', 'orangeD']];
+    b.forEach(([x, y, w, c, sh], k) => building(ctx, x, y, w, 60, c, sh, k));
+    sidewalk(ctx, 60, 6); road(ctx, 67, 23, 72);
+    lamp(ctx, 22, 36, 24); lamp(ctx, 104, 36, 24);
+    tree(ctx, 30, 44, 1); tree(ctx, 118, 46, 1);
+    busStop(ctx, 135, 46);
+    put(ctx, 'hidrante', 66, 46); put(ctx, 'bancoparque', 88, 50);
   }
 };
 
@@ -1466,7 +1787,7 @@ const REGIONS = [
   { id: 'casas', name: 'Bairro das Casas', color: '#e0705a', music: { root: 60, scale: 'maj', tempo: 92, wave: 'triangle' },
     intro: 'Ruas de casinhas e prédios baixos. Antes, as janelas brilhavam à noite. Agora está tudo cinza e silencioso.',
     faisca: 'Aqui mora muita gente. E muita gente trabalha para que essas casas funcionem.',
-    missions: ['cida', 'jorge'] },
+    missions: ['cida', 'jorge', 'tania'] },
   { id: 'vila', name: 'Vila do Aprendizado', color: '#e8a93a', music: { root: 62, scale: 'maj', tempo: 104, wave: 'square' },
     intro: 'A escola da cidade, com pátio, cozinha e salas de aula. O sinal tocou, mas ninguém lembra quem deixou tudo pronto.',
     faisca: 'Uma escola não funciona só com professores e alunos. Vamos descobrir quem mais está aqui?',
@@ -1474,7 +1795,7 @@ const REGIONS = [
   { id: 'saude', name: 'Estação da Saúde', color: '#4aa6a0', music: { root: 57, scale: 'maj', tempo: 84, wave: 'sine' },
     intro: 'O posto de saúde do bairro e as casas das famílias. A Névoa fez todo mundo esquecer quem cuida da saúde de pertinho.',
     faisca: 'Cuidar da saúde não acontece só no hospital. Acontece na porta de casa também!',
-    missions: ['lucia', 'benedito'] },
+    missions: ['lucia', 'benedito', 'joana'] },
   { id: 'mercado', name: 'Mercado das Mil Histórias', color: '#d0603f', music: { root: 65, scale: 'maj', tempo: 112, wave: 'triangle' },
     intro: 'Barracas de frutas, legumes e temperos. Cada alimento tem uma história, mas a Névoa apagou o caminho que ele fez até aqui.',
     faisca: 'Será que a comida nasce no mercado? Hmm... acho que tem mais gente nessa história.',
@@ -1486,11 +1807,35 @@ const REGIONS = [
   { id: 'caminhos', name: 'Caminhos da Cidade', color: '#6a7fd0', music: { root: 55, scale: 'pent', tempo: 96, wave: 'triangle' },
     intro: 'Ruas, calçadas e postes ligam todos os lugares. É aqui que a Névoa está mais forte: quase todos os postes estão apagados.',
     faisca: 'Se a gente acender os caminhos, todos os bairros voltam a se encontrar!',
-    missions: ['denise', 'pedro'] }
+    missions: ['denise', 'pedro', 'carlos'] }
 ];
 
 /* ---------------- PERSONAGENS (álbum) ---------------- */
 const CHARACTERS = {
+  tania: { name: 'Tânia', full: 'Tânia Ribeiro', job: 'Técnica de saneamento', region: 'casas', prop: 'copoagua',
+    story: 'Tânia trabalha na estação de tratamento de água. Ela adora química e explica para a filha por que a água da torneira é segura.',
+    routine: ['Confere a água que chega do rio', 'Mede o cloro e a limpeza', 'Cuida dos filtros e das bombas', 'Corre para consertar canos quebrados'],
+    contribution: 'Água limpa na torneira evita doenças e deixa a gente cozinhar, tomar banho e beber sem medo.',
+    challenges: 'Plantões de madrugada, canos que quebram na chuva e gente que desperdiça a água tratada.',
+    quote: 'Cada copo d’água limpinha passou pelas mãos de muita gente.',
+    curiosity: 'Fechar a torneira enquanto escova os dentes economiza até 12 litros de água.',
+    reflection: 'Quantas vezes por dia você usa água que alguém tratou?' },
+  joana: { name: 'Tenente Joana', full: 'Joana Pereira', job: 'Bombeira', region: 'saude', prop: 'extintor',
+    story: 'Joana é bombeira há 12 anos. Já resgatou gente, cachorro e até um gato no alto de um poste. Treina todos os dias.',
+    routine: ['Confere o caminhão e as mangueiras', 'Treina resgates e primeiros socorros', 'Atende chamados pelo 193', 'Ensina prevenção nas escolas'],
+    contribution: 'Bombeiros salvam vidas em incêndios, enchentes, acidentes e resgates.',
+    challenges: 'Fogo, fumaça, calor e plantões de 24 horas longe da família.',
+    quote: 'A gente corre para onde todo mundo está fugindo.',
+    curiosity: 'O telefone dos bombeiros no Brasil é 193. É grátis!',
+    reflection: 'Você sabe para quem ligar numa emergência?' },
+  carlos: { name: 'Sargento Carlos', full: 'Carlos Henrique Santos', job: 'Policial comunitário', region: 'caminhos', prop: 'apito',
+    story: 'Carlos conhece as famílias do bairro pelo nome. Toda manhã ele cuida da travessia da escola e ajuda quem se perde.',
+    routine: ['Ronda a pé pelo bairro', 'Organiza a saída da escola', 'Ajuda crianças perdidas a achar a família', 'Conversa com os moradores'],
+    contribution: 'Ajuda o bairro a ser mais seguro e organiza o trânsito para ninguém se machucar.',
+    challenges: 'Sol, chuva, trânsito perigoso e situações difíceis todos os dias.',
+    quote: 'Segurança se faz junto, conhecendo as pessoas.',
+    curiosity: 'O telefone da polícia no Brasil é 190.',
+    reflection: 'Quem ajuda você a atravessar a rua perto da escola?' },
   cida: { name: 'Dona Cida', full: 'Aparecida Santos', job: 'Trabalhadora doméstica', region: 'casas', prop: 'roupa',
     story: 'Cida cuida de casas há mais de 20 anos. Com esse trabalho, criou dois filhos. Hoje, à noite, ela estuda Pedagogia.',
     routine: ['Pega dois ônibus para chegar às 8h', 'Lava, passa, cozinha e organiza a casa', 'Sai às 17h e ainda cuida da própria casa'],
@@ -1594,6 +1939,45 @@ const CHARACTERS = {
    whoami, reveal, choice, reflect
    level: 'det' = só no Detetive; 'inv' = Investigador e Detetive        */
 const MISSIONS = {
+  tania: { title: 'A água que chega na torneira', char: 'tania', steps: [
+    { t: 'dialog', scene: 'sala', cast: [{ id: 'theo', x: 70, y: 52 }], lines: [
+      { who: 'theo', text: 'Abri a torneira e... nada!' },
+      { who: '?tania', text: 'Vem ver o caminho da água!' }] },
+    { t: 'water' },
+    { t: 'reveal', char: 'tania' },
+    { t: 'choice', scene: 'sala', cast: [{ id: 'theo', x: 70, y: 52 }],
+      prompt: 'Escovando os dentes, a torneira fica aberta. E aí?',
+      options: [
+        { text: 'Fechar a torneira enquanto escova.', kind: true, result: 'Economiza até 12 litros. A Tânia agradece!' },
+        { text: 'Deixar aberta. Água não acaba.', kind: false, result: 'Acaba sim! E cada gota tratada deu trabalho para muita gente.' },
+        { text: 'Fechar e contar para a família.', kind: true, result: 'Água limpa é de todo mundo. Cuidar é com a gente também!' }] }
+  ] },
+  joana: { title: 'Fogo na rua das casas!', char: 'joana', steps: [
+    { t: 'dialog', scene: 'ruacasas', cast: [{ id: 'davi', x: 40, y: 40 }], lines: [
+      { who: 'davi', text: 'Socorro! Tem fumaça na rua!' },
+      { who: '?joana', text: 'Bombeiros chegando! Me ajuda?' }] },
+    { t: 'fire' },
+    { t: 'reveal', char: 'joana' },
+    { t: 'choice', scene: 'ruacasas', cast: [{ id: 'joana', x: 100, y: 40 }],
+      prompt: 'Um fio caído solta faíscas na calçada. O que fazer?',
+      options: [
+        { text: 'Ficar longe e chamar um adulto: 193!', kind: true, result: 'Isso! Longe do perigo e pedindo ajuda certa.' },
+        { text: 'Chegar perto para ver.', kind: false, result: 'Perigo! Eletricidade machuca muito. Fique longe.' },
+        { text: 'Jogar água no fio.', kind: false, result: 'Nunca! Água e eletricidade juntas dão choque. Ligue 193.' }] }
+  ] },
+  carlos: { title: 'A travessia da escola', char: 'carlos', steps: [
+    { t: 'dialog', scene: 'ruacasas', cast: [{ id: 'bia', x: 40, y: 40 }], lines: [
+      { who: 'bia', text: 'Tanto carro! Como eu atravesso?' },
+      { who: '?carlos', text: 'Eu cuido da travessia. Me ajuda?' }] },
+    { t: 'cross' },
+    { t: 'reveal', char: 'carlos' },
+    { t: 'choice', scene: 'ruacasas', cast: [{ id: 'bia', x: 40, y: 40 }],
+      prompt: 'O sinal está verde para os carros. E você?',
+      options: [
+        { text: 'Espero na calçada o sinal fechar.', kind: true, result: 'Perfeito! Paciência salva vidas.' },
+        { text: 'Corro antes do carro chegar.', kind: false, result: 'Nunca! Atravesse só na faixa e com o sinal fechado.' },
+        { text: 'Seguro a mão de um adulto e espero.', kind: true, result: 'Muito bem! Juntos é mais seguro.' }] }
+  ] },
   /* ===== BAIRRO DAS CASAS ===== */
   cida: { title: 'A casa que se arruma sozinha?', char: 'cida', steps: [
     { t: 'dialog', scene: 'sala', cast: [{ id: 'theo', x: 70, y: 52 }], lines: [
@@ -2029,7 +2413,9 @@ const FINALE = {
     lucia: 'Vacinas atrasariam e a dengue se espalharia pelo bairro.', benedito: 'Dona Olímpia não poderia continuar morando na casa dela.',
     zefa: 'Não haveria tomate, alface nem mandioca na feira.', rafa: 'Quem não pode sair de casa ficaria sem comida e remédio.',
     marina: 'Toneladas de material reciclável iriam parar no lixão.', joaquim: 'O parque viraria um matagal sem sombra.',
-    denise: 'As ruas ficariam sujas e alagariam na primeira chuva.', pedro: 'As ruas ficariam escuras e perigosas à noite.' },
+    denise: 'As ruas ficariam sujas e alagariam na primeira chuva.', pedro: 'As ruas ficariam escuras e perigosas à noite.',
+    tania: 'A água da torneira chegaria suja e muita gente ficaria doente.', joana: 'Ninguém apagaria incêndios nem salvaria quem está em perigo.',
+    carlos: 'A saída da escola viraria uma confusão perigosa.' },
   thanks: ['Obrigado por cuidar da gente!', 'Seu trabalho é muito importante.', 'Eu reparei em você!', 'Obrigada por deixar tudo funcionando!', 'Sem você, a cidade parava.', 'Você faz a diferença todos os dias.'],
   outro: [
     { who: 'nevoa', text: 'Que quentinho... Obrigada!' },
@@ -2170,7 +2556,7 @@ const INTERLUDES = [
 
 
 const Audio8 = {
-  ctx: null, master: null, musicBus: null, sfxBus: null, timer: null, cfg: null, step: 0, brightness: 0,
+  ctx: null, master: null, musicBus: null, sfxBus: null, leadBus: null, timer: null, cfg: null, step: 0, brightness: 0, energy: 0,
   vol: { music: .5, sfx: .7, mute: false },
   init() {
     if (this.ctx) { if (this.ctx.state === 'suspended') this.ctx.resume().catch(() => {}); return; }
@@ -2181,6 +2567,11 @@ const Audio8 = {
       const lp = this.ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 5200; lp.connect(this.master);
       this.musicBus = this.ctx.createGain(); this.musicBus.connect(lp);
       this.sfxBus = this.ctx.createGain(); this.sfxBus.connect(this.master);
+      /* eco suave só na melodia: deixa o som mais redondo e menos 'apito' */
+      this.leadBus = this.ctx.createGain(); this.leadBus.connect(this.musicBus);
+      const dl = this.ctx.createDelay(1); dl.delayTime.value = .27; const fb = this.ctx.createGain(); fb.gain.value = .28; const wet = this.ctx.createGain(); wet.gain.value = .22;
+      const dlp = this.ctx.createBiquadFilter(); dlp.type = 'lowpass'; dlp.frequency.value = 2600;
+      this.leadBus.connect(dl); dl.connect(dlp); dlp.connect(fb); fb.connect(dl); dlp.connect(wet); wet.connect(this.musicBus);
       this.apply();
     } catch (e) { this.ctx = null; }
   },
@@ -2242,23 +2633,27 @@ const Audio8 = {
       if (!this.ctx) return;
       while (next < this.ctx.currentTime + .3) {
         const s = this.step++, st = s % 16, bar = Math.floor(s / 16), chordDeg = song.prog[bar % 4] + 1;
-        const rootN = key - 12 + this.deg(chordDeg), br = this.brightness, full = br >= .2;
-        /* bateria */
-        if (st % 8 === 0 || (st === 10 && full)) this.hit('kick', next);
-        if ((st === 4 || st === 12) && full) this.hit('snare', next);
-        if (st % 2 === 0) this.hit('hat', next);
-        /* baixo saltitante em colcheias: fundamental / oitava */
-        if (st % 2 === 0) this.note(this.mtof(rootN - 12 + (st % 4 ? 12 : 0)), next, six * 1.6, 'square', .1, this.musicBus);
-        /* arpejo do acorde */
-        if (full && st % 2 === 1) { const tri = [0, 2, 4][((st - 1) / 2) % 3]; this.note(this.mtof(key + this.deg(chordDeg + tri)), next, six * 1.2, 'triangle', .08, this.musicBus); }
-        /* melodia (colcheias) */
+        const rootN = key - 12 + this.deg(chordDeg), br = this.brightness, full = br >= .2, chorus = Math.floor(bar / 8) % 2 === 1, en = this.energy;
+        const sw = st % 2 ? six * .14 : 0, t = next + sw, lead = this.leadBus || this.musicBus;
+        /* bateria: verso leve, refrão cheio, virada a cada 8 compassos */
+        const fill = bar % 8 === 7 && st >= 12;
+        if (st % 8 === 0 || (st === 10 && (full || chorus))) this.hit('kick', t);
+        if (((st === 4 || st === 12) && (full || chorus)) || (fill && st % 1 === 0 && st >= 12)) this.hit('snare', t);
+        if (st % 2 === 0 || en || chorus) this.hit('hat', t);
+        /* baixo saltitante */
+        if (st % 2 === 0) this.note(this.mtof(rootN - 12 + (st % 4 ? 12 : 0)), t, six * 1.6, 'square', .085, this.musicBus);
+        /* acorde: arpejo no refrão, pad suave no verso */
+        if ((full || chorus) && st % 2 === 1) { const tri = [0, 2, 4][((st - 1) / 2) % 3]; this.note(this.mtof(key + this.deg(chordDeg + tri)), t, six * 1.2, 'triangle', .07, this.musicBus); }
+        if (!chorus && st === 0) [0, 2, 4].forEach(o => this.note(this.mtof(key + this.deg(chordDeg + o)), t, six * 15, 'sine', .05, this.musicBus));
+        /* melodia: verso com triângulo doce, refrão com quadrada + harmonia */
         if (st % 2 === 0) {
           const row = toks[bar % toks.length], tk = row[st / 2];
           if (tk && tk !== '.' && tk !== '-') {
             let len = 1; for (let j = st / 2 + 1; j < row.length && row[j] === '-'; j++) len++;
             const d = isNaN(+tk) ? 10 + 'ABC'.indexOf(tk) : +tk, f = this.mtof(key + 12 + this.deg(d));
-            this.note(f, next, six * 2 * len * .95, 'square', .1, this.musicBus);
-            this.note(f * 2, next + six * .5, six * 2 * len * .6, 'triangle', .035, this.musicBus);
+            this.note(f, t, six * 2 * len * .95, chorus ? 'square' : 'triangle', chorus ? .075 : .16, lead);
+            if (chorus) this.note(this.mtof(key + 12 + this.deg(d + 2)), t, six * 2 * len * .9, 'triangle', .06, lead);
+            else this.note(f * 2, t + six * .5, six * 2 * len * .5, 'sine', .03, lead);
           }
         }
         next += six;
@@ -2357,6 +2752,7 @@ function saveSettings() { Store.set(KEY_SET, S); applySettings(); }
 function saveGame() { if (G && !(typeof NET !== 'undefined' && NET.on && NET.role === 'guest')) Store.set(KEY_GAME, G); }
 function applySettings() {
   const H = document.documentElement;
+  try { H.style.setProperty('--lit', G ? progress().toFixed(2) : 0); } catch (e) {}
   H.classList.toggle('hc', !!S.contrast);
   H.classList.toggle('bt', !!S.bigText);
   H.classList.toggle('rm', !!S.reduceMotion);
@@ -2368,8 +2764,8 @@ function applySettings() {
 
 /* ---------- partida ---------- */
 const PLANS = {
-  short: { label: 'Curta', time: '10 a 15 min', regions: { casas: ['jorge'], vila: ['ze'], parque: ['marina'] } },
-  medium: { label: 'Média', time: '20 a 30 min', regions: { casas: ['cida'], vila: ['katia'], saude: ['lucia'], mercado: ['rafa'], parque: ['joaquim'], caminhos: ['pedro'] } },
+  short: { label: 'Curta', time: '10 a 15 min', regions: { casas: ['cida'], vila: ['ze'], saude: ['joana'] } },
+  medium: { label: 'Média', time: '20 a 30 min', regions: { casas: ['cida', 'tania'], vila: ['ze'], saude: ['joana'], mercado: ['rafa'], caminhos: ['pedro', 'carlos'] } },
   full: { label: 'Completa', time: '35 a 50 min', regions: Object.fromEntries(REGIONS.map(r => [r.id, r.missions.slice()])) }
 };
 const DIFFS = {
@@ -2404,7 +2800,7 @@ function player() { return G.players[G.turn % G.players.length]; }
 function isJuntos() { return G && G.mode === 'juntos' && G.players.length > 1; }
 function avatarOf(p) { return avatarId((p || player()).avatar); }
 function starsHTML(n, max = 3) { return `<span class="stars" aria-label="${n || 0} de ${max} estrelas">${Array.from({ length: max }, (_, i) => `<i class="${i < (n || 0) ? 'on' : ''}">★</i>`).join('')}</span>`; }
-const MISSION_ORDER = ['cida', 'jorge', 'ze', 'katia', 'lucia', 'benedito', 'zefa', 'rafa', 'marina', 'joaquim', 'denise', 'pedro'];
+const MISSION_ORDER = ['cida', 'jorge', 'ze', 'katia', 'lucia', 'benedito', 'zefa', 'rafa', 'marina', 'joaquim', 'denise', 'pedro', 'tania', 'joana', 'carlos'];
 /* código das pistas para celulares: missão(2) + jogadores(1) + pistas(1) + verificador(1) */
 function clueCode(mid, n, c) { const d = String(MISSION_ORDER.indexOf(mid) + 1).padStart(2, '0') + n + c; const chk = [...d].reduce((a, x, i) => a + (+x) * (i + 3), 0) % 10; return d + chk; }
 function readClueCode(code) {
@@ -2525,14 +2921,14 @@ function bubbleHTML(who, text) {
 }
 /* vida na cidade: vira-lata caramelo, bicicletas, carros e passarinhos (decoração animada) */
 const AMBIENT = {
-  rua: [['dog', 47, 18], ['bike', 72, 11, 'davi'], ['bird', 8, 22]],
-  ruacasas: [['dog', 50, 16], ['carro', 72, 9], ['bird', 10, 26]],
-  cidade: [['bike', 68, 10, 'bia'], ['dog', 58, 20], ['bird', 12, 20], ['carro', 76, 13, null, 6]],
+  ruacasas: [['dog', 50, 16], ['carro', 74, 9], ['bird', 10, 26], ['carro', 74, 13, 'carro3', 7]],
+  cidade: [['bike', 64, 10, 'bia'], ['dog', 50, 20], ['bird', 12, 20], ['carro', 76, 9, 'carro2', 2], ['bus', 66, 16, null, 9], ['carro', 76, 12, 'taxi', 11]],
   parque: [['dog', 64, 15], ['bike', 66, 12, 'theo'], ['bird', 10, 18], ['bird', 18, 24, null, 9]],
   feira: [['dog', 70, 17], ['bird', 8, 24]],
   festa: [['dog', 70, 14], ['bird', 10, 30]],
   sala: [['sleep', 76, 0]],
-  ruanoite: [['carro', 74, 11]]
+  ruanoite: [['carro', 74, 11]],
+  rua: [['dog', 47, 18], ['bike', 72, 11, 'davi'], ['bird', 8, 22], ['carro', 76, 10, 'carro2', 4]]
 };
 function ambientHTML(key) {
   const list = AMBIENT[key]; if (!list) return '';
@@ -2541,7 +2937,7 @@ function ambientHTML(key) {
     if (kind === 'dog') return `<div class="amb patrol" style="${d};width:${pct(16, SW)}"><img class="px f1" src="${SPR.url('dog')}" alt=""><img class="px f2" src="${SPR.url('dog2')}" alt=""></div>`;
     if (kind === 'sleep') return `<div class="amb still" style="left:${pct(118, SW)};top:${pct(66, SH)};width:${pct(16, SW)}"><img class="px" src="${SPR.url('dogsleep')}" alt=""><span class="zz">z</span></div>`;
     if (kind === 'bike') return `<div class="amb cross" style="${d};width:${pct(16, SW)}"><img class="px rider" src="${SPR.url(who || 'davi')}" alt=""><img class="px" src="${SPR.url('bike')}" alt=""></div>`;
-    if (kind === 'carro') return `<div class="amb cross back" style="${d};width:${pct(18, SW)}"><img class="px" src="${SPR.url('carro')}" alt=""></div>`;
+    if (kind === 'carro' || kind === 'bus') { const v = kind === 'bus' ? 'onibus' : (who || ['carro', 'carro2', 'carro3', 'taxi'][Math.round(y + dur) % 4]); return `<div class="amb cross back" style="${d};width:${pct(v === 'onibus' ? 48 : 32, SW)}"><img class="px" src="${SPR.url(v)}" alt=""></div>`; }
     return `<div class="amb fly" style="${d};width:${pct(8, SW)}"><img class="px f1" src="${SPR.url('passaro')}" alt=""><img class="px f2" src="${SPR.url('passaro2')}" alt=""></div>`;
   }).join('') + '</div>';
 }
@@ -2879,7 +3275,7 @@ const STEPS = {
     const key = (x, y) => x + ',' + y;
     const blockAt = (x, y) => g.blocks.find(b => b.x === x && b.y === y);
     const dropAt = (x, y) => g.drops.findIndex(d => d.x === x && d.y === y);
-    ctx.stage.innerHTML = promptHTML(step.prompt) + `<div class="route-wrap"><div class="grid" id="grid" style="grid-template-columns:repeat(${g.w},auto);--gw:${g.w}" role="grid" aria-label="Mapa das entregas"></div>
+    ctx.stage.innerHTML = promptHTML(step.prompt) + `<div class="route-wrap"><div class="grid" id="grid" style="grid-template-columns:repeat(${g.w},auto);--gw:${g.w};--gh:${g.h}" role="grid" aria-label="Mapa das entregas"></div>
       <div class="route-side"><div class="drop-list" id="dl"></div><div class="arrows" aria-label="Setas para mover">
         <span></span><button class="btn" data-mv="0,-1" aria-label="Para cima">▲</button><span></span>
         <button class="btn" data-mv="-1,0" aria-label="Para a esquerda">◀</button><button class="btn" id="undo" aria-label="Desfazer">${ICON.undo}</button><button class="btn" data-mv="1,0" aria-label="Para a direita">▶</button>
@@ -3220,6 +3616,7 @@ function charCardHTML(id) {
 /* ---------------- HUD ---------------- */
 function hudHTML() {
   const p = Math.round(progress() * 100);
+  document.documentElement.style.setProperty('--lit', (p / 100).toFixed(2));
   return `<div class="hud">
     <button class="btn small" data-act="home" data-local aria-label="Tela inicial">${ICON.home}</button>
     <button class="btn small" data-act="map" aria-label="Mapa da cidade">${ICON.map}<span class="lbl">Mapa</span></button>
@@ -3551,12 +3948,14 @@ let RUN = null;
 function renderMission(id, idx) {
   const M = MISSIONS[id], step = M.steps[idx], r = regionOf(id);
   if (!step) { finishMission(id); return; }
+  /* menos cartas e leitura: no modo sozinho, o 'Quem sou eu?' fica só no Detetive; a associação some no Explorador */
+  if ((step.t === 'whoami' && G.mode === 'solo' && G.diff !== 'det') || (step.t === 'match' && G.diff === 'exp')) return renderMission(id, idx + 1);
   const prev = G.current && G.current.mission === id ? G.current : {};
   G.current = { mission: id, step: idx, mistakes: prev.mistakes || 0, hints: prev.hints || 0 }; saveGame();
   Audio8.music(r.music, progress());
   const revealIdx = M.steps.findIndex(s => s.t === 'reveal');
   const known = G.album.includes(M.char);
-  const label = { dialog: 'História', investigate: 'Investigação', spot: 'Antes e depois', match: 'Associação', sequence: 'Sequência', sort: 'Separação', route: 'Rota', whoami: 'Quem sou eu?', reveal: 'Descoberta', choice: 'Decisão', reflect: 'Reflexão', thanks: 'Mural do Obrigado', mirror: 'A última carta', memory: 'Desafio extra · Memória', days: 'E se ninguém fizesse?', shift: 'Um turno com a Denise', tidy: 'Minijogo · Arruma-arruma', cook: 'Minijogo · Cozinha', logic: 'Desafio extra · Lógica' }[step.t];
+  const label = { dialog: 'História', investigate: 'Investigação', spot: 'Antes e depois', match: 'Associação', sequence: 'Sequência', sort: 'Separação', route: 'Rota', whoami: 'Quem sou eu?', reveal: 'Descoberta', choice: 'Decisão', reflect: 'Reflexão', thanks: 'Mural do Obrigado', mirror: 'A última carta', memory: 'Desafio extra · Memória', days: 'E se ninguém fizesse?', shift: 'Um turno com a Denise', tidy: 'Minijogo · Arruma-arruma', cook: 'Minijogo · Cozinha', fire: 'Minijogo · Apagar o fogo', water: 'Minijogo · Caminho da água', cross: 'Minijogo · Travessia segura', power: 'Minijogo · De onde vem a luz', recycle: 'Minijogo · Centro de reciclagem', logic: 'Desafio extra · Lógica' }[step.t];
   app().innerHTML = `<div class="screen">${hudHTML()}
     <div class="mhead"><div><div class="where">${esc(r.name)} · ${label}</div><h2>${esc(M.title)}</h2></div>
     <div class="dots" aria-label="Etapa ${idx + 1} de ${M.steps.length}">${M.steps.map((_, i) => `<i class="${i < idx ? 'done' : i === idx ? 'now' : ''}"></i>`).join('')}</div></div>
@@ -4057,6 +4456,7 @@ STEPS.days = function (step, ctx) {
 
 /* ---------- "Um turno com a Denise": varrer junto ---------- */
 STEPS.shift = function (step, ctx) {
+  Audio8.energy = 1; onCleanup(() => { Audio8.energy = 0; });
   const PSIDE = 80, BIN = { x: 2, y: 38 }, CAP = 5;
   const P = { x: 20, y: 54, load: 0, total: 0, tx: null, ty: null };
   const D = { x: 120, y: 52, total: 0 };
@@ -4202,6 +4602,7 @@ function floatText(root, html, x = 50, y = 40) {
 
 /* ---------------- ARRUMA-ARRUMA (Dona Cida) ---------------- */
 STEPS.tidy = function (step, ctx) {
+  Audio8.energy = 1; onCleanup(() => { Audio8.energy = 0; });
   const BINS = [
     { id: 'cesto', prop: 'cesto', label: 'Roupa suja' },
     { id: 'pia', prop: 'pia', label: 'Pia' },
@@ -4297,6 +4698,7 @@ STEPS.tidy = function (step, ctx) {
 
 /* ---------------- COZINHA DO SEU ZÉ: arroz de verdade ---------------- */
 STEPS.cook = function (step, ctx) {
+  Audio8.energy = 1; onCleanup(() => { Audio8.energy = 0; });
   const ING = { arroz: '1 copo de arroz', copoagua: '2 copos de água', oleo: '1 colher de óleo', alho: '1 dente de alho', sal: '1 pitada de sal' };
   const SILLY = { chocolate: 'Arroz de chocolate? Hoje não!', meia: 'Eca! Meia não é comida!', sorvete: 'Sorvete derrete na panela!' };
   const LABEL = { arroz: 'Arroz', copoagua: 'Água', oleo: 'Óleo', alho: 'Alho', sal: 'Sal', chocolate: 'Chocolate', meia: 'Meia', sorvete: 'Sorvete' };
@@ -4440,6 +4842,430 @@ STEPS.cook = function (step, ctx) {
 (function () {
   const swap = (id, type) => { const st = MISSIONS[id].steps, i = st.findIndex(s => s.t === 'sequence'); if (i >= 0) st.splice(i, 1, { t: type }); else st.splice(2, 0, { t: type }); };
   swap('cida', 'tidy'); swap('ze', 'cook');
+})();
+
+/* ============================================================
+   PROFISSÕES QUE FAZEM A CIDADE FUNCIONAR — minijogos de ação
+   fire: bombeira · water: saneamento · cross: policial comunitário
+   power: hidrelétrica + solar · recycle: centro de reciclagem + pé de meia
+   ============================================================ */
+
+
+function mgHead(who, text) {
+  return `<div class="mghead"><img class="px" src="${SPR.url(who)}" alt=""><b id="mgt">${text}</b><button class="ibtn" data-say data-local aria-label="Ouvir">${ICON.voice}</button></div>`;
+}
+function setHead(ctx, html) { const t = $('#mgt', ctx.stage); if (t) t.innerHTML = html; }
+function hotBtn(x, y, w, h, attrs = '') { return `<button class="jhot" style="left:${pct(x, SW)};top:${pct(y, SH)};width:${pct(w, SW)};height:${pct(h, SH)}" ${attrs}></button>`; }
+function energize() { Audio8.energy = 1; onCleanup(() => { Audio8.energy = 0; }); }
+const money = v => 'R$ ' + v.toFixed(2).replace('.', ',');
+
+/* ---------------- BOMBEIRA: apagar o fogo ---------------- */
+STEPS.fire = function (step, ctx) {
+  energize();
+  const SPOTS = [[9, 28], [32, 30], [53, 20], [70, 24], [95, 30], [110, 32], [131, 24], [146, 28]];
+  const goal = G.diff === 'exp' ? 5 : 8;
+  let hose = false, out = 0, spawned = 0, done = false, flames = [], tick = 0;
+  ctx.stage.innerHTML = `<div class="mg job">${mgHead('joana', 'Ligue a mangueira no <b>hidrante</b>!')}
+    <div class="scene jobscene" id="js"><img class="bg px" src="${composeScene('ruacasas').toDataURL()}" alt="Rua com incêndio">
+      <div class="firetint" id="ft"></div><div class="layer" id="lay"></div>
+      ${hotBtn(119, 40, 20, 22, 'id="hyd" aria-label="Hidrante"')}
+      <svg class="hose" id="hose" viewBox="0 0 160 90" preserveAspectRatio="none" hidden><path d="M128 58 Q 110 84 60 80 T 20 76" /></svg>
+      <div class="mgsay" id="say"></div></div>
+    <div class="mgbar"><span>Fogo</span><div class="bar"><i id="fm" style="width:100%"></i></div><b id="cnt">0/${goal}</b></div></div>`;
+  wireSay(ctx.stage, () => hose ? 'Toque nas chamas para jogar água!' : 'Ligue a mangueira no hidrante!');
+  const lay = $('#lay', ctx.stage), sc = $('#js', ctx.stage), say = $('#say', ctx.stage);
+  const truck = spriteEl('bombeiros', -50, 66, { w: 48 }); lay.appendChild(truck); setTimeout(() => moveEl(truck, 4, 66, 1200), 50);
+  const jo = spriteEl('joana', 26, 50); lay.appendChild(jo);
+  $('#hyd', ctx.stage).classList.add('glow');
+  const spawn = () => {
+    if (spawned >= goal) return;
+    const free = SPOTS.filter(p => !flames.some(f => f.x === p[0]));
+    if (!free.length) return;
+    const [x, y] = pick(free); spawned++;
+    const b = document.createElement('button'); b.className = 'flame'; b.style.left = pct(x, SW); b.style.top = pct(y, SH); b.style.width = pct(12, SW);
+    b.innerHTML = `${SPR.img('fogo')}<i class="smoke"></i>`; b.setAttribute('aria-label', 'Chama'); lay.appendChild(b);
+    const f = { x, y, hp: 3, el: b }; flames.push(f);
+    b.onclick = () => hit(f);
+  };
+  const upd = () => {
+    $('#fm', ctx.stage).style.width = Math.max(0, (goal - out) / goal * 100) + '%';
+    $('#cnt', ctx.stage).textContent = `${out}/${goal}`;
+    $('#ft', ctx.stage).style.opacity = Math.min(.55, flames.length * .12);
+  };
+  const hit = f => {
+    ctx.activity();
+    if (!hose) { mgSay(say, 'Primeiro, ligue a mangueira no hidrante!', 'info'); $('#hyd', ctx.stage).classList.add('glow'); return; }
+    if (done || f.hp <= 0) return;
+    f.hp--; Audio8.sfx('page');
+    const sp = document.createElement('i'); sp.className = 'spray'; sp.style.left = pct(f.x + 2, SW); sp.style.top = pct(f.y, SH); lay.appendChild(sp); setTimeout(() => sp.remove(), 500);
+    f.el.style.transform = `scale(${.45 + f.hp * .2})`;
+    if (f.hp <= 0) {
+      out++; Audio8.sfx('found'); f.el.classList.add('poof'); setTimeout(() => f.el.remove(), 400);
+      flames = flames.filter(x => x !== f); floatText(sc, pick(['Apagou!', 'Isso!', 'Boa!']), f.x / SW * 100, f.y / SH * 100);
+      ctx.nextTurn();
+      if (out >= goal) return finish();
+      if (!flames.length) spawn();
+    }
+    upd();
+  };
+  $('#hyd', ctx.stage).onclick = () => {
+    if (hose) return; ctx.activity(); hose = true; Audio8.sfx('ok');
+    $('#hyd', ctx.stage).classList.remove('glow'); $('#hose', ctx.stage).hidden = false;
+    setHead(ctx, 'Água ligada! <b>Toque nas chamas</b> até apagar.');
+    mgSay(say, 'Mangueira ligada!');
+  };
+  for (let i = 0; i < (G.diff === 'exp' ? 3 : 4); i++) spawn();
+  const loop = setInterval(() => {
+    if (done || !hose) return; tick++;
+    if (tick % 5 === 0 && flames.length < 4) { spawn(); upd(); if (flames.length >= 3) mgSay(say, 'O fogo está se espalhando! Rápido!', 'soft'); }
+    flames.forEach(f => { if (f.hp < 3 && tick % 4 === 0) { f.hp++; f.el.style.transform = `scale(${.45 + f.hp * .2})`; } });
+  }, 900);
+  onCleanup(() => clearInterval(loop));
+  const finish = () => {
+    done = true; clearInterval(loop); Audio8.sfx('win'); confetti(40);
+    $('#ft', ctx.stage).style.opacity = 0;
+    setHead(ctx, '<b>Fogo apagado!</b> Numa emergência, ligue <b>193</b>.');
+    moveEl(jo, 70, 50, 1200, true);
+    if (S.autoRead) Voice.speak('Fogo apagado! Numa emergência, ligue 193.');
+    ctx.complete();
+  };
+  upd();
+  return {
+    speak: () => hose ? 'Toque nas chamas para apagar.' : 'Ligue a mangueira no hidrante.',
+    hint() { ctx.usedHint(); if (!hose) $('#hyd', ctx.stage).classList.add('glow'); else if (flames[0]) { flames[0].el.classList.add('glow'); setTimeout(() => flames[0] && flames[0].el.classList.remove('glow'), 1500); } },
+    autoStep() { if (done) return; if (!hose) $('#hyd', ctx.stage).click(); else if (flames[0]) flames[0].el.click(); else spawn(); }
+  };
+};
+
+/* ---------------- SANEAMENTO: o caminho da água ---------------- */
+STEPS.water = function (step, ctx) {
+  energize();
+  const ST = [
+    { id: 'bomba', x: 21, y: 52, w: 14, h: 18, say: 'Ligue a <b>bomba</b> para puxar a água do rio!', tag: 'Captação' },
+    { id: 'grade', x: 37, y: 52, w: 13, h: 20, say: 'Tire o <b>lixo</b> da grade!', tag: 'Grade', trash: 3 },
+    { id: 'mistura', x: 53, y: 50, w: 18, h: 22, say: '<b>Mexa</b> para a sujeira grudar em bolinhas!', tag: 'Floculação', taps: 4 },
+    { id: 'decanta', x: 73, y: 50, w: 18, h: 22, say: 'Toque e <b>espere</b> a sujeira descer...', tag: 'Decantação', wait: 1800 },
+    { id: 'filtro', x: 93, y: 50, w: 14, h: 22, say: 'Passe pelo <b>filtro</b> de areia e carvão!', tag: 'Filtração' },
+    { id: 'cloro', x: 108, y: 54, w: 10, h: 14, say: 'Só <b>uma gotinha</b> de cloro!', tag: 'Cloro' },
+    { id: 'reserva', x: 120, y: 30, w: 18, h: 36, say: 'Encha o <b>reservatório</b>!', tag: 'Reservatório' },
+    { id: 'casa', x: 139, y: 40, w: 21, h: 32, say: 'Abra a <b>torneira</b> da casa!', tag: 'Sua casa' }];
+  const COL = ['#7a5a33', '#7a5a33', '#86704a', '#8e8a6a', '#9cc3cf', '#7fd0f0', '#5fb8ff', '#5fb8ff', '#5fb8ff'];
+  let k = 0, taps = 0, trash = 0, busy = false, done = false, t = 0;
+  ctx.stage.innerHTML = `<div class="mg job">${mgHead('tania', ST[0].say)}
+    <div class="scene jobscene" id="js"><canvas class="px" id="wc" width="160" height="90" aria-label="Estação de tratamento de água"></canvas><div class="layer" id="lay"></div>
+      ${ST.map((s, i) => hotBtn(s.x, s.y, s.w, s.h, `data-st="${i}" aria-label="${s.tag}"`)).join('')}<div class="mgsay" id="say"></div></div>
+    <div class="wsteps">${ST.map((s, i) => `<span data-w="${i}">${s.tag}</span>`).join('<i>›</i>')}</div></div>`;
+  wireSay(ctx.stage, () => ST[k] ? ST[k].say.replace(/<[^>]+>/g, '') : 'Água limpinha!');
+  const cv = $('#wc', ctx.stage), g = cv.getContext('2d'), say = $('#say', ctx.stage), lay = $('#lay', ctx.stage), sc = $('#js', ctx.stage);
+  const P = (c, x, y, w = 1, h = 1) => { g.fillStyle = col(c); g.fillRect(x, y, w, h); };
+  let floc = 0, sed = 0, res = 0, glass = 0;
+  const draw = () => {
+    t++;
+    P('skyD', 0, 0, 160, 20); P('sky', 0, 12, 160, 30); P('#cfeefa', 0, 34, 160, 8);
+    P('greenD', 0, 40, 160, 4); P('green', 0, 44, 160, 46); for (let i = 0; i < 40; i++) P('greenL', (i * 37) % 160, 46 + (i * 11) % 40, 2, 1);
+    /* rio */
+    P('#6e5a3a', 0, 46, 20, 44); for (let i = 0; i < 6; i++) P('#8a7450', (t + i * 7) % 20, 52 + i * 6, 5, 1);
+    /* cano principal */
+    P('ink', 18, 69, 124, 5); P('greyL', 18, 70, 124, 3);
+    for (let i = 0; i < ST.length; i++) { const x0 = i ? ST[i - 1].x + ST[i - 1].w : 18, x1 = ST[i].x; if (i <= k - 1 || (i === k && k > 0)) { for (let x = x0; x < x1; x++) if ((x + t) % 4) P(COL[Math.min(i, 8)], x, 71, 1, 1); } }
+    /* bomba */
+    P('ink', 21, 52, 14, 18); P('greyL', 22, 53, 12, 16); P('red', 24, 56, 8, 8); P('white', 27, 59, 2, 2); if (k > 0) P('green', 32, 54, 2, 2);
+    /* grade */
+    P('#6e5a3a', 37, 60, 13, 12); for (let x = 38; x < 50; x += 3) P('ink', x, 52, 1, 20); P('greyD', 37, 52, 13, 1);
+    /* floculação */
+    P('ink', 53, 50, 18, 22); P(k > 2 ? COL[3] : COL[2], 54, 54, 16, 17); P('greyL', 54, 51, 16, 3);
+    if (floc) for (let i = 0; i < 6; i++) P('#5e4a2a', 56 + ((i * 5 + t * (k === 2 ? 1 : 0)) % 12), 57 + (i * 3) % 12, 2, 2);
+    /* decantação */
+    P('ink', 73, 50, 18, 22); P(k > 3 ? COL[4] : COL[3], 74, 54, 16, 17); P('greyL', 74, 51, 16, 3); P('#5e4a2a', 74, 71 - sed, 16, sed);
+    /* filtro */
+    P('ink', 93, 50, 14, 22); P(k > 4 ? COL[5] : '#9cc3cf', 94, 52, 12, 6); P('tan', 94, 58, 12, 5); P('ink', 94, 63, 12, 3); P('grey', 94, 66, 12, 5);
+    /* cloro */
+    P('ink', 108, 54, 10, 14); P('white', 109, 57, 8, 10); P('green', 109, 61, 8, 3); P('greyD', 111, 55, 4, 2);
+    /* reservatório na torre */
+    P('ink', 122, 46, 1, 24); P('ink', 136, 46, 1, 24); P('ink', 121, 30, 17, 17); P('greyL', 122, 31, 15, 15); P('#5fb8ff', 122, 46 - res, 15, res);
+    /* casa com caixa d'água e torneira */
+    P('ink', 140, 50, 19, 22); P('cream', 141, 51, 17, 20); P('ink', 138, 45, 23, 6); P('red', 139, 46, 21, 4); P('ink', 150, 40, 8, 6); P('blue', 151, 41, 6, 4);
+    P('ink', 143, 54, 6, 6); P('glass', 144, 55, 4, 4); P('greyD', 152, 58, 5, 2); P('greyD', 155, 58, 2, 4);
+    if (k >= 8) { if (t % 2) P('#5fb8ff', 156, 62, 1, 3); P('ink', 152, 64, 6, 7); P('glass', 153, 65, 4, 5); P('#5fb8ff', 153, 70 - glass, 4, glass); }
+  };
+  const loop = setInterval(draw, 120); onCleanup(() => clearInterval(loop)); draw();
+  const showStep = () => {
+    $$('.wsteps span', ctx.stage).forEach((e, i) => e.className = i < k ? 'ok' : i === k ? 'now' : '');
+    $$('.jhot', ctx.stage).forEach(b => b.classList.toggle('glow', +b.dataset.st === k));
+    if (ST[k]) setHead(ctx, ST[k].say);
+    if (ST[k] && ST[k].trash) {
+      ['garrafa', 'folhas', 'saco'].forEach((p, i) => { const b = document.createElement('button'); b.className = 'trashit'; b.dataset.tr = i; b.style.left = pct(37 + i * 3, SW); b.style.top = pct(54 + i * 5, SH); b.style.width = pct(10, SW); b.innerHTML = SPR.img(p); lay.appendChild(b);
+        b.onclick = () => { if (b.classList.contains('gone')) return; ctx.activity(); b.classList.add('gone'); trash++; Audio8.sfx('found'); setTimeout(() => b.remove(), 400); if (trash >= 3) next(); }; });
+    }
+  };
+  const next = () => { k++; ctx.nextTurn(); Audio8.sfx('ok'); if (k >= ST.length) return finish(); mgSay(say, pick(['Isso!', 'A água está ficando limpa!', 'Muito bem!'])); showStep(); };
+  $$('.jhot', ctx.stage).forEach(b => b.onclick = () => {
+    if (done || busy) return; ctx.activity();
+    const i = +b.dataset.st, s = ST[k];
+    if (i !== k) { ctx.mistake(); Audio8.sfx('soft'); mgSay(say, `Ainda não! Agora é: ${s.tag}.`, 'soft'); return; }
+    if (s.trash) { mgSay(say, 'Toque em cada lixo preso na grade!', 'info'); return; }
+    if (s.taps) { taps++; floc = taps; Audio8.sfx('step'); floatText(sc, 'Mexe!', 60 + taps * 3, 50); if (taps >= s.taps) next(); return; }
+    if (s.wait) { busy = true; const iv = setInterval(() => { sed = Math.min(5, sed + 1); }, 300); setTimeout(() => { clearInterval(iv); busy = false; next(); }, s.wait); return; }
+    if (s.id === 'reserva') { busy = true; const iv = setInterval(() => { res = Math.min(14, res + 2); if (res >= 14) { clearInterval(iv); busy = false; next(); } }, 120); onCleanup(() => clearInterval(iv)); return; }
+    if (s.id === 'casa') { k = 8; busy = true; const iv = setInterval(() => { glass = Math.min(5, glass + 1); if (glass >= 5) { clearInterval(iv); busy = false; finish(); } }, 220); onCleanup(() => clearInterval(iv)); return; }
+    next();
+  });
+  const finish = () => {
+    done = true; k = 8; Audio8.sfx('win'); confetti(40);
+    $$('.wsteps span', ctx.stage).forEach(e => e.className = 'ok'); $$('.jhot', ctx.stage).forEach(b => b.classList.remove('glow'));
+    setHead(ctx, '<b>Água limpinha na torneira!</b> Muita gente trabalhou para ela chegar aqui.');
+    if (S.autoRead) Voice.speak('Água limpinha na torneira! Muita gente trabalhou para ela chegar aqui.');
+    ctx.complete();
+  };
+  showStep();
+  return {
+    speak: () => ST[k] ? ST[k].say.replace(/<[^>]+>/g, '') : 'Água limpinha!',
+    hint() { ctx.usedHint(); showStep(); },
+    autoStep() { if (done || busy) return; const tr = $('.trashit:not(.gone)', ctx.stage); if (tr) return tr.click(); const b = $(`.jhot[data-st="${k}"]`, ctx.stage); if (b) b.click(); }
+  };
+};
+
+/* ---------------- POLICIAL COMUNITÁRIO: travessia segura ---------------- */
+STEPS.cross = function (step, ctx) {
+  energize();
+  const goal = G.diff === 'exp' ? 3 : 4, ZX0 = 62, ZX1 = 80;
+  let mode = 'go', cars = [], kids = null, crossed = 0, done = false, tick = 0, waitT = 0, idleStop = 0, nextCar = 0;
+  ctx.stage.innerHTML = `<div class="mg job">${mgHead('carlos', 'Quando as crianças chegarem, toque em <b>PARE</b>!')}
+    <div class="scene jobscene" id="js"><img class="bg px" src="${composeScene('ruacasas').toDataURL()}" alt="Rua com faixa de pedestres"><div class="layer" id="lay"></div><div class="mgsay" id="say"></div></div>
+    <div class="crossbar"><button class="btn big stopb" id="cpare">${SPR.img('pare')} PARE</button><span class="kidsok">Crianças seguras: <b id="cnt">0/${goal}</b></span><button class="btn big gob" id="csiga" disabled>SIGA ${ICON.next}</button></div></div>`;
+  wireSay(ctx.stage, () => 'Quando as crianças chegarem, toque em PARE. Depois que atravessarem, toque em SIGA.');
+  const lay = $('#lay', ctx.stage), say = $('#say', ctx.stage), sc = $('#js', ctx.stage);
+  const cop = spriteEl('carlos', 82, 40); lay.appendChild(cop);
+  const sign = spriteEl('pare', 92, 34, { w: 10 }); sign.style.opacity = 0; lay.appendChild(sign);
+  const VAR = ['carro', 'carro2', 'carro3', 'taxi'];
+  const addCar = lane => {
+    const v = pick(VAR), x = lane === 0 ? -34 : 162, el = spriteEl(v, x, lane === 0 ? 66 : 75, { w: 32 }); el.style.transitionDuration = '0s';
+    if (lane === 1) el.classList.add('flip'); lay.appendChild(el); cars.push({ lane, x, el });
+  };
+  const zebraClear = () => !cars.some(c => c.x + 32 > ZX0 - 1 && c.x < ZX1 + 1);
+  const spawnKids = () => {
+    const ids = shuffle(['theo', 'bia', 'iara', 'davi']).slice(0, 2);
+    const els = ids.map((id, i) => { const e = spriteEl(id, 60 + i * 9, 40); lay.appendChild(e); return e; });
+    kids = { els, state: 'wait' }; waitT = 0;
+    floatText(sc, 'Quero atravessar!', 45, 30); Audio8.sfx('select');
+  };
+  const upd = () => { $('#cnt', ctx.stage).textContent = `${crossed}/${goal}`; $('#cpare', ctx.stage).disabled = mode === 'stop'; $('#csiga', ctx.stage).disabled = mode === 'go'; sign.style.opacity = mode === 'stop' ? 1 : 0; };
+  $('#cpare', ctx.stage).onclick = () => {
+    if (done || mode === 'stop') return; ctx.activity();
+    if (!kids) { ctx.mistake(); Audio8.sfx('soft'); floatText(sc, 'Biii!', 30, 60); mgSay(say, 'Ninguém esperando: deixe os carros passarem.', 'soft'); return; }
+    mode = 'stop'; idleStop = 0; Audio8.sfx('ok'); upd(); setHead(ctx, 'Carros parando... quando a faixa ficar livre, as crianças atravessam.');
+  };
+  $('#csiga', ctx.stage).onclick = () => {
+    if (done || mode === 'go') return; ctx.activity();
+    if (kids) { ctx.mistake(); Audio8.sfx('soft'); mgSay(say, kids.state === 'cross' ? 'Espere! Tem criança na faixa!' : 'As crianças ainda não atravessaram!', 'soft'); return; }
+    mode = 'go'; Audio8.sfx('select'); upd(); setHead(ctx, 'Trânsito liberado. Fique de olho nas crianças!');
+  };
+  const loop = setInterval(() => {
+    if (done) return; tick++;
+    /* carros */
+    if (tick >= nextCar && cars.length < 5) { addCar(tick % 2); nextCar = tick + 22 + (tick * 7) % 18; }
+    for (const lane of [0, 1]) {
+      const list = cars.filter(c => c.lane === lane).sort((a, b) => lane === 0 ? b.x - a.x : a.x - b.x);
+      list.forEach((c, i) => {
+        const sp = 1.8; let nx = lane === 0 ? c.x + sp : c.x - sp;
+        if (mode === 'stop') { if (lane === 0 && c.x + 32 <= ZX0 - 1) nx = Math.min(nx, ZX0 - 34); if (lane === 1 && c.x >= ZX1 + 1) nx = Math.max(nx, ZX1 + 2); }
+        const ahead = list[i - 1]; if (ahead) nx = lane === 0 ? Math.min(nx, ahead.x - 35) : Math.max(nx, ahead.x + 35);
+        c.x = nx; c.el.style.left = pct(c.x, SW);
+      });
+    }
+    cars = cars.filter(c => { const gone = c.x > 170 || c.x < -40; if (gone) c.el.remove(); return !gone; });
+    /* crianças */
+    if (!kids && mode === 'go' && tick % 40 === 20 && crossed < goal) spawnKids();
+    if (kids && kids.state === 'wait') {
+      waitT++;
+      if (mode === 'stop' && zebraClear()) { kids.state = 'cross'; Audio8.sfx('step'); kids.els.forEach((e, i) => moveEl(e, 64 + i * 7, 92, 2400, true)); setTimeout(() => { if (!kids) return; kids.els.forEach(e => e.remove()); kids = null; crossed++; Audio8.sfx('found'); floatText(sc, 'Atravessaram!', 50, 70); ctx.nextTurn(); upd(); if (crossed >= goal) finish(); else setHead(ctx, 'Agora toque em <b>SIGA</b> para liberar os carros.'); }, 2500); }
+      if (mode === 'go' && waitT === 60) mgSay(say, 'As crianças estão esperando! Toque em PARE.', 'info');
+    }
+    if (mode === 'stop' && !kids) { idleStop++; if (idleStop % 50 === 30) { floatText(sc, 'Biii!', 20, 62); Audio8.sfx('soft'); mgSay(say, 'Já atravessaram! Toque em SIGA.', 'info'); } }
+  }, 50);
+  onCleanup(() => clearInterval(loop));
+  const finish = () => {
+    done = true; clearInterval(loop); Audio8.sfx('win'); confetti(40);
+    setHead(ctx, '<b>Todo mundo seguro!</b> Atravesse sempre na faixa. Emergência: <b>190</b>.');
+    if (S.autoRead) Voice.speak('Todo mundo seguro! Atravesse sempre na faixa.');
+    ctx.complete();
+  };
+  upd();
+  return {
+    speak: () => 'Quando as crianças chegarem, toque em PARE. Depois, toque em SIGA.',
+    hint() { ctx.usedHint(); const b = kids && mode === 'go' ? $('#cpare', ctx.stage) : $('#csiga', ctx.stage); b.classList.add('glow'); setTimeout(() => b.classList.remove('glow'), 1600); },
+    autoStep() { if (done) return; if (kids && mode === 'go') $('#cpare', ctx.stage).click(); else if (!kids && mode === 'stop') $('#csiga', ctx.stage).click(); }
+  };
+};
+
+/* ---------------- ENERGIA: hidrelétrica + solar ---------------- */
+STEPS.power = function (step, ctx) {
+  energize();
+  const TW = [64, 86, 106], HOUSES = [[120, 52], [132, 50], [144, 52], [150, 64]];
+  let phase = 'gate', spin = 0, ang = 0, towers = 0, lit = 0, panels = new Set(), lake = 14, night = 0, t = 0, done = false;
+  ctx.stage.innerHTML = `<div class="mg job">${mgHead('pedro', 'Abra a <b>comporta</b> da represa!')}
+    <div class="scene jobscene" id="js"><canvas class="px" id="pc" width="160" height="90" aria-label="Usina hidrelétrica e casas"></canvas>
+      ${hotBtn(12, 52, 16, 20, 'data-p="gate" aria-label="Comporta"')}${hotBtn(30, 44, 22, 22, 'data-p="turb" aria-label="Turbina"')}
+      ${TW.map((x, i) => hotBtn(x - 5, 26, 12, 40, `data-p="tw${i}" aria-label="Torre ${i + 1}"`)).join('')}
+      ${HOUSES.map(([x, y], i) => hotBtn(x - 1, y - 8, 12, 10, `data-p="roof${i}" aria-label="Telhado ${i + 1}"`)).join('')}
+      <div class="mgsay" id="say"></div></div>
+    <div class="mgbar"><span>Energia</span><div class="bar"><i id="en" style="width:0%"></i></div><b id="ph">Hidrelétrica</b></div></div>`;
+  wireSay(ctx.stage, () => $('#mgt', ctx.stage).textContent);
+  const cv = $('#pc', ctx.stage), g = cv.getContext('2d'), say = $('#say', ctx.stage), sc = $('#js', ctx.stage);
+  const P = (c, x, y, w = 1, h = 1) => { g.fillStyle = col(c); g.fillRect(Math.round(x), Math.round(y), w, h); };
+  const draw = () => {
+    t++;
+    const dark = night;
+    P(dark ? 'nightD' : 'skyD', 0, 0, 160, 16); P(dark ? 'night' : 'sky', 0, 10, 160, 30); P(dark ? '#3a4a7a' : '#cfeefa', 0, 34, 160, 8);
+    if (phase === 'solar' || phase === 'done') { const sx = dark ? 20 : 30, sy = dark ? 8 : 8; P(dark ? '#f3f0d8' : 'yellow', sx, sy, 8, 8); if (!dark) for (let i = 0; i < 4; i++) P('yellowL', sx - 3 + ((t + i * 3) % 14), sy + 10 + i, 1, 1); }
+    P(dark ? '#2f5a3c' : 'greenD', 0, 40, 160, 4); P(dark ? '#3c6e48' : 'green', 0, 44, 160, 46);
+    /* represa e lago */
+    P('blueD', 0, 70 - lake * 2.4, 12, lake * 2.4 + 20); P('blue', 0, 72 - lake * 2.4, 12, 2);
+    P('ink', 11, 34, 8, 40); P('greyL', 12, 35, 6, 38); P('grey', 12, 50, 6, 1); P('grey', 12, 60, 6, 1);
+    P('ink', 13, 64, 4, 8); P(phase === 'gate' ? 'greyD' : 'blue', 14, 65, 2, 6);
+    if (phase !== 'gate') for (let i = 0; i < 6; i++) P('blueL', 19 + ((t * 2 + i * 4) % 14), 66 + (i % 3) * 2, 2, 1);
+    /* casa de força com turbina */
+    P('ink', 30, 50, 22, 18); P('cream', 31, 51, 20, 16); P('ink', 29, 47, 24, 4); P('redD', 30, 48, 22, 2);
+    const cx = 41, cy = 59; P('greyD', cx - 6, cy - 6, 12, 12); for (let i = 0; i < 4; i++) { const a = ang + i * Math.PI / 2; P('white', cx + Math.cos(a) * 4 - 1, cy + Math.sin(a) * 4 - 1, 2, 2); } P('yellow', cx - 1, cy - 1, 2, 2);
+    /* torres e fios */
+    TW.forEach((x, i) => { P('ink', x, 30, 1, 36); P('ink', x - 4, 30, 9, 1); P('ink', x - 3, 34, 7, 1); P('greyD', x - 2, 40, 1, 26); P('greyD', x + 2, 40, 1, 26); });
+    const wire = (x0, x1, on) => { for (let x = x0; x < x1; x++) { const sag = Math.sin((x - x0) / (x1 - x0) * Math.PI) * 3; P(on ? ((x + t) % 6 < 3 ? 'yellow' : 'yellowL') : 'ink', x, 31 + sag, 1, 1); } };
+    wire(51, TW[0], towers >= 1); wire(TW[0], TW[1], towers >= 2); wire(TW[1], TW[2], towers >= 3); wire(TW[2], 120, towers >= 3);
+    /* casas */
+    HOUSES.forEach(([x, y], i) => {
+      P('ink', x - 1, y - 1, 12, 12); P(['pink', 'yellowL', 'tealL', 'cream'][i], x, y, 10, 10); P('ink', x - 2, y - 5, 14, 5); P(['red', 'orangeD', 'blueD', 'brown'][i], x - 1, y - 4, 12, 3);
+      if (panels.has(i)) { P('navy', x, y - 6, 9, 3); P('blue', x + 1, y - 5, 2, 1); P('blue', x + 4, y - 5, 2, 1); }
+      const on = i < lit; P('ink', x + 2, y + 2, 4, 4); P(on ? '#ffd65e' : (dark ? '#1b2142' : 'glass'), x + 3, y + 3, 2, 2);
+      if (on && dark) { g.fillStyle = 'rgba(255,214,94,.25)'; g.fillRect(x + 1, y + 1, 6, 6); }
+    });
+  };
+  const loop = setInterval(() => { if (spin > 0) ang += .15 + spin * .05; spin = Math.max(0, spin - .02); draw(); }, 80); onCleanup(() => clearInterval(loop)); draw();
+  const glow = p => $$('.jhot', ctx.stage).forEach(b => b.classList.toggle('glow', b.dataset.p === p || (p === 'roofs' && b.dataset.p.startsWith('roof') && !panels.has(+b.dataset.p.slice(4)))));
+  const bar = v => { $('#en', ctx.stage).style.width = Math.min(100, v) + '%'; };
+  let turbTaps = 0; const need = G.diff === 'exp' ? 6 : 9;
+  glow('gate');
+  $$('.jhot', ctx.stage).forEach(b => b.onclick = () => {
+    if (done) return; ctx.activity(); const p = b.dataset.p;
+    const wrong = msg => { ctx.mistake(); Audio8.sfx('soft'); mgSay(say, msg, 'soft'); };
+    if (phase === 'gate') { if (p !== 'gate') return wrong('Primeiro, abra a comporta da represa!'); phase = 'turb'; Audio8.sfx('ok'); mgSay(say, 'A água desceu com força!'); setHead(ctx, '<b>Toque rápido</b> na turbina para ela girar!'); glow('turb'); return; }
+    if (phase === 'turb') { if (p !== 'turb') return wrong('Faça a turbina girar!'); turbTaps++; spin = Math.min(3, spin + .6); Audio8.sfx('step'); bar(turbTaps / need * 40); if (turbTaps >= need) { phase = 'towers'; mgSay(say, 'O gerador transformou o giro em energia!', 'info'); setHead(ctx, 'Ligue as <b>torres</b>, uma de cada vez!'); glow('tw0'); spin = 3; } return; }
+    if (phase === 'towers') {
+      if (p !== 'tw' + towers) return wrong('Siga o fio: da usina para a próxima torre.');
+      towers++; Audio8.sfx('found'); bar(40 + towers * 15); spin = 3;
+      if (towers < 3) { glow('tw' + towers); return; }
+      glow(''); setHead(ctx, 'A energia está chegando nas casas...');
+      let i = 0; const iv = setInterval(() => { lit = ++i; Audio8.sfx('light'); if (i >= 4) { clearInterval(iv); solar(); } }, 450); onCleanup(() => clearInterval(iv));
+      return;
+    }
+    if (phase === 'solar') {
+      if (!p.startsWith('roof')) return wrong('Toque nos telhados para pôr placas solares!');
+      const i = +p.slice(4); if (panels.has(i)) return;
+      panels.add(i); Audio8.sfx('found'); sparkle(b, 6); lit = Math.min(4, lit + 1); bar(100 * panels.size / 4); glow('roofs');
+      if (panels.size >= 4) { phase = 'done'; glow(''); setTimeout(finishNight, 500); }
+    }
+  });
+  const solar = () => {
+    phase = 'solar'; lit = 1; $('#ph', ctx.stage).textContent = 'Solar'; bar(0);
+    const iv = setInterval(() => { lake = Math.max(4, lake - 1); if (lake <= 4) clearInterval(iv); }, 120); onCleanup(() => clearInterval(iv));
+    mgSay(say, 'Seca! A represa baixou e a luz enfraqueceu.', 'soft');
+    setHead(ctx, 'Use o <b>sol</b>! Toque nos telhados para pôr <b>placas solares</b>.'); glow('roofs');
+  };
+  const finishNight = () => {
+    night = 1; lit = 4; done = true; Audio8.sfx('win'); confetti(40);
+    setHead(ctx, '<b>Água e sol: energia limpa!</b> E o Pedro leva a luz até o poste da sua rua.');
+    if (S.autoRead) Voice.speak('Água e sol: energia limpa! E o Pedro leva a luz até o poste da sua rua.');
+    ctx.complete();
+  };
+  return {
+    speak: () => $('#mgt', ctx.stage).textContent,
+    hint() { ctx.usedHint(); mgSay(say, 'Toque no que está brilhando!', 'info'); },
+    autoStep() {
+      if (done) return;
+      const want = phase === 'gate' ? 'gate' : phase === 'turb' ? 'turb' : phase === 'towers' ? 'tw' + towers : phase === 'solar' ? 'roof' + [0, 1, 2, 3].find(i => !panels.has(i)) : null;
+      const b = want && $(`.jhot[data-p="${want}"]`, ctx.stage); if (b) b.click();
+    }
+  };
+};
+
+/* ---------------- CENTRO DE RECICLAGEM + PÉ DE MEIA ---------------- */
+STEPS.recycle = function (step, ctx) {
+  energize();
+  const BINS = [{ id: 'papel', label: 'Papel', c: '#3b6fd1', v: .5 }, { id: 'plastico', label: 'Plástico', c: '#d9534f', v: 1 }, { id: 'metal', label: 'Metal', c: '#e8b42e', v: 2 }, { id: 'vidro', label: 'Vidro', c: '#3d9a55', v: .5 }];
+  const POOL = [['jornal', 'papel'], ['papelao', 'papel'], ['caderno', 'papel'], ['pet', 'plastico'], ['iogurte', 'plastico'], ['lata', 'metal'], ['vidro', 'vidro'], ['garrafa', 'vidro']];
+  const items = shuffle(POOL.slice()).concat(shuffle(POOL.slice())).slice(0, G.diff === 'exp' ? 6 : 8);
+  const PARTS = { celularvelho: [['bateria', 'Bateria', 2, 'Vai para coleta especial: no lixo comum, polui!'], ['placa', 'Placa', 6, 'Tem cobre: vira fio novo!'], ['chip', 'Chip', 12, 'Tem ouro! Vira chip de celular novo.']],
+    computador: [['bateria', 'Bateria', 3, 'Coleta especial, sempre!'], ['placa', 'Placa-mãe', 10, 'Cobre, estanho e prata!'], ['chip', 'Processador', 15, 'Ouro de verdade lá dentro!']] };
+  let k = 0, wallet = 0, phase = 'sort', dev = 'celularvelho', opened = false, gotParts = new Set(), jars = { guardar: 0, gastar: 0, doar: 0 }, pile = 0;
+  ctx.stage.innerHTML = `<div class="mg job rec">${mgHead('marina', 'Centro de reciclagem! Toque na <b>lixeira certa</b>.')}
+    <div class="recarea" id="ra"><div class="mgsay" id="say"></div></div>
+    <div class="wallet">${SPR.img('moeda')} <b id="wal">${money(0)}</b><small>dinheiro da cooperativa</small></div></div>`;
+  wireSay(ctx.stage, () => $('#mgt', ctx.stage).textContent);
+  const ra = $('#ra', ctx.stage), say = $('#say', ctx.stage);
+  const pay = (v, where) => { wallet += v; $('#wal', ctx.stage).textContent = money(wallet); $('.wallet', ctx.stage).classList.remove('pop'); void ra.offsetWidth; $('.wallet', ctx.stage).classList.add('pop'); floatText(ra, '+' + money(v), where || 50, 30); };
+  const renderSort = () => {
+    const [p, bin] = items[k];
+    ra.innerHTML = `<div class="belt"><div class="ritem" id="ri">${SPR.img(p)}</div><div class="beltline"></div></div>
+      <div class="rbins">${BINS.map(b => `<button class="rbin" data-b="${b.id}" style="--bc:${b.c}"><span class="lid"></span><b>${b.label}</b><small>${money(b.v)}</small></button>`).join('')}</div>
+      <p class="rcount">${k + 1} de ${items.length}</p><div class="mgsay" id="say2"></div>`;
+    $$('.rbin', ra).forEach(b => b.onclick = () => {
+      ctx.activity();
+      if (b.dataset.b === bin) { const B = BINS.find(x => x.id === bin); Audio8.sfx('found'); b.classList.add('gulp'); $('#ri', ra).classList.add('gone'); pay(B.v, 15 + BINS.indexOf(B) * 23); k++; ctx.nextTurn(); setTimeout(() => k < items.length ? renderSort() : ewaste(), 380); }
+      else { ctx.mistake(); Audio8.sfx('soft'); b.classList.add('shake'); setTimeout(() => b.classList.remove('shake'), 400); mgSay($('#say2', ra), `Ops! Isso é ${BINS.find(x => x.id === bin).label.toLowerCase()}.`, 'soft'); }
+    });
+  };
+  const ewaste = () => {
+    phase = 'ewaste'; opened = false; gotParts = new Set(); Audio8.sfx('ok');
+    setHead(ctx, dev === 'celularvelho' ? '<b>Lixo eletrônico vale muito!</b> Toque no celular velho para abrir.' : 'Agora o <b>computador</b>! Toque para abrir.');
+    ra.innerHTML = `<div class="ewaste"><button class="dev" id="dev">${SPR.img(dev)}<span>${dev === 'celularvelho' ? 'Celular velho' : 'Computador velho'}</span></button><div class="parts" id="parts"></div></div>
+      <p class="fact mini">Uma tonelada de celulares velhos tem mais ouro do que uma tonelada de minério!</p><div class="mgsay" id="say2"></div>`;
+    $('#dev', ra).onclick = () => {
+      if (opened) return; ctx.activity(); opened = true; Audio8.sfx('reveal'); $('#dev', ra).classList.add('open');
+      setHead(ctx, 'Tire cada peça para reciclar!');
+      $('#parts', ra).innerHTML = PARTS[dev].map(([id, nm, v], i) => `<button class="part" data-pt="${i}">${SPR.img(id)}<b>${nm}</b><small>${money(v)}</small></button>`).join('');
+      $$('.part', ra).forEach(b => b.onclick = () => {
+        const i = +b.dataset.pt; if (gotParts.has(i)) return; ctx.activity(); gotParts.add(i);
+        const [, nm, v, tip] = PARTS[dev][i]; b.classList.add('got'); Audio8.sfx('found'); pay(v, 30 + i * 20); mgSay($('#say2', ra), tip, 'info'); ctx.nextTurn();
+        if (gotParts.size === 3) setTimeout(() => { if (dev === 'celularvelho') { dev = 'computador'; ewaste(); } else savings(); }, 1100);
+      });
+    };
+  };
+  const savings = () => {
+    phase = 'save'; pile = Math.round(wallet); Audio8.sfx('ok');
+    setHead(ctx, `<b>Pé de meia!</b> Você tem ${money(pile)}. Toque nos potes para dividir.`);
+    const J = [['guardar', 'Guardar', 'porquinho'], ['gastar', 'Gastar', 'sacola'], ['doar', 'Doar', 'coracao']];
+    ra.innerHTML = `<div class="jars">${J.map(([id, nm, ic]) => `<button class="jar" data-j="${id}">${SPR.img(ic)}<b>${nm}</b><span id="j_${id}">${money(0)}</span></button>`).join('')}</div>
+      <p class="pile">Para dividir: <b id="pile">${money(pile)}</b> · cada toque põe R$ 5,00</p><div class="mgsay" id="say2"></div>`;
+    $$('.jar', ra).forEach(b => b.onclick = () => {
+      if (pile <= 0) return; ctx.activity(); const id = b.dataset.j, v = Math.min(5, pile); pile -= v; jars[id] += v;
+      $('#j_' + id, ra).textContent = money(jars[id]); $('#pile', ra).textContent = money(pile); Audio8.sfx('select'); b.classList.add('gulp'); setTimeout(() => b.classList.remove('gulp'), 300);
+      if (pile <= 0) finish();
+    });
+  };
+  const finish = () => {
+    phase = 'done'; Audio8.sfx('win'); confetti(40);
+    const tot = jars.guardar + jars.gastar + jars.doar, g = tot ? jars.guardar / tot : 0;
+    const msg = g >= .5 ? 'Pé de meia forte! Guardando um pouco sempre, o dinheiro cresce.' : g > 0 ? 'Boa! Guardar um pouquinho todo mês faz diferença.' : 'Que tal guardar um pouquinho da próxima vez? O futuro agradece!';
+    setHead(ctx, `<b>${msg}</b>`);
+    ra.insertAdjacentHTML('beforeend', `<p class="fact mini">Na vida real, a reciclagem paga o trabalho de catadoras como a Marina. Sem elas, tudo isso iria para o lixão.</p>`);
+    if (S.autoRead) Voice.speak(msg);
+    ctx.complete();
+  };
+  renderSort();
+  return {
+    speak: () => $('#mgt', ctx.stage).textContent,
+    hint() { ctx.usedHint(); if (phase === 'sort') { const b = $(`.rbin[data-b="${items[k][1]}"]`, ra); if (b) { b.classList.add('glow'); setTimeout(() => b.classList.remove('glow'), 1500); } } },
+    autoStep() {
+      if (phase === 'sort' && items[k]) { const b = $(`.rbin[data-b="${items[k][1]}"]`, ra); if (b && !$('#ri.gone', ra)) b.click(); }
+      else if (phase === 'ewaste') { if (!opened) { const d = $('#dev', ra); if (d) d.click(); } else { const p = $('.part:not(.got)', ra); if (p) p.click(); } }
+      else if (phase === 'save') { const order = ['guardar', 'guardar', 'gastar', 'doar']; const j = $(`.jar[data-j="${order[Math.floor(Math.random() * 4)]}"]`, ra); if (j) j.click(); }
+    }
+  };
+};
+
+/* encaixa: energia na missão do Pedro, reciclagem na da Marina */
+(function () {
+  const ps = MISSIONS.pedro.steps; ps.splice(1, 0, { t: 'power' });
+  const ms = MISSIONS.marina.steps, i = ms.findIndex(s => s.t === 'sort'); if (i >= 0) ms.splice(i, 1, { t: 'recycle' }); else ms.splice(1, 0, { t: 'recycle' });
 })();
 
 /* ============================================================
@@ -4671,7 +5497,8 @@ const CHAR_IDS = () => Object.keys(CHARACTERS);
 const MEDAL_IDS = ['colaboracao', 'curiosidade', 'criatividade', 'gentileza'];
 const AV_BITS = [['skin', 2], ['hair', 3], ['hairColor', 3], ['shirt', 3], ['bottom', 1], ['bottomColor', 3], ['extra', 2]];
 
-/* 2 versão + 12 álbum + 24 estrelas + 4 medalhas + 1 final + 17 visual + 5 verificador = 65 bits = 13 letras */
+/* versão(2) + álbum(n) + estrelas(2n) + medalhas(4) + final(1) + visual(17) + verificador(5) */
+const codeLen = () => Math.ceil((29 + 3 * CHAR_IDS().length) / 5);
 function packCity(album, stars, earned, finished, av) {
   const ids = CHAR_IDS(); let v = 0n;
   const put = (val, n) => { v = (v << BigInt(n)) | BigInt(val & ((1 << n) - 1)); };
@@ -4688,7 +5515,7 @@ function cityCode() {
   if (!G) return null;
   const data = packCity(G.album, G.stars, G.earned, G.finished, G.players[0] && G.players[0].avatar);
   let v = (data << 5n) | BigInt(chk32(data)), s = '';
-  for (let i = 0; i < 13; i++) { s = B32[Number(v & 31n)] + s; v >>= 5n; }
+  for (let i = 0; i < codeLen(); i++) { s = B32[Number(v & 31n)] + s; v >>= 5n; }
   return s;
 }
 function cityName() {
@@ -4703,7 +5530,7 @@ function cityLink() {
 }
 function readCityCode(raw) {
   const code = String(raw || '').toUpperCase().replace(/[^0-9A-Z]/g, '').replace(/O/g, '0').replace(/[IL]/g, '1');
-  if (code.length !== 13) return null;
+  if (code.length !== codeLen()) return null;
   let v = 0n;
   for (const ch of code) { const i = B32.indexOf(ch); if (i < 0) return null; v = (v << 5n) | BigInt(i); }
   const sum = Number(v & 31n), data = v >> 5n;
@@ -4721,10 +5548,10 @@ function readCityCode(raw) {
 /* ---------- mandar a minha cidade ---------- */
 function openShareCity() {
   if (!G || !G.album) { toast('Jogue um pouquinho primeiro: sua cidade ainda está vazia!'); return; }
-  const code = cityCode(), link = cityLink(), pretty = code.replace(/(.{4})(.{4})(.{5})/, '$1-$2-$3');
+  const code = cityCode(), link = cityLink(), pretty = code.match(/.{1,5}/g).join('-');
   modal(`<div style="text-align:center"><h2>Minha cidade</h2>
     <img class="px" src="${SPR.url(avatarOf(G.players[0]))}" style="width:64px;height:96px" alt="">
-    <p style="font-weight:800;margin:6px 0">${G.album.length} de 12 pessoas lembradas · ${totalStars()} estrelas</p>
+    <p style="font-weight:800;margin:6px 0">${G.album.length} de ${CHAR_IDS().length} pessoas lembradas · ${totalStars()} estrelas</p>
     <p style="font-weight:700;margin:0">Mande o código ou o link para um amigo visitar a sua cidade:</p>
     <div class="code big" style="font-size:clamp(1.3rem,6vw,2.2rem);margin:10px auto">${pretty}</div>
     <div class="row center"><button class="btn primary" id="shr">${SPR.img('carta')} Mandar link</button><button class="btn" id="cpy">Copiar código</button></div>
@@ -4740,7 +5567,7 @@ function openShareCity() {
 /* ---------- visitar a cidade de alguém ---------- */
 function openVisitInput() {
   modal(`<h2>Visitar a cidade de um amigo</h2><p style="font-weight:700;margin-top:0">Digite o código que seu amigo mandou.</p>
-    <input class="txt" id="vc" maxlength="16" autocomplete="off" placeholder="XXXX-XXXX-XXXXX" style="text-transform:uppercase;font-family:var(--title);font-size:1.4rem;letter-spacing:2px;text-align:center">
+    <input class="txt" id="vc" maxlength="22" autocomplete="off" placeholder="XXXXX-XXXXX-XXXXX" style="text-transform:uppercase;font-family:var(--title);font-size:1.4rem;letter-spacing:2px;text-align:center">
     <input class="txt" id="vn" maxlength="20" autocomplete="off" placeholder="Nome do amigo (opcional)" style="margin-top:8px">
     <div id="vfb" style="margin-top:8px"></div>
     <div class="row" style="margin-top:10px"><button class="btn primary" id="vgo">${ICON.next} Visitar</button></div>`, { label: 'Visitar amigo' });
@@ -4760,7 +5587,7 @@ function screenVisit(d, name = 'Amigo') {
   app().innerHTML = `<div class="screen visit">
     <div class="row" style="justify-content:space-between;align-items:center"><h2 style="margin:0;color:#fff">Cidade de ${esc(name)}</h2><button class="btn small" id="vback">${ICON.back} Voltar</button></div>
     <div class="scene vcity" id="vcity" style="--gray:${(1 - lit).toFixed(2)}"><img class="bg px" src="${composeScene('cidade').toDataURL()}" alt="A cidade do amigo">${ambientHTML('cidade')}<div class="layer" id="vl"></div>
-      <div class="vbadge">${SPR.img('estrela')} ${starsT} · ${theirs.length}/12 ${d.finished ? '· Cidade toda acesa!' : ''}</div></div>
+      <div class="vbadge">${SPR.img('estrela')} ${starsT} · ${theirs.length}/${ids.length} ${d.finished ? '· Cidade toda acesa!' : ''}</div></div>
     <div class="vgrid">${ids.map(id => theirs.includes(id) ? `<div class="vcard on" style="--rc:${REGIONS.find(r => r.id === CHARACTERS[id].region).color}">${SPR.img(id)}<b>${nm(id)}</b><small>${starsHTML(d.stars[id] || 0)}</small></div>` : `<div class="vcard">${SPR.img(id, 'sil')}<b>???</b></div>`).join('')}</div>
     <div class="vcompare">
       ${both.length ? `<div class="fact">${SPR.img('coracao')}<p><b>Vocês dois já conhecem:</b> ${list(both)}.</p></div>` : ''}
@@ -4814,6 +5641,24 @@ function screenVisit(d, name = 'Amigo') {
   document.addEventListener('pointerdown', wake, { once: true });
   document.addEventListener('keydown', wake, { once: true });
   if (window.__visit) go(screenVisit, ...window.__visit); else go(screenTitle);
+})();
+/* celular: pedir para girar e, no Android, tela cheia na horizontal */
+(function () {
+  const coarse = matchMedia('(pointer: coarse)').matches;
+  if (!coarse) return;
+  document.documentElement.classList.add('needrot');
+  try { if (sessionStorage.getItem('rotOk')) document.documentElement.classList.add('rotok'); } catch (e) {}
+  const el = document.createElement('div'); el.id = 'rotate';
+  el.innerHTML = `<div class="in"><div class="phone" aria-hidden="true"></div><h2>Gire o celular!</h2><p>Deitado, a cidade fica maior e os botões ficam pertinho do seu dedo.</p><button class="skip" id="rotskip">Jogar em pé mesmo</button></div>`;
+  document.body.appendChild(el);
+  el.querySelector('#rotskip').onclick = () => { document.documentElement.classList.add('rotok'); try { sessionStorage.setItem('rotOk', '1'); } catch (e) {} };
+  /* primeiro toque: tela cheia + travar na horizontal quando o navegador deixa (Android) */
+  let tried = false;
+  document.addEventListener('pointerup', () => {
+    if (tried) return; tried = true;
+    const d = document.documentElement;
+    if (d.requestFullscreen && !document.fullscreenElement) d.requestFullscreen({ navigationUI: 'hide' }).then(() => screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape').catch(() => {})).catch(() => {});
+  }, { capture: true });
 })();
 </script>
 </body>

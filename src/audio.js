@@ -5,7 +5,7 @@
 'use strict';
 
 const Audio8 = {
-  ctx: null, master: null, musicBus: null, sfxBus: null, timer: null, cfg: null, step: 0, brightness: 0,
+  ctx: null, master: null, musicBus: null, sfxBus: null, leadBus: null, timer: null, cfg: null, step: 0, brightness: 0, energy: 0,
   vol: { music: .5, sfx: .7, mute: false },
   init() {
     if (this.ctx) { if (this.ctx.state === 'suspended') this.ctx.resume().catch(() => {}); return; }
@@ -16,6 +16,11 @@ const Audio8 = {
       const lp = this.ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 5200; lp.connect(this.master);
       this.musicBus = this.ctx.createGain(); this.musicBus.connect(lp);
       this.sfxBus = this.ctx.createGain(); this.sfxBus.connect(this.master);
+      /* eco suave só na melodia: deixa o som mais redondo e menos 'apito' */
+      this.leadBus = this.ctx.createGain(); this.leadBus.connect(this.musicBus);
+      const dl = this.ctx.createDelay(1); dl.delayTime.value = .27; const fb = this.ctx.createGain(); fb.gain.value = .28; const wet = this.ctx.createGain(); wet.gain.value = .22;
+      const dlp = this.ctx.createBiquadFilter(); dlp.type = 'lowpass'; dlp.frequency.value = 2600;
+      this.leadBus.connect(dl); dl.connect(dlp); dlp.connect(fb); fb.connect(dl); dlp.connect(wet); wet.connect(this.musicBus);
       this.apply();
     } catch (e) { this.ctx = null; }
   },
@@ -77,23 +82,27 @@ const Audio8 = {
       if (!this.ctx) return;
       while (next < this.ctx.currentTime + .3) {
         const s = this.step++, st = s % 16, bar = Math.floor(s / 16), chordDeg = song.prog[bar % 4] + 1;
-        const rootN = key - 12 + this.deg(chordDeg), br = this.brightness, full = br >= .2;
-        /* bateria */
-        if (st % 8 === 0 || (st === 10 && full)) this.hit('kick', next);
-        if ((st === 4 || st === 12) && full) this.hit('snare', next);
-        if (st % 2 === 0) this.hit('hat', next);
-        /* baixo saltitante em colcheias: fundamental / oitava */
-        if (st % 2 === 0) this.note(this.mtof(rootN - 12 + (st % 4 ? 12 : 0)), next, six * 1.6, 'square', .1, this.musicBus);
-        /* arpejo do acorde */
-        if (full && st % 2 === 1) { const tri = [0, 2, 4][((st - 1) / 2) % 3]; this.note(this.mtof(key + this.deg(chordDeg + tri)), next, six * 1.2, 'triangle', .08, this.musicBus); }
-        /* melodia (colcheias) */
+        const rootN = key - 12 + this.deg(chordDeg), br = this.brightness, full = br >= .2, chorus = Math.floor(bar / 8) % 2 === 1, en = this.energy;
+        const sw = st % 2 ? six * .14 : 0, t = next + sw, lead = this.leadBus || this.musicBus;
+        /* bateria: verso leve, refrão cheio, virada a cada 8 compassos */
+        const fill = bar % 8 === 7 && st >= 12;
+        if (st % 8 === 0 || (st === 10 && (full || chorus))) this.hit('kick', t);
+        if (((st === 4 || st === 12) && (full || chorus)) || (fill && st % 1 === 0 && st >= 12)) this.hit('snare', t);
+        if (st % 2 === 0 || en || chorus) this.hit('hat', t);
+        /* baixo saltitante */
+        if (st % 2 === 0) this.note(this.mtof(rootN - 12 + (st % 4 ? 12 : 0)), t, six * 1.6, 'square', .085, this.musicBus);
+        /* acorde: arpejo no refrão, pad suave no verso */
+        if ((full || chorus) && st % 2 === 1) { const tri = [0, 2, 4][((st - 1) / 2) % 3]; this.note(this.mtof(key + this.deg(chordDeg + tri)), t, six * 1.2, 'triangle', .07, this.musicBus); }
+        if (!chorus && st === 0) [0, 2, 4].forEach(o => this.note(this.mtof(key + this.deg(chordDeg + o)), t, six * 15, 'sine', .05, this.musicBus));
+        /* melodia: verso com triângulo doce, refrão com quadrada + harmonia */
         if (st % 2 === 0) {
           const row = toks[bar % toks.length], tk = row[st / 2];
           if (tk && tk !== '.' && tk !== '-') {
             let len = 1; for (let j = st / 2 + 1; j < row.length && row[j] === '-'; j++) len++;
             const d = isNaN(+tk) ? 10 + 'ABC'.indexOf(tk) : +tk, f = this.mtof(key + 12 + this.deg(d));
-            this.note(f, next, six * 2 * len * .95, 'square', .1, this.musicBus);
-            this.note(f * 2, next + six * .5, six * 2 * len * .6, 'triangle', .035, this.musicBus);
+            this.note(f, t, six * 2 * len * .95, chorus ? 'square' : 'triangle', chorus ? .075 : .16, lead);
+            if (chorus) this.note(this.mtof(key + 12 + this.deg(d + 2)), t, six * 2 * len * .9, 'triangle', .06, lead);
+            else this.note(f * 2, t + six * .5, six * 2 * len * .5, 'sine', .03, lead);
           }
         }
         next += six;

@@ -82,3 +82,14 @@ Vira-lata caramelo patrulhando a rua, bicicletas, carros, passarinhos e um cacho
 ## Visitar a cidade de um amigo (sem servidor)
 Em **Mandar minha cidade** (título ou álbum), o progresso vira um código de 13 letras e um link. Quem abre o link vê a cidade do amigo, o personagem dele passeando, o álbum e a comparação ("vocês dois já conhecem...", "ele já achou e você ainda não..."). Nenhum dado pessoal vai para servidor.
 Próximo passo possível: servidor (Firebase/Supabase) com lista de amigos — exige login e autorização dos responsáveis (LGPD).
+
+## Novas profissões e minijogos de ação
+- **Tenente Joana (bombeira):** ligar a mangueira no hidrante e apagar o fogo antes que espalhe (193).
+- **Tânia (técnica de saneamento):** o caminho da água — captação, grade, floculação, decantação, filtração, cloro, reservatório e torneira.
+- **Sargento Carlos (policial comunitário):** travessia segura da escola — PARE os carros na hora certa, SIGA depois (190).
+- **Pedro (energia):** hidrelétrica (comporta, turbina, torres) e depois placas solares na seca.
+- **Marina (centro de reciclagem):** separar recicláveis valendo moedas, desmontar celular e computador velhos (bateria, placa, chip com ouro) e dividir o dinheiro no pé de meia: guardar, gastar, doar.
+- Menos cartas: no modo sozinho, o "Quem sou eu?" fica só no Detetive; a associação sai do Explorador.
+
+## Celular
+Na vertical aparece "Gire o celular!" (dá para jogar em pé mesmo). Na horizontal, o jogo fica à esquerda e os botões num trilho à direita, perto do polegar. No Android, o primeiro toque pede tela cheia na horizontal.

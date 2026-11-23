@@ -29,12 +29,60 @@ function tree(ctx, x, y, s = 1, leaf = 'green') {
 }
 function house(ctx, x, y, w, h, wall, roof, lit) {
   R(ctx, 'ink', x - 1, y - 1, w + 2, h + 2); R(ctx, wall, x, y, w, h);
+  for (let j = y + 3; j < y + h; j += 4) R(ctx, '#0000000d', x, j, w, 1);
+  R(ctx, '#00000022', x + w - 2, y, 2, h);
   R(ctx, 'ink', x - 3, y - 6, w + 6, 7); R(ctx, roof, x - 2, y - 5, w + 4, 5);
-  R(ctx, 'brownD', x + (w >> 1) - 3, y + h - 10, 6, 10);
+  for (let i = x - 2; i < x + w + 2; i += 3) R(ctx, '#00000026', i, y - 5, 1, 5); R(ctx, '#ffffff33', x - 2, y - 5, w + 4, 1);
+  if (w > 26) { R(ctx, 'ink', x + w - 8, y - 11, 6, 6); R(ctx, 'brownL', x + w - 7, y - 10, 4, 5); }
+  R(ctx, 'ink', x + (w >> 1) - 4, y + h - 11, 8, 11); R(ctx, 'brownD', x + (w >> 1) - 3, y + h - 10, 6, 10); R(ctx, 'brown', x + (w >> 1) - 2, y + h - 9, 4, 4);
+  R(ctx, 'yellow', x + (w >> 1) + 1, y + h - 5, 1, 1); R(ctx, 'grey', x + (w >> 1) - 5, y + h - 1, 10, 1);
   windowPx(ctx, x + 3, y + 4, 8, 8, lit ? '#ffd65e' : 'sky');
   if (w > 26) windowPx(ctx, x + w - 11, y + 4, 8, 8, lit ? '#ffd65e' : 'sky');
 }
 function sky(ctx, c1 = 'sky', h = 60) { R(ctx, c1, 0, 0, SW, h); R(ctx, 'white', 18, 10, 18, 4); R(ctx, 'white', 22, 7, 9, 3); R(ctx, 'white', 110, 14, 22, 4); R(ctx, 'white', 116, 11, 10, 3); }
+
+/* ---- detalhes de cidade ---- */
+function skyGrad(ctx, top = 'skyD', mid = 'sky', h = 60) { R(ctx, top, 0, 0, SW, h); for (let i = 0; i < 6; i++) R(ctx, mid, 0, Math.round(h * (.2 + i * .12)), SW, h); R(ctx, '#cfeefa', 0, h - 8, SW, 8);
+  R(ctx, 'white', 18, 10, 18, 4); R(ctx, 'white', 22, 7, 9, 3); R(ctx, 'white', 110, 14, 22, 4); R(ctx, 'white', 116, 11, 10, 3); R(ctx, '#eaf7fd', 18, 13, 18, 1); R(ctx, '#eaf7fd', 110, 17, 22, 1); }
+function skyline(ctx, c = '#9fc7e3', base = 52) {
+  const t = [[0, 30, 12], [11, 22, 9], [20, 34, 14], [33, 26, 8], [40, 18, 10], [52, 30, 12], [63, 24, 9], [74, 16, 12], [88, 28, 10], [97, 20, 13], [112, 30, 9], [122, 24, 12], [136, 18, 10], [148, 28, 12]];
+  for (const [x, y, w] of t) { R(ctx, c, x, y, w, base - y); for (let wy = y + 3; wy < base - 2; wy += 5) for (let wx = x + 2; wx < x + w - 1; wx += 4) R(ctx, '#b8d8ee', wx, wy, 2, 2); }
+}
+function building(ctx, x, y, w, base, c, shade, k) {
+  const h = base - y;
+  R(ctx, 'ink', x - 1, y - 1, w + 2, h + 1); R(ctx, c, x, y, w, h); R(ctx, shade, x + w - 2, y, 2, h);
+  R(ctx, 'white', x, y, w, 1); R(ctx, shade, x - 1, y + 2, w + 2, 1);
+  /* telhado: caixa d'água, antena ou ar-condicionado */
+  if (k % 3 === 0) { R(ctx, 'ink', x + 3, y - 5, 7, 5); R(ctx, 'brownL', x + 4, y - 4, 5, 3); R(ctx, 'brown', x + 4, y - 2, 5, 1); }
+  else if (k % 3 === 1) { R(ctx, 'ink', x + w - 5, y - 7, 1, 7); R(ctx, 'ink', x + w - 7, y - 6, 5, 1); }
+  else { R(ctx, 'ink', x + 2, y - 3, 6, 3); R(ctx, 'greyL', x + 3, y - 2, 4, 2); }
+  /* andares e janelas (algumas acesas, algumas com cortina) */
+  let n = 0;
+  for (let wy = y + 4; wy < base - 14; wy += 7) {
+    R(ctx, shade, x, wy + 5, w - 2, 1);
+    for (let wx = x + 2; wx < x + w - 5; wx += 5) {
+      const v = (k * 7 + n++ * 3) % 5;
+      R(ctx, 'ink', wx, wy, 4, 4); R(ctx, v === 0 ? '#ffd65e' : v === 1 ? 'navy' : 'blueL', wx + 1, wy + 1, 2, 2);
+      if (v === 2) R(ctx, 'pink', wx + 1, wy + 1, 1, 2); if (v === 3) R(ctx, 'white', wx + 1, wy + 1, 1, 1);
+    }
+  }
+  /* térreo: loja com toldo listrado, vitrine e porta */
+  const aw = ['red', 'green', 'orange', 'blue', 'purple', 'teal'][k % 6];
+  R(ctx, 'ink', x - 1, base - 13, w + 2, 4);
+  for (let i = 0; i < w; i += 2) R(ctx, i % 4 ? 'white' : aw, x + i, base - 12, 2, 2);
+  R(ctx, 'ink', x + 2, base - 8, w - 10, 6); R(ctx, 'glass', x + 3, base - 7, w - 12, 4); R(ctx, 'white', x + 4, base - 7, 2, 1);
+  R(ctx, 'ink', x + w - 7, base - 9, 5, 9); R(ctx, 'brownD', x + w - 6, base - 8, 3, 8); R(ctx, 'yellow', x + w - 4, base - 4, 1, 1);
+}
+function sidewalk(ctx, y, h) { R(ctx, 'greyL', 0, y, SW, h); for (let i = 0; i < SW; i += 8) R(ctx, '#bfc5cc', i, y, 1, h); R(ctx, '#bfc5cc', 0, y + (h >> 1), SW, 1); R(ctx, 'grey', 0, y + h, SW, 1); R(ctx, 'white', 0, y + h + 1, SW, 1); }
+function road(ctx, y, h, zebra) {
+  R(ctx, '#4f5663', 0, y, SW, h);
+  for (let i = 0; i < 90; i++) R(ctx, i % 2 ? '#585f6d' : '#474d59', (i * 37) % SW, y + 2 + (i * 13) % (h - 3), 1, 1);
+  const mid = y + (h >> 1); for (let i = 4; i < SW; i += 16) { R(ctx, 'yellow', i, mid - 1, 9, 1); R(ctx, 'yellow', i, mid + 1, 9, 1); }
+  if (zebra != null) for (let j = y + 2; j < y + h - 2; j += 4) R(ctx, 'white', zebra, j, 14, 2);
+  R(ctx, 'grey', 0, y + h - 1, SW, 1);
+}
+function lamp(ctx, x, y, h = 26) { R(ctx, 'ink', x - 1, y, 3, h); R(ctx, 'greyD', x, y, 1, h); R(ctx, 'ink', x - 1, y - 1, 8, 3); R(ctx, 'greyD', x, y, 6, 1); R(ctx, '#fff1a8', x + 4, y + 1, 3, 2); }
+function busStop(ctx, x, y) { R(ctx, 'ink', x - 1, y - 1, 22, 4); R(ctx, 'tealD', x, y, 20, 2); R(ctx, 'ink', x + 1, y + 2, 1, 14); R(ctx, 'ink', x + 18, y + 2, 1, 14); R(ctx, 'glass', x + 2, y + 3, 15, 7); R(ctx, 'brownL', x + 3, y + 11, 13, 2); R(ctx, 'ink', x + 4, y + 13, 1, 3); R(ctx, 'ink', x + 14, y + 13, 1, 3); R(ctx, 'yellow', x + 19, y - 6, 4, 4); R(ctx, 'ink', x + 20, y - 2, 1, 4); }
 
 const SCENES = {
   sala(ctx) {
@@ -98,8 +146,8 @@ const SCENES = {
   ruacasas(ctx) {
     sky(ctx, 'sky', 58);
     house(ctx, 6, 28, 34, 30, 'yellowL', 'red'); house(ctx, 50, 22, 30, 36, 'tealL', 'blueD'); house(ctx, 92, 30, 28, 28, 'pink', 'brown'); house(ctx, 128, 26, 30, 32, 'greenL', 'redD');
-    R(ctx, 'greyL', 0, 58, SW, 8); stripes(ctx, 'grey', 0, 58, SW, 8, 10);
-    R(ctx, 'greyD', 0, 66, SW, 24); for (let i = 4; i < SW; i += 20) R(ctx, 'white', i, 77, 10, 2);
+    sidewalk(ctx, 58, 7);
+    road(ctx, 67, 23, 64);
     put(ctx, 'vaso', 42, 42); put(ctx, 'vaso', 84, 42); put(ctx, 'hidrante', 122, 42);
     R(ctx, 'ink', 140, 8, 6, 2); R(ctx, 'pink', 141, 6, 4, 2);
   },
@@ -150,9 +198,8 @@ const SCENES = {
   rua(ctx) {
     sky(ctx, '#ffd9a8', 50); R(ctx, '#ffe9c7', 0, 0, SW, 20);
     house(ctx, 4, 22, 30, 28, 'cream', 'orangeD'); house(ctx, 44, 16, 36, 34, 'blueL', 'navy'); house(ctx, 92, 24, 28, 26, 'yellowL', 'red'); house(ctx, 130, 20, 26, 30, 'pink', 'brownD');
-    R(ctx, 'greyL', 0, 50, SW, 14); stripes(ctx, 'grey', 0, 50, SW, 14, 12);
-    R(ctx, 'grey', 0, 63, SW, 3);
-    R(ctx, 'greyD', 0, 66, SW, 24); for (let i = 6; i < SW; i += 24) R(ctx, 'white', i, 78, 12, 2);
+    sidewalk(ctx, 50, 14); R(ctx, 'grey', 0, 64, SW, 2);
+    road(ctx, 66, 24, null);
     R(ctx, 'greyD', 86, 18, 2, 34); R(ctx, 'greyD', 86, 18, 9, 2); R(ctx, 'greyL', 92, 20, 5, 2);
     /* amarelinha na calçada e detalhes */
     for (let i = 0; i < 4; i++) { R(ctx, 'white', 112 + i * 7, 56, 6, 1); R(ctx, 'white', 112 + i * 7, 61, 6, 1); R(ctx, 'white', 112 + i * 7, 56, 1, 6); }
@@ -172,15 +219,14 @@ const SCENES = {
     for (let i = 0; i < SW; i += 8) { const y = 18 + Math.round(Math.sin(i / 25) * 3); R(ctx, ['red', 'yellow', 'teal', 'pink', 'green'][(i / 8) % 5], i + 2, y, 4, 4); R(ctx, 'ink', i, y - 1, 8, 1); }
   },
   cidade(ctx) {
-    sky(ctx, 'sky', 60);
-    const b = [[2, 30, 20, 'pink'], [24, 18, 18, 'yellowL'], [44, 34, 16, 'tealL'], [62, 10, 22, 'purpleL'], [86, 26, 18, 'greenL'], [106, 16, 20, 'blueL'], [128, 32, 14, 'cream'], [144, 22, 16, 'orange']];
-    for (const [x, y, w, c] of b) {
-      R(ctx, 'ink', x - 1, y - 1, w + 2, 62 - y); R(ctx, c, x, y, w, 61 - y);
-      for (let wy = y + 4; wy < 54; wy += 8) for (let wx = x + 3; wx < x + w - 3; wx += 6) R(ctx, 'yellowL', wx, wy, 3, 4);
-    }
-    R(ctx, 'greyD', 0, 61, SW, 29); for (let i = 6; i < SW; i += 24) R(ctx, 'white', i, 74, 12, 2);
-    tree(ctx, 30, 48, 1); tree(ctx, 118, 50, 1);
-    put(ctx, 'hidrante', 66, 46); put(ctx, 'bancoparque', 90, 50);
+    skyGrad(ctx, 'skyD', 'sky', 62); skyline(ctx, '#9fc7e3', 56);
+    const b = [[2, 26, 21, 'pink', 'pinkD'], [25, 14, 18, 'yellowL', 'yellowD'], [45, 30, 16, 'tealL', 'teal'], [63, 8, 22, 'purpleL', 'purple'], [87, 22, 18, 'greenL', 'green'], [107, 12, 20, 'blueL', 'blue'], [129, 28, 14, 'cream', 'tan'], [145, 18, 15, 'orange', 'orangeD']];
+    b.forEach(([x, y, w, c, sh], k) => building(ctx, x, y, w, 60, c, sh, k));
+    sidewalk(ctx, 60, 6); road(ctx, 67, 23, 72);
+    lamp(ctx, 22, 36, 24); lamp(ctx, 104, 36, 24);
+    tree(ctx, 30, 44, 1); tree(ctx, 118, 46, 1);
+    busStop(ctx, 135, 46);
+    put(ctx, 'hidrante', 66, 46); put(ctx, 'bancoparque', 88, 50);
   }
 };
 

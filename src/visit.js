@@ -10,7 +10,8 @@ const CHAR_IDS = () => Object.keys(CHARACTERS);
 const MEDAL_IDS = ['colaboracao', 'curiosidade', 'criatividade', 'gentileza'];
 const AV_BITS = [['skin', 2], ['hair', 3], ['hairColor', 3], ['shirt', 3], ['bottom', 1], ['bottomColor', 3], ['extra', 2]];
 
-/* 2 versão + 12 álbum + 24 estrelas + 4 medalhas + 1 final + 17 visual + 5 verificador = 65 bits = 13 letras */
+/* versão(2) + álbum(n) + estrelas(2n) + medalhas(4) + final(1) + visual(17) + verificador(5) */
+const codeLen = () => Math.ceil((29 + 3 * CHAR_IDS().length) / 5);
 function packCity(album, stars, earned, finished, av) {
   const ids = CHAR_IDS(); let v = 0n;
   const put = (val, n) => { v = (v << BigInt(n)) | BigInt(val & ((1 << n) - 1)); };
@@ -27,7 +28,7 @@ function cityCode() {
   if (!G) return null;
   const data = packCity(G.album, G.stars, G.earned, G.finished, G.players[0] && G.players[0].avatar);
   let v = (data << 5n) | BigInt(chk32(data)), s = '';
-  for (let i = 0; i < 13; i++) { s = B32[Number(v & 31n)] + s; v >>= 5n; }
+  for (let i = 0; i < codeLen(); i++) { s = B32[Number(v & 31n)] + s; v >>= 5n; }
   return s;
 }
 function cityName() {
@@ -42,7 +43,7 @@ function cityLink() {
 }
 function readCityCode(raw) {
   const code = String(raw || '').toUpperCase().replace(/[^0-9A-Z]/g, '').replace(/O/g, '0').replace(/[IL]/g, '1');
-  if (code.length !== 13) return null;
+  if (code.length !== codeLen()) return null;
   let v = 0n;
   for (const ch of code) { const i = B32.indexOf(ch); if (i < 0) return null; v = (v << 5n) | BigInt(i); }
   const sum = Number(v & 31n), data = v >> 5n;
@@ -60,10 +61,10 @@ function readCityCode(raw) {
 /* ---------- mandar a minha cidade ---------- */
 function openShareCity() {
   if (!G || !G.album) { toast('Jogue um pouquinho primeiro: sua cidade ainda está vazia!'); return; }
-  const code = cityCode(), link = cityLink(), pretty = code.replace(/(.{4})(.{4})(.{5})/, '$1-$2-$3');
+  const code = cityCode(), link = cityLink(), pretty = code.match(/.{1,5}/g).join('-');
   modal(`<div style="text-align:center"><h2>Minha cidade</h2>
     <img class="px" src="${SPR.url(avatarOf(G.players[0]))}" style="width:64px;height:96px" alt="">
-    <p style="font-weight:800;margin:6px 0">${G.album.length} de 12 pessoas lembradas · ${totalStars()} estrelas</p>
+    <p style="font-weight:800;margin:6px 0">${G.album.length} de ${CHAR_IDS().length} pessoas lembradas · ${totalStars()} estrelas</p>
     <p style="font-weight:700;margin:0">Mande o código ou o link para um amigo visitar a sua cidade:</p>
     <div class="code big" style="font-size:clamp(1.3rem,6vw,2.2rem);margin:10px auto">${pretty}</div>
     <div class="row center"><button class="btn primary" id="shr">${SPR.img('carta')} Mandar link</button><button class="btn" id="cpy">Copiar código</button></div>
@@ -79,7 +80,7 @@ function openShareCity() {
 /* ---------- visitar a cidade de alguém ---------- */
 function openVisitInput() {
   modal(`<h2>Visitar a cidade de um amigo</h2><p style="font-weight:700;margin-top:0">Digite o código que seu amigo mandou.</p>
-    <input class="txt" id="vc" maxlength="16" autocomplete="off" placeholder="XXXX-XXXX-XXXXX" style="text-transform:uppercase;font-family:var(--title);font-size:1.4rem;letter-spacing:2px;text-align:center">
+    <input class="txt" id="vc" maxlength="22" autocomplete="off" placeholder="XXXXX-XXXXX-XXXXX" style="text-transform:uppercase;font-family:var(--title);font-size:1.4rem;letter-spacing:2px;text-align:center">
     <input class="txt" id="vn" maxlength="20" autocomplete="off" placeholder="Nome do amigo (opcional)" style="margin-top:8px">
     <div id="vfb" style="margin-top:8px"></div>
     <div class="row" style="margin-top:10px"><button class="btn primary" id="vgo">${ICON.next} Visitar</button></div>`, { label: 'Visitar amigo' });
@@ -99,7 +100,7 @@ function screenVisit(d, name = 'Amigo') {
   app().innerHTML = `<div class="screen visit">
     <div class="row" style="justify-content:space-between;align-items:center"><h2 style="margin:0;color:#fff">Cidade de ${esc(name)}</h2><button class="btn small" id="vback">${ICON.back} Voltar</button></div>
     <div class="scene vcity" id="vcity" style="--gray:${(1 - lit).toFixed(2)}"><img class="bg px" src="${composeScene('cidade').toDataURL()}" alt="A cidade do amigo">${ambientHTML('cidade')}<div class="layer" id="vl"></div>
-      <div class="vbadge">${SPR.img('estrela')} ${starsT} · ${theirs.length}/12 ${d.finished ? '· Cidade toda acesa!' : ''}</div></div>
+      <div class="vbadge">${SPR.img('estrela')} ${starsT} · ${theirs.length}/${ids.length} ${d.finished ? '· Cidade toda acesa!' : ''}</div></div>
     <div class="vgrid">${ids.map(id => theirs.includes(id) ? `<div class="vcard on" style="--rc:${REGIONS.find(r => r.id === CHARACTERS[id].region).color}">${SPR.img(id)}<b>${nm(id)}</b><small>${starsHTML(d.stars[id] || 0)}</small></div>` : `<div class="vcard">${SPR.img(id, 'sil')}<b>???</b></div>`).join('')}</div>
     <div class="vcompare">
       ${both.length ? `<div class="fact">${SPR.img('coracao')}<p><b>Vocês dois já conhecem:</b> ${list(both)}.</p></div>` : ''}

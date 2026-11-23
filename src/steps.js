@@ -322,7 +322,7 @@ const STEPS = {
     const key = (x, y) => x + ',' + y;
     const blockAt = (x, y) => g.blocks.find(b => b.x === x && b.y === y);
     const dropAt = (x, y) => g.drops.findIndex(d => d.x === x && d.y === y);
-    ctx.stage.innerHTML = promptHTML(step.prompt) + `<div class="route-wrap"><div class="grid" id="grid" style="grid-template-columns:repeat(${g.w},auto);--gw:${g.w}" role="grid" aria-label="Mapa das entregas"></div>
+    ctx.stage.innerHTML = promptHTML(step.prompt) + `<div class="route-wrap"><div class="grid" id="grid" style="grid-template-columns:repeat(${g.w},auto);--gw:${g.w};--gh:${g.h}" role="grid" aria-label="Mapa das entregas"></div>
       <div class="route-side"><div class="drop-list" id="dl"></div><div class="arrows" aria-label="Setas para mover">
         <span></span><button class="btn" data-mv="0,-1" aria-label="Para cima">▲</button><span></span>
         <button class="btn" data-mv="-1,0" aria-label="Para a esquerda">◀</button><button class="btn" id="undo" aria-label="Desfazer">${ICON.undo}</button><button class="btn" data-mv="1,0" aria-label="Para a direita">▶</button>

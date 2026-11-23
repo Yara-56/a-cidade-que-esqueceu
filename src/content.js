@@ -23,7 +23,7 @@ const REGIONS = [
   { id: 'casas', name: 'Bairro das Casas', color: '#e0705a', music: { root: 60, scale: 'maj', tempo: 92, wave: 'triangle' },
     intro: 'Ruas de casinhas e prédios baixos. Antes, as janelas brilhavam à noite. Agora está tudo cinza e silencioso.',
     faisca: 'Aqui mora muita gente. E muita gente trabalha para que essas casas funcionem.',
-    missions: ['cida', 'jorge'] },
+    missions: ['cida', 'jorge', 'tania'] },
   { id: 'vila', name: 'Vila do Aprendizado', color: '#e8a93a', music: { root: 62, scale: 'maj', tempo: 104, wave: 'square' },
     intro: 'A escola da cidade, com pátio, cozinha e salas de aula. O sinal tocou, mas ninguém lembra quem deixou tudo pronto.',
     faisca: 'Uma escola não funciona só com professores e alunos. Vamos descobrir quem mais está aqui?',
@@ -31,7 +31,7 @@ const REGIONS = [
   { id: 'saude', name: 'Estação da Saúde', color: '#4aa6a0', music: { root: 57, scale: 'maj', tempo: 84, wave: 'sine' },
     intro: 'O posto de saúde do bairro e as casas das famílias. A Névoa fez todo mundo esquecer quem cuida da saúde de pertinho.',
     faisca: 'Cuidar da saúde não acontece só no hospital. Acontece na porta de casa também!',
-    missions: ['lucia', 'benedito'] },
+    missions: ['lucia', 'benedito', 'joana'] },
   { id: 'mercado', name: 'Mercado das Mil Histórias', color: '#d0603f', music: { root: 65, scale: 'maj', tempo: 112, wave: 'triangle' },
     intro: 'Barracas de frutas, legumes e temperos. Cada alimento tem uma história, mas a Névoa apagou o caminho que ele fez até aqui.',
     faisca: 'Será que a comida nasce no mercado? Hmm... acho que tem mais gente nessa história.',
@@ -43,11 +43,35 @@ const REGIONS = [
   { id: 'caminhos', name: 'Caminhos da Cidade', color: '#6a7fd0', music: { root: 55, scale: 'pent', tempo: 96, wave: 'triangle' },
     intro: 'Ruas, calçadas e postes ligam todos os lugares. É aqui que a Névoa está mais forte: quase todos os postes estão apagados.',
     faisca: 'Se a gente acender os caminhos, todos os bairros voltam a se encontrar!',
-    missions: ['denise', 'pedro'] }
+    missions: ['denise', 'pedro', 'carlos'] }
 ];
 
 /* ---------------- PERSONAGENS (álbum) ---------------- */
 const CHARACTERS = {
+  tania: { name: 'Tânia', full: 'Tânia Ribeiro', job: 'Técnica de saneamento', region: 'casas', prop: 'copoagua',
+    story: 'Tânia trabalha na estação de tratamento de água. Ela adora química e explica para a filha por que a água da torneira é segura.',
+    routine: ['Confere a água que chega do rio', 'Mede o cloro e a limpeza', 'Cuida dos filtros e das bombas', 'Corre para consertar canos quebrados'],
+    contribution: 'Água limpa na torneira evita doenças e deixa a gente cozinhar, tomar banho e beber sem medo.',
+    challenges: 'Plantões de madrugada, canos que quebram na chuva e gente que desperdiça a água tratada.',
+    quote: 'Cada copo d’água limpinha passou pelas mãos de muita gente.',
+    curiosity: 'Fechar a torneira enquanto escova os dentes economiza até 12 litros de água.',
+    reflection: 'Quantas vezes por dia você usa água que alguém tratou?' },
+  joana: { name: 'Tenente Joana', full: 'Joana Pereira', job: 'Bombeira', region: 'saude', prop: 'extintor',
+    story: 'Joana é bombeira há 12 anos. Já resgatou gente, cachorro e até um gato no alto de um poste. Treina todos os dias.',
+    routine: ['Confere o caminhão e as mangueiras', 'Treina resgates e primeiros socorros', 'Atende chamados pelo 193', 'Ensina prevenção nas escolas'],
+    contribution: 'Bombeiros salvam vidas em incêndios, enchentes, acidentes e resgates.',
+    challenges: 'Fogo, fumaça, calor e plantões de 24 horas longe da família.',
+    quote: 'A gente corre para onde todo mundo está fugindo.',
+    curiosity: 'O telefone dos bombeiros no Brasil é 193. É grátis!',
+    reflection: 'Você sabe para quem ligar numa emergência?' },
+  carlos: { name: 'Sargento Carlos', full: 'Carlos Henrique Santos', job: 'Policial comunitário', region: 'caminhos', prop: 'apito',
+    story: 'Carlos conhece as famílias do bairro pelo nome. Toda manhã ele cuida da travessia da escola e ajuda quem se perde.',
+    routine: ['Ronda a pé pelo bairro', 'Organiza a saída da escola', 'Ajuda crianças perdidas a achar a família', 'Conversa com os moradores'],
+    contribution: 'Ajuda o bairro a ser mais seguro e organiza o trânsito para ninguém se machucar.',
+    challenges: 'Sol, chuva, trânsito perigoso e situações difíceis todos os dias.',
+    quote: 'Segurança se faz junto, conhecendo as pessoas.',
+    curiosity: 'O telefone da polícia no Brasil é 190.',
+    reflection: 'Quem ajuda você a atravessar a rua perto da escola?' },
   cida: { name: 'Dona Cida', full: 'Aparecida Santos', job: 'Trabalhadora doméstica', region: 'casas', prop: 'roupa',
     story: 'Cida cuida de casas há mais de 20 anos. Com esse trabalho, criou dois filhos. Hoje, à noite, ela estuda Pedagogia.',
     routine: ['Pega dois ônibus para chegar às 8h', 'Lava, passa, cozinha e organiza a casa', 'Sai às 17h e ainda cuida da própria casa'],
@@ -151,6 +175,45 @@ const CHARACTERS = {
    whoami, reveal, choice, reflect
    level: 'det' = só no Detetive; 'inv' = Investigador e Detetive        */
 const MISSIONS = {
+  tania: { title: 'A água que chega na torneira', char: 'tania', steps: [
+    { t: 'dialog', scene: 'sala', cast: [{ id: 'theo', x: 70, y: 52 }], lines: [
+      { who: 'theo', text: 'Abri a torneira e... nada!' },
+      { who: '?tania', text: 'Vem ver o caminho da água!' }] },
+    { t: 'water' },
+    { t: 'reveal', char: 'tania' },
+    { t: 'choice', scene: 'sala', cast: [{ id: 'theo', x: 70, y: 52 }],
+      prompt: 'Escovando os dentes, a torneira fica aberta. E aí?',
+      options: [
+        { text: 'Fechar a torneira enquanto escova.', kind: true, result: 'Economiza até 12 litros. A Tânia agradece!' },
+        { text: 'Deixar aberta. Água não acaba.', kind: false, result: 'Acaba sim! E cada gota tratada deu trabalho para muita gente.' },
+        { text: 'Fechar e contar para a família.', kind: true, result: 'Água limpa é de todo mundo. Cuidar é com a gente também!' }] }
+  ] },
+  joana: { title: 'Fogo na rua das casas!', char: 'joana', steps: [
+    { t: 'dialog', scene: 'ruacasas', cast: [{ id: 'davi', x: 40, y: 40 }], lines: [
+      { who: 'davi', text: 'Socorro! Tem fumaça na rua!' },
+      { who: '?joana', text: 'Bombeiros chegando! Me ajuda?' }] },
+    { t: 'fire' },
+    { t: 'reveal', char: 'joana' },
+    { t: 'choice', scene: 'ruacasas', cast: [{ id: 'joana', x: 100, y: 40 }],
+      prompt: 'Um fio caído solta faíscas na calçada. O que fazer?',
+      options: [
+        { text: 'Ficar longe e chamar um adulto: 193!', kind: true, result: 'Isso! Longe do perigo e pedindo ajuda certa.' },
+        { text: 'Chegar perto para ver.', kind: false, result: 'Perigo! Eletricidade machuca muito. Fique longe.' },
+        { text: 'Jogar água no fio.', kind: false, result: 'Nunca! Água e eletricidade juntas dão choque. Ligue 193.' }] }
+  ] },
+  carlos: { title: 'A travessia da escola', char: 'carlos', steps: [
+    { t: 'dialog', scene: 'ruacasas', cast: [{ id: 'bia', x: 40, y: 40 }], lines: [
+      { who: 'bia', text: 'Tanto carro! Como eu atravesso?' },
+      { who: '?carlos', text: 'Eu cuido da travessia. Me ajuda?' }] },
+    { t: 'cross' },
+    { t: 'reveal', char: 'carlos' },
+    { t: 'choice', scene: 'ruacasas', cast: [{ id: 'bia', x: 40, y: 40 }],
+      prompt: 'O sinal está verde para os carros. E você?',
+      options: [
+        { text: 'Espero na calçada o sinal fechar.', kind: true, result: 'Perfeito! Paciência salva vidas.' },
+        { text: 'Corro antes do carro chegar.', kind: false, result: 'Nunca! Atravesse só na faixa e com o sinal fechado.' },
+        { text: 'Seguro a mão de um adulto e espero.', kind: true, result: 'Muito bem! Juntos é mais seguro.' }] }
+  ] },
   /* ===== BAIRRO DAS CASAS ===== */
   cida: { title: 'A casa que se arruma sozinha?', char: 'cida', steps: [
     { t: 'dialog', scene: 'sala', cast: [{ id: 'theo', x: 70, y: 52 }], lines: [
@@ -586,7 +649,9 @@ const FINALE = {
     lucia: 'Vacinas atrasariam e a dengue se espalharia pelo bairro.', benedito: 'Dona Olímpia não poderia continuar morando na casa dela.',
     zefa: 'Não haveria tomate, alface nem mandioca na feira.', rafa: 'Quem não pode sair de casa ficaria sem comida e remédio.',
     marina: 'Toneladas de material reciclável iriam parar no lixão.', joaquim: 'O parque viraria um matagal sem sombra.',
-    denise: 'As ruas ficariam sujas e alagariam na primeira chuva.', pedro: 'As ruas ficariam escuras e perigosas à noite.' },
+    denise: 'As ruas ficariam sujas e alagariam na primeira chuva.', pedro: 'As ruas ficariam escuras e perigosas à noite.',
+    tania: 'A água da torneira chegaria suja e muita gente ficaria doente.', joana: 'Ninguém apagaria incêndios nem salvaria quem está em perigo.',
+    carlos: 'A saída da escola viraria uma confusão perigosa.' },
   thanks: ['Obrigado por cuidar da gente!', 'Seu trabalho é muito importante.', 'Eu reparei em você!', 'Obrigada por deixar tudo funcionando!', 'Sem você, a cidade parava.', 'Você faz a diferença todos os dias.'],
   outro: [
     { who: 'nevoa', text: 'Que quentinho... Obrigada!' },

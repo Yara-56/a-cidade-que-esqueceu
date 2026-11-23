@@ -186,6 +186,7 @@ STEPS.days = function (step, ctx) {
 
 /* ---------- "Um turno com a Denise": varrer junto ---------- */
 STEPS.shift = function (step, ctx) {
+  Audio8.energy = 1; onCleanup(() => { Audio8.energy = 0; });
   const PSIDE = 80, BIN = { x: 2, y: 38 }, CAP = 5;
   const P = { x: 20, y: 54, load: 0, total: 0, tx: null, ty: null };
   const D = { x: 120, y: 52, total: 0 };

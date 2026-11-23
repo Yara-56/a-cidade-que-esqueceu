@@ -68,6 +68,14 @@ function filtered(src, mode, amount = 1) {
    cada operação: [cor, x, y, largura, altura]
    'top' = desenhado depois do contorno (vapor, água, brilho)
    ============================================================ */
+/* carros com proporção de verdade (32x14) e ônibus (48x22) */
+function carOps(C, CD, CL, glass = 'glass') {
+  return [[C, 1, 6, 30, 5], [C, 7, 2, 15, 4], [C, 6, 4, 1, 2], [C, 22, 3, 2, 3], [C, 24, 5, 3, 1],
+    [glass, 8, 3, 6, 3], [glass, 15, 3, 6, 3], ['white', 9, 3, 2, 1], ['white', 16, 3, 2, 1], [CD, 14, 3, 1, 3],
+    [CL, 2, 6, 27, 1], [CD, 1, 10, 30, 1], [CD, 14, 7, 1, 3], ['white', 11, 8, 2, 1], ['white', 18, 8, 2, 1], [CD, 23, 5, 1, 1],
+    ['yellowL', 29, 7, 2, 2], ['red', 1, 7, 1, 2], ['greyD', 0, 9, 2, 2], ['greyD', 29, 9, 3, 2],
+    ['ink', 4, 9, 6, 5], ['ink', 21, 9, 6, 5], ['ink', 5, 8, 4, 1], ['ink', 22, 8, 4, 1], ['greyL', 6, 10, 2, 2], ['greyL', 23, 10, 2, 2], ['grey', 6, 12, 2, 1], ['grey', 23, 12, 2, 1]];
+}
 const PROPS = {
   roupa: { ops: [['blue', 1, 11, 14, 4], ['blueD', 1, 13, 14, 1], ['pink', 2, 7, 12, 4], ['pinkD', 2, 9, 12, 1], ['yellow', 1, 3, 14, 4], ['yellowD', 1, 5, 14, 1], ['white', 6, 3, 4, 1]] },
   panela: { ops: [['greyD', 3, 7, 10, 7], ['grey', 2, 6, 12, 2], ['greyL', 4, 8, 2, 4], ['greyD', 0, 8, 2, 2], ['greyD', 14, 8, 2, 2], ['brownD', 4, 6, 8, 1]], top: [['white', 5, 0, 1, 2], ['white', 6, 2, 1, 2], ['white', 10, 1, 1, 2], ['white', 9, 3, 1, 2]] },
@@ -178,7 +186,19 @@ const PROPS = {
   dogsleep: { ops: [['caramel', 2, 9, 12, 5], ['caramel', 10, 7, 5, 5], ['caramelD', 10, 6, 2, 3], ['caramelL', 14, 10, 2, 2], ['caramel', 0, 11, 3, 2], ['ink', 12, 9, 2, 1], ['red', 10, 11, 3, 1]] },
   passaro: { ops: [['blueD', 5, 7, 6, 3], ['blueD', 2, 5, 4, 2], ['blueD', 10, 5, 4, 2], ['orange', 11, 8, 2, 1]] },
   passaro2: { ops: [['blueD', 5, 6, 6, 3], ['blueD', 2, 8, 4, 2], ['blueD', 10, 8, 4, 2], ['orange', 11, 7, 2, 1]] },
-  carro: { ops: [['red', 0, 8, 16, 5], ['red', 3, 4, 9, 4], ['glass', 4, 5, 3, 3], ['glass', 8, 5, 3, 3], ['ink', 2, 12, 4, 4], ['ink', 10, 12, 4, 4], ['grey', 3, 13, 2, 2], ['grey', 11, 13, 2, 2], ['yellow', 15, 9, 1, 2]] },
+  carro: { w: 32, h: 14, ops: carOps('red', 'redD', '#ef8a84') },
+  carro2: { w: 32, h: 14, ops: carOps('blue', 'blueD', 'blueL') },
+  carro3: { w: 32, h: 14, ops: carOps('greyL', 'grey', 'white', 'skyD') },
+  taxi: { w: 32, h: 14, ops: carOps('yellow', 'yellowD', 'yellowL').concat([['ink', 13, 1, 4, 1], ['white', 14, 0, 2, 1]]) },
+  bombeiros: { w: 48, h: 22, ops: [['red', 0, 4, 47, 13], ['redD', 0, 14, 47, 2], ['white', 0, 10, 40, 1], ['greyL', 4, 1, 30, 2], ['greyD', 6, 0, 1, 3], ['greyD', 31, 0, 1, 3],
+    ['glass', 38, 5, 8, 5], ['white', 39, 5, 2, 1], ['ink', 36, 4, 1, 12], ['yellowL', 45, 12, 2, 2], ['blue', 40, 2, 3, 2], ['red', 43, 2, 3, 2], ['yellow', 4, 7, 6, 2], ['yellow', 14, 7, 6, 2], ['yellow', 24, 7, 6, 2],
+    ['ink', 5, 15, 8, 7], ['ink', 33, 15, 8, 7], ['greyL', 7, 17, 4, 3], ['greyL', 35, 17, 4, 3]] },
+  onibus: { w: 48, h: 22, ops: [['teal', 0, 2, 47, 15], ['tealL', 1, 2, 45, 1], ['white', 0, 11, 47, 2], ['tealD', 0, 16, 47, 1],
+    ['glass', 3, 4, 5, 5], ['glass', 10, 4, 5, 5], ['glass', 17, 4, 5, 5], ['glass', 24, 4, 5, 5], ['glass', 31, 4, 3, 5], ['glass', 41, 3, 5, 8],
+    ['white', 4, 4, 2, 1], ['white', 11, 4, 2, 1], ['white', 18, 4, 2, 1], ['white', 25, 4, 2, 1], ['white', 42, 3, 2, 2],
+    ['greyD', 35, 4, 5, 12], ['glass', 36, 5, 3, 5], ['ink', 40, 0, 6, 2], ['yellow', 41, 0, 4, 1],
+    ['yellowL', 45, 13, 2, 2], ['red', 0, 13, 1, 2], ['greyD', 0, 17, 48, 1],
+    ['ink', 6, 15, 8, 7], ['ink', 33, 15, 8, 7], ['greyL', 8, 17, 4, 3], ['greyL', 35, 17, 4, 3]] },
   hidrante: { ops: [['red', 5, 4, 6, 11], ['red', 4, 2, 8, 3], ['redD', 3, 8, 10, 2], ['greyD', 4, 15, 8, 1]] },
   vaso: { ops: [['orangeD', 4, 10, 8, 6], ['orange', 3, 9, 10, 2], ['green', 4, 4, 8, 6], ['pink', 5, 3, 2, 2], ['yellow', 9, 4, 2, 2], ['red', 7, 6, 2, 2]] },
   mosca: { ops: [['ink', 6, 7, 5, 4], ['glass', 3, 4, 4, 3], ['glass', 10, 4, 4, 3], ['red', 6, 7, 1, 1], ['red', 10, 7, 1, 1]] },
@@ -191,6 +211,18 @@ const PROPS = {
   murcha: { ops: [['brownL', 4, 11, 8, 5], ['brown', 3, 10, 10, 2], ['brownL', 7, 4, 2, 7], ['tan', 3, 6, 4, 2], ['tan', 9, 5, 4, 2], ['brown', 5, 3, 3, 2]] },
   vazia: { ops: [['tan', 1, 7, 14, 8], ['brownL', 1, 7, 14, 2], ['brown', 3, 10, 10, 4]] },
   carta: { ops: [['white', 1, 3, 14, 11], ['greyL', 1, 3, 14, 1], ['pink', 1, 4, 7, 5], ['pink', 8, 4, 7, 5], ['white', 2, 4, 12, 3], ['red', 6, 8, 4, 3]] },
+  /* novas profissões */
+  extintor: { ops: [['red', 5, 4, 6, 11], ['redD', 9, 4, 2, 11], ['white', 6, 8, 3, 2], ['ink', 6, 1, 4, 3], ['greyD', 9, 1, 4, 1], ['ink', 12, 2, 2, 6]] },
+  apito: { ops: [['greyL', 3, 6, 9, 6], ['white', 4, 7, 3, 2], ['greyD', 11, 7, 4, 3], ['ink', 5, 9, 2, 2], ['yellow', 1, 3, 3, 3]] },
+  placasolar: { ops: [['navy', 1, 4, 14, 8], ['blue', 2, 5, 3, 2], ['blue', 6, 5, 3, 2], ['blue', 10, 5, 4, 2], ['blue', 2, 8, 3, 3], ['blue', 6, 8, 3, 3], ['blue', 10, 8, 4, 3], ['white', 2, 5, 1, 1], ['greyD', 7, 12, 2, 3]] },
+  pare: { ops: [['greyD', 7, 9, 2, 7], ['red', 3, 1, 10, 9], ['red', 2, 3, 12, 5], ['white', 4, 4, 8, 3]] },
+  celularvelho: { ops: [['ink', 4, 1, 8, 14], ['greyD', 5, 2, 6, 12], ['glass', 5, 3, 6, 8], ['white', 6, 4, 2, 1], ['grey', 7, 12, 2, 1], ['red', 9, 9, 2, 2]] },
+  computador: { ops: [['ink', 1, 2, 14, 9], ['greyL', 2, 3, 12, 7], ['blueL', 3, 4, 10, 5], ['white', 4, 5, 2, 1], ['grey', 6, 11, 4, 2], ['greyD', 3, 13, 10, 2]] },
+  bateria: { ops: [['ink', 4, 3, 8, 11], ['green', 5, 4, 6, 9], ['greenL', 5, 4, 6, 2], ['greyL', 6, 1, 4, 2], ['white', 7, 7, 2, 3]] },
+  placa: { ops: [['greenD', 1, 3, 14, 10], ['green', 2, 4, 12, 8], ['yellow', 3, 5, 6, 1], ['yellow', 3, 8, 8, 1], ['ink', 10, 5, 3, 3], ['orange', 4, 10, 2, 1], ['orange', 9, 10, 2, 1]] },
+  chip: { ops: [['ink', 4, 4, 8, 8], ['greyD', 5, 5, 6, 6], ['yellow', 2, 5, 2, 1], ['yellow', 2, 8, 2, 1], ['yellow', 12, 5, 2, 1], ['yellow', 12, 8, 2, 1], ['yellow', 5, 2, 1, 2], ['yellow', 9, 2, 1, 2], ['yellow', 5, 12, 1, 2], ['yellow', 9, 12, 1, 2], ['white', 6, 6, 2, 1]] },
+  porquinho: { ops: [['pink', 2, 5, 12, 8], ['pink', 12, 6, 3, 4], ['pinkD', 14, 7, 2, 2], ['pink', 4, 3, 3, 3], ['ink', 10, 7, 1, 1], ['pinkD', 3, 13, 2, 2], ['pinkD', 10, 13, 2, 2], ['ink', 6, 5, 4, 1], ['pinkD', 0, 7, 2, 1]] },
+  moeda: { ops: [['yellowD', 3, 3, 10, 10], ['yellow', 4, 4, 8, 8], ['yellowL', 5, 5, 2, 3], ['yellowD', 7, 6, 2, 4]] },
   /* cozinha: receita de arroz */
   arroz: { ops: [['white', 3, 4, 10, 11], ['cream', 3, 12, 10, 3], ['yellow', 4, 7, 8, 4], ['yellowD', 4, 10, 8, 1], ['white', 5, 8, 2, 2], ['white', 8, 8, 1, 1], ['brownL', 5, 2, 6, 2], ['brown', 6, 1, 4, 1]] },
   copoagua: { ops: [['glass', 4, 3, 8, 12], ['blueL', 4, 7, 8, 8], ['blue', 4, 13, 8, 2], ['white', 5, 4, 1, 3]] },
@@ -298,6 +330,9 @@ const LOOKS = {
   joaquim: { S: 's3', H: '#e6e6ec', T: 'cream', U: 'tan', P: 'greenD', F: 'brownD', A: 'greenD', B: 'green', layers: ['bald', 'cap', 'beard', 'overalls', 'smile'] },
   denise: { S: 's1', H: '#e8c25a', T: 'orange', U: 'orangeD', P: 'orange', F: 'ink', A: 'orange', B: 'orangeD', V: 'vest', G: 'yellow', layers: ['pony', 'cap', 'stripes', 'gloves', 'smile'] },
   pedro: { S: 's4', H: '#1d1418', T: 'blueD', U: 'navy', P: 'navy', F: 'ink', A: 'white', B: 'greyL', V: 'vest', G: 'red', layers: ['helmet', 'stripes', 'gloves', 'smile'] },
+  joana: { S: 's3', H: '#2b2233', T: 'redD', U: 'red', P: 'navy', F: 'ink', A: 'yellow', B: 'yellowD', V: 'yellowL', G: 'ink', layers: ['helmet', 'stripes', 'gloves', 'smile'] },
+  carlos: { S: 's2', H: '#1d1418', T: 'blueD', U: 'navy', P: 'navy', F: 'ink', A: 'navy', B: 'ink', M: 'yellow', layers: ['short', 'cap', 'mustache', 'strap', 'smile'] },
+  tania: { S: 's1', H: '#b5562c', T: 'blue', U: 'blueD', P: 'greyD', F: 'ink', A: 'white', B: 'greyL', V: 'orange', G: 'yellow', layers: ['helmet', 'vest', 'gloves', 'smile'] },
   /* figurantes */
   theo: { S: 's3', H: '#2b2233', T: 'red', U: 'redD', P: 'blue', F: 'white', layers: ['curly', 'smile'] },
   bia: { S: 's1', H: '#6b3e26', T: 'yellow', U: 'yellowD', P: 'purple', F: 'pink', A: 'purple', layers: ['long', 'band', 'skirt', 'smile'] },
@@ -414,7 +449,7 @@ const SPR = {
     else if (name === 'nevoaFeliz') c = buildNevoa(true);
     else if (LOOKS[name]) c = buildCharacter(name);
     else if (PROPS[name]) {
-      const p = PROPS[name], b = mkCanvas(16, 16);
+      const p = PROPS[name], b = mkCanvas(p.w || 16, p.h || 16);
       drawOps(b.getContext('2d'), p.ops);
       c = outlined(b);
       if (p.top) drawOps(c.getContext('2d'), p.top, 1, 1);

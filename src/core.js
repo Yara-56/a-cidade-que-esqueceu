@@ -47,6 +47,7 @@ function saveSettings() { Store.set(KEY_SET, S); applySettings(); }
 function saveGame() { if (G && !(typeof NET !== 'undefined' && NET.on && NET.role === 'guest')) Store.set(KEY_GAME, G); }
 function applySettings() {
   const H = document.documentElement;
+  try { H.style.setProperty('--lit', G ? progress().toFixed(2) : 0); } catch (e) {}
   H.classList.toggle('hc', !!S.contrast);
   H.classList.toggle('bt', !!S.bigText);
   H.classList.toggle('rm', !!S.reduceMotion);
@@ -58,8 +59,8 @@ function applySettings() {
 
 /* ---------- partida ---------- */
 const PLANS = {
-  short: { label: 'Curta', time: '10 a 15 min', regions: { casas: ['jorge'], vila: ['ze'], parque: ['marina'] } },
-  medium: { label: 'Média', time: '20 a 30 min', regions: { casas: ['cida'], vila: ['katia'], saude: ['lucia'], mercado: ['rafa'], parque: ['joaquim'], caminhos: ['pedro'] } },
+  short: { label: 'Curta', time: '10 a 15 min', regions: { casas: ['cida'], vila: ['ze'], saude: ['joana'] } },
+  medium: { label: 'Média', time: '20 a 30 min', regions: { casas: ['cida', 'tania'], vila: ['ze'], saude: ['joana'], mercado: ['rafa'], caminhos: ['pedro', 'carlos'] } },
   full: { label: 'Completa', time: '35 a 50 min', regions: Object.fromEntries(REGIONS.map(r => [r.id, r.missions.slice()])) }
 };
 const DIFFS = {
@@ -94,7 +95,7 @@ function player() { return G.players[G.turn % G.players.length]; }
 function isJuntos() { return G && G.mode === 'juntos' && G.players.length > 1; }
 function avatarOf(p) { return avatarId((p || player()).avatar); }
 function starsHTML(n, max = 3) { return `<span class="stars" aria-label="${n || 0} de ${max} estrelas">${Array.from({ length: max }, (_, i) => `<i class="${i < (n || 0) ? 'on' : ''}">★</i>`).join('')}</span>`; }
-const MISSION_ORDER = ['cida', 'jorge', 'ze', 'katia', 'lucia', 'benedito', 'zefa', 'rafa', 'marina', 'joaquim', 'denise', 'pedro'];
+const MISSION_ORDER = ['cida', 'jorge', 'ze', 'katia', 'lucia', 'benedito', 'zefa', 'rafa', 'marina', 'joaquim', 'denise', 'pedro', 'tania', 'joana', 'carlos'];
 /* código das pistas para celulares: missão(2) + jogadores(1) + pistas(1) + verificador(1) */
 function clueCode(mid, n, c) { const d = String(MISSION_ORDER.indexOf(mid) + 1).padStart(2, '0') + n + c; const chk = [...d].reduce((a, x, i) => a + (+x) * (i + 3), 0) % 10; return d + chk; }
 function readClueCode(code) {
@@ -215,14 +216,14 @@ function bubbleHTML(who, text) {
 }
 /* vida na cidade: vira-lata caramelo, bicicletas, carros e passarinhos (decoração animada) */
 const AMBIENT = {
-  rua: [['dog', 47, 18], ['bike', 72, 11, 'davi'], ['bird', 8, 22]],
-  ruacasas: [['dog', 50, 16], ['carro', 72, 9], ['bird', 10, 26]],
-  cidade: [['bike', 68, 10, 'bia'], ['dog', 58, 20], ['bird', 12, 20], ['carro', 76, 13, null, 6]],
+  ruacasas: [['dog', 50, 16], ['carro', 74, 9], ['bird', 10, 26], ['carro', 74, 13, 'carro3', 7]],
+  cidade: [['bike', 64, 10, 'bia'], ['dog', 50, 20], ['bird', 12, 20], ['carro', 76, 9, 'carro2', 2], ['bus', 66, 16, null, 9], ['carro', 76, 12, 'taxi', 11]],
   parque: [['dog', 64, 15], ['bike', 66, 12, 'theo'], ['bird', 10, 18], ['bird', 18, 24, null, 9]],
   feira: [['dog', 70, 17], ['bird', 8, 24]],
   festa: [['dog', 70, 14], ['bird', 10, 30]],
   sala: [['sleep', 76, 0]],
-  ruanoite: [['carro', 74, 11]]
+  ruanoite: [['carro', 74, 11]],
+  rua: [['dog', 47, 18], ['bike', 72, 11, 'davi'], ['bird', 8, 22], ['carro', 76, 10, 'carro2', 4]]
 };
 function ambientHTML(key) {
   const list = AMBIENT[key]; if (!list) return '';
@@ -231,7 +232,7 @@ function ambientHTML(key) {
     if (kind === 'dog') return `<div class="amb patrol" style="${d};width:${pct(16, SW)}"><img class="px f1" src="${SPR.url('dog')}" alt=""><img class="px f2" src="${SPR.url('dog2')}" alt=""></div>`;
     if (kind === 'sleep') return `<div class="amb still" style="left:${pct(118, SW)};top:${pct(66, SH)};width:${pct(16, SW)}"><img class="px" src="${SPR.url('dogsleep')}" alt=""><span class="zz">z</span></div>`;
     if (kind === 'bike') return `<div class="amb cross" style="${d};width:${pct(16, SW)}"><img class="px rider" src="${SPR.url(who || 'davi')}" alt=""><img class="px" src="${SPR.url('bike')}" alt=""></div>`;
-    if (kind === 'carro') return `<div class="amb cross back" style="${d};width:${pct(18, SW)}"><img class="px" src="${SPR.url('carro')}" alt=""></div>`;
+    if (kind === 'carro' || kind === 'bus') { const v = kind === 'bus' ? 'onibus' : (who || ['carro', 'carro2', 'carro3', 'taxi'][Math.round(y + dur) % 4]); return `<div class="amb cross back" style="${d};width:${pct(v === 'onibus' ? 48 : 32, SW)}"><img class="px" src="${SPR.url(v)}" alt=""></div>`; }
     return `<div class="amb fly" style="${d};width:${pct(8, SW)}"><img class="px f1" src="${SPR.url('passaro')}" alt=""><img class="px f2" src="${SPR.url('passaro2')}" alt=""></div>`;
   }).join('') + '</div>';
 }

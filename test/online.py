@@ -13,7 +13,7 @@ async def main():
         errs = {'A': [], 'B': []}
         A.on('pageerror', lambda e: errs['A'].append(str(e))); B.on('pageerror', lambda e: errs['B'].append(str(e)))
         for pg in (A, B):
-            await pg.goto(URL); await pg.evaluate("() => localStorage.clear()"); await pg.reload()
+            await pg.goto(URL); await pg.evaluate("() => { localStorage.clear(); sessionStorage.setItem('rotOk', '1'); }"); await pg.reload()
         # anfitrião cria a sala
         await A.click('#online'); await A.click('#mk'); await A.fill('#on', 'Yara'); await A.click('[data-l="medium"]'); await A.click('#go')
         await A.wait_for_function("() => document.querySelector('.code.big') && /^[A-Z0-9]{4}$/.test(document.querySelector('.code.big').textContent)", timeout=15000)
