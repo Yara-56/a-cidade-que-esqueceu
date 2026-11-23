@@ -796,3 +796,23 @@ const INTERLUDES = [
   [{ who: 'nevoa', text: 'Eu vi vocês ajudando, conversando, agradecendo... Eu queria saber fazer isso também.' }, { who: 'faisca', text: 'Ainda dá tempo, Névoa!' }],
   [{ who: 'nevoa', text: 'Me encontrem na praça. Quero ver as luzes!' }]
 ];
+
+/* pensamentos dos trabalhadores durante os minijogos: dúvidas e emoções, para a criança se conectar */
+const THOUGHTS = {
+  cida: ['Será que alguém repara quando a casa fica limpinha?', 'Eu cuido dessa casa como se fosse minha...', 'Um "obrigado" ia fazer meu dia.'],
+  jorge: ['Eu sei o nome de todo mundo do prédio. E quem sabe o meu?', 'Um "bom dia" deixa meu turno mais leve.'],
+  ze: ['Comida quentinha ajuda a estudar!', 'Amo ver a criançada repetindo o prato.', 'Será que eles sabem que eu acordo às 5h?'],
+  katia: ['Quando tudo brilha, ninguém lembra de mim...', 'Mas eu fico feliz vendo a escola limpinha.'],
+  lucia: ['Cada casa que eu visito é uma família protegida.', 'Às vezes ninguém abre a porta... e eu volto outro dia.'],
+  benedito: ['Cuidar de alguém é trabalho de verdade, sabia?', 'Dona Olímpia sorriu hoje. Valeu o dia!'],
+  zefa: ['Sem a roça, não tem feira nem merenda.', 'O sol tá forte... mas a horta tá linda!'],
+  rafa: ['Corro o dia todo, faça chuva ou sol.', 'Quando dizem "obrigado", eu pedalo mais feliz!'],
+  marina: ['O que vocês jogam fora vira trabalho pra mim.', 'Separar certinho ajuda muito, sabia?'],
+  joaquim: ['Uma praça bonita não nasce sozinha.', 'Essa árvore eu plantei há dez anos!'],
+  denise: ['Varro a rua antes de todo mundo acordar.', 'Ninguém me vê... mas todo mundo vê a rua limpa.'],
+  pedro: ['Luz acesa parece mágica, mas é trabalho!', 'Lá no alto do poste dá até frio na barriga.'],
+  tania: ['Água limpa na torneira dá muito trabalho!', 'Será que alguém pensa de onde vem a água?'],
+  joana: ['Meu coração dispara, mas eu não paro!', 'Salvar alguém é o melhor sentimento do mundo.'],
+  carlos: ['Primeiro as crianças, sempre!', 'Proteger a cidade é cuidar de todo mundo.'],
+  faisca: ['Minha luz está ficando mais forte!', 'Você é demais, sabia?', 'Hmm... e agora?']
+};

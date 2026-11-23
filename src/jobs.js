@@ -6,9 +6,17 @@
 'use strict';
 
 function mgHead(who, text) {
-  return `<div class="mghead"><img class="px" src="${SPR.url(who)}" alt=""><b id="mgt">${text}</b><button class="ibtn" data-say data-local aria-label="Ouvir">${ICON.voice}</button></div>`;
+  return `<div class="mghead talky" data-who="${who}"><div class="hface"><img class="px" src="${SPR.url(who)}" alt=""><i class="emo" aria-hidden="true"></i></div><div class="hbub"><b id="mgt">${text}</b></div><button class="ibtn" data-say data-local aria-label="Ouvir">${ICON.voice}</button></div>`;
 }
-function setHead(ctx, html) { const t = $('#mgt', ctx.stage); if (t) t.innerHTML = html; }
+/* fala do personagem: balão que salta, com emoção (dúvida, alegria, susto, pensamento) */
+function emoOf(html, kind) { const t = String(html).replace(/<[^>]+>/g, ''); if (kind === 'think') return 'think'; if (kind === 'soft') return 'oops'; if (kind === 'ok' || /\b(boa|isso|uau|valeu|obrigad|ufa|venceram|brilh)/i.test(t)) return 'love'; if (/\?/.test(t)) return 'ask'; if (/!/.test(t)) return 'wow'; return ''; }
+function headSay(head, html, kind) {
+  if (!head) return; const b = head.querySelector('#mgt'), bub = head.querySelector('.hbub'), emo = emoOf(html, kind);
+  if (!b) return; b.innerHTML = html; head.dataset.emo = emo; bub.classList.toggle('think', kind === 'think');
+  bub.classList.remove('pop'); void bub.offsetWidth; bub.classList.add('pop');
+  const f = head.querySelector('.hface'); if (f) { f.classList.remove('react'); void f.offsetWidth; f.classList.add('react'); }
+}
+function setHead(ctx, html) { const h = $('.mghead', ctx.stage); if (h) { h._main = html; headSay(h, html); } else { const t = $('#mgt', ctx.stage); if (t) t.innerHTML = html; } }
 function hotBtn(x, y, w, h, attrs = '') { return `<button class="jhot" style="left:${pct(x, SW)};top:${pct(y, SH)};width:${pct(w, SW)};height:${pct(h, SH)}" ${attrs}></button>`; }
 function energize() { Audio8.energy = 1; onCleanup(() => { Audio8.energy = 0; }); }
 const money = v => 'R$ ' + v.toFixed(2).replace('.', ',');

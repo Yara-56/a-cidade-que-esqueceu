@@ -7,6 +7,12 @@
 
 function mgSay(box, html, kind = 'ok') {
   if (!box) return;
+  /* no modo fluido, a reação sai do balão do personagem (não cobre o jogo) */
+  const head = box.closest('.mg') && box.closest('.mg').querySelector('.mghead.talky');
+  if (head && typeof flowOn === 'function' && flowOn()) {
+    if (head._main === undefined) head._main = head.querySelector('#mgt').innerHTML;
+    headSay(head, html, kind); clearTimeout(head._rt); head._rt = setTimeout(() => headSay(head, head._main), 2600); return;
+  }
   box.innerHTML = html; box.className = 'mgsay on ' + kind;
   clearTimeout(box._t); box._t = setTimeout(() => box.className = 'mgsay', 2400);
 }
@@ -63,8 +69,7 @@ STEPS.tidy = function (step, ctx) {
   let sel = null, combo = 0, lastOk = 0, phase = 'tidy', folds = [0, 0, 0], left = items.length;
 
   ctx.stage.innerHTML = `<div class="mg tidy">
-    <div class="mghead"><img class="px" src="${SPR.url('cida')}" alt=""><b id="mgt">Arruma-arruma! <b>Arraste</b> cada coisa para o lugar certo.</b>
-      <button class="ibtn" data-say data-local aria-label="Ouvir">${ICON.voice}</button></div>
+    ${mgHead('cida', 'Arruma-arruma! <b>Arraste</b> cada coisa para o lugar certo.')}
     <div class="scene tidyroom" id="room"><img class="bg px" src="${composeScene('sala').toDataURL()}" alt="Sala bagunçada">
       <div class="dust" id="dust"></div><div class="layer" id="lay"></div><div class="mgsay" id="say"></div></div>
     <div class="mgbar"><span>Bagunça</span><div class="bar"><i id="mess" style="width:100%"></i></div><b id="cmb"></b></div>
@@ -184,8 +189,7 @@ STEPS.cook = function (step, ctx) {
   const pot = { fill: 'none', fire: false, lid: false, stir: 0, bub: false, done: false, wash: 0 };
 
   ctx.stage.innerHTML = `<div class="mg cook">
-    <div class="mghead"><img class="px" src="${SPR.url('ze')}" alt=""><b id="mgt">Vamos fazer arroz! Pegue só o que vai na receita.</b>
-      <button class="ibtn" data-say data-local aria-label="Ouvir">${ICON.voice}</button></div>
+    ${mgHead('ze', 'Vamos fazer arroz! Pegue só o que vai na receita.')}
     <div class="kitchen" id="kit"><canvas id="pot" width="64" height="48" aria-label="Panela no fogão"></canvas>
       <div class="stepdots" id="dots">${PLAN.map(() => '<i></i>').join('')}</div><div class="mgsay" id="say"></div><div class="clock" id="clk" hidden></div></div>
     <div class="counter" id="ctr"></div>

@@ -1341,3 +1341,37 @@ html.flowfoot #app { padding: 8px 10px 10px !important; }
 .mg.bossg .bossbar { display: none; }
 .mg.bossg .scene.jobscene, .mg.catchg .scene.jobscene { max-width: min(100%, calc((100dvh - 130px) * 16 / 9)) !important; }
 @media (orientation: landscape) and (max-height: 520px) { .mg.bossg .scene.jobscene, .mg.catchg .scene.jobscene { max-width: calc((100dvh - 60px) * 16 / 9) !important; } }
+/* ===== personagem que fala: rosto + balão animado com emoções ===== */
+.mghead.talky { background: none !important; background-image: none !important; border: 0 !important; box-shadow: none !important; padding: 2px 0 6px 0 !important; align-items: flex-end; gap: 6px; }
+.mghead.talky .hface { position: relative; flex: none; width: 58px; height: 58px; border-radius: 50%; border: 3px solid var(--ink); background: radial-gradient(circle at 35% 30%, #fff8d6, #f4c542 75%); display: grid; place-items: center; box-shadow: 0 4px 0 rgba(43,34,51,.35); animation: facebob 2.4s ease-in-out infinite; }
+.mghead.talky .hface img.px { width: 30px !important; height: 45px !important; margin-top: 6px; }
+.mghead.talky .hface.react { animation: react .45s cubic-bezier(.2,.9,.3,1.5), facebob 2.4s .45s ease-in-out infinite; }
+@keyframes react { 40% { transform: translateY(-8px) scale(1.12) rotate(-6deg); } }
+.mghead.talky .emo { position: absolute; top: -10px; right: -12px; width: 26px; height: 26px; border-radius: 50%; background: #fff; border: 2px solid var(--ink); display: none; place-items: center; font-style: normal; font-weight: 900; font-size: 15px; line-height: 1; color: var(--ink); }
+.mghead.talky[data-emo="ask"] .emo { display: grid; } .mghead.talky[data-emo="ask"] .emo::after { content: '?'; }
+.mghead.talky[data-emo="wow"] .emo { display: grid; background: var(--glow); } .mghead.talky[data-emo="wow"] .emo::after { content: '!'; }
+.mghead.talky[data-emo="love"] .emo { display: grid; background: #ffd1e1; color: #d8456f; } .mghead.talky[data-emo="love"] .emo::after { content: '♥'; }
+.mghead.talky[data-emo="oops"] .emo { display: grid; background: #ffe2dc; } .mghead.talky[data-emo="oops"] .emo::after { content: '!?'; font-size: 12px; }
+.mghead.talky[data-emo="think"] .emo { display: grid; background: #e6f1ff; } .mghead.talky[data-emo="think"] .emo::after { content: '...'; font-size: 12px; margin-top: -4px; }
+.mghead.talky[data-emo] .emo { animation: emopop .4s cubic-bezier(.2,.9,.3,1.6); } @keyframes emopop { from { transform: scale(0) rotate(-30deg); } }
+.mghead.talky .hbub { position: relative; flex: 1; background: #fffdf7; border: 3px solid var(--ink); border-radius: 22px 22px 22px 6px; padding: 9px 16px; box-shadow: 0 5px 0 rgba(43,34,51,.3), 0 10px 22px rgba(0,0,0,.2); transform-origin: 0 100%; }
+.mghead.talky .hbub::before { content: ''; position: absolute; left: -11px; bottom: 6px; width: 14px; height: 14px; background: #fffdf7; border-left: 3px solid var(--ink); border-bottom: 3px solid var(--ink); transform: skewY(35deg); border-bottom-left-radius: 4px; }
+.mghead.talky .hbub.pop { animation: hbubpop .38s cubic-bezier(.2,.9,.3,1.4); }
+@keyframes hbubpop { from { transform: scale(.85) translateY(6px); opacity: .2; } }
+.mghead.talky .hbub b { font-size: 1.12rem; font-weight: 800; }
+.mghead.talky .hbub.think { background: #f1f6ff; border-style: dashed; } .mghead.talky .hbub.think b { font-style: italic; font-weight: 700; color: #3b3354; }
+.mghead.talky .hbub.think::before { width: 10px; height: 10px; border-radius: 50%; transform: none; left: -16px; bottom: 2px; border: 3px solid var(--ink); background: #f1f6ff; }
+.mghead.talky .ibtn { align-self: center; }
+html.flowfoot .mg .mgsay { display: none !important; }
+@media (orientation: landscape) and (max-height: 520px) {
+  .mghead.talky { padding: 0 0 4px 40px !important; }
+  .mghead.talky .hface { width: 40px; height: 40px; } .mghead.talky .hface img.px { width: 20px !important; height: 30px !important; margin-top: 4px; }
+  .mghead.talky .hbub { padding: 5px 12px; border-radius: 16px 16px 16px 5px; } .mghead.talky .hbub b { font-size: .88rem; }
+  .mghead.talky .emo { width: 20px; height: 20px; font-size: 12px; top: -8px; right: -9px; }
+}
+.bubble.right { flex-direction: row-reverse !important; text-align: right; border-radius: 26px 26px 8px 26px; }
+.bubble.right .who b { left: auto; right: 22px; }
+.bubble.villain { background: #2b2233 !important; border-color: #c3a3e0; box-shadow: 0 6px 0 rgba(0,0,0,.4), 0 0 24px #8f5fb877; }
+.bubble.villain .text, .bubble.villain .text p { color: #fff !important; }
+.bubble.villain .who .face { background: radial-gradient(circle at 35% 30%, #e9dcff, #8f5fb8 75%) !important; }
+.bubble.villain .who b { background: #c3a3e0; color: #2b2233 !important; }

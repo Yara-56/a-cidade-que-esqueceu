@@ -31,6 +31,8 @@ function playCutscene(frames, { title = 'Lumiara', where = 'História', onDone }
     <div class="scene cap cut" id="cut"><img class="bg px" id="cbg" alt=""><div class="layer" id="lay"></div><div class="tint" id="dark"></div><div class="fogl" id="fog"></div></div>
     <div id="cb"></div></div>`;
   const lay = $('#lay'), bg = $('#cbg');
+  $('#cut').addEventListener('click', () => { const n = $('#nx'); if (n) n.click(); });
+  $('#cb').addEventListener('click', e => { if (e.target.closest('button')) return; const n = $('#nx'); if (n) n.click(); });
   let sceneKey = null;
   const show = () => {
     const f = frames[i];

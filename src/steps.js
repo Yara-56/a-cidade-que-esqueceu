@@ -77,6 +77,8 @@ const STEPS = {
     const lines = step.lines;
     ctx.stage.innerHTML = sceneHTML(step.scene, { items: step.items, faded: step.faded ?? !ctx.colored, alt: 'Cena da história', cap: true }) + `<div id="bub"></div>`;
     const sc = $('.scene', ctx.stage), lay = document.createElement('div'); lay.className = 'layer'; sc.appendChild(lay);
+    /* tocar na cena ou no balão também avança (mais fluido) */
+    ctx.stage.addEventListener('click', e => { if (e.target.closest('button, a, input')) return; const p = $('#prim'); if (p && !p.disabled) p.click(); else if (RUN.ctrl && RUN.ctrl.primary) { RUN.ctrl.primary(); } });
     const actors = (step.cast || []).map((m, k) => {
       const big = m.id.startsWith('nevoa'), fromX = big ? m.x : (m.x < 80 ? -20 : 170);
       const el = spriteEl(m.id, fromX, big ? m.y - 20 : m.y, { mode: m.mode }); el.dataset.who = m.id; lay.appendChild(el);

@@ -466,6 +466,16 @@ function renderMission(id, idx) {
   RUN.ctrl = STEPS[step.t](step, ctx) || {};
   refreshHint(); resetIdle();
   setTimeout(() => heroTip(id, step, false), 2200);
+  /* pensamentos: de vez em quando o personagem pensa alto (só quando a criança não está no meio de uma ação) */
+  if (flowOn()) {
+    let lastAct = Date.now(), k = 0; const oldAct = ctx.activity; ctx.activity = () => { lastAct = Date.now(); oldAct(); };
+    const thinkT = setInterval(() => {
+      const h = $('#stage .mghead.talky'); if (!h || RUN.done || Date.now() - lastAct < 3500 || h._rt && Date.now() - lastAct < 6000) return;
+      const who = h.dataset.who, list = THOUGHTS[who] || THOUGHTS.faisca; if (h._main === undefined) h._main = h.querySelector('#mgt').innerHTML;
+      headSay(h, list[k++ % list.length], 'think'); clearTimeout(h._rt); h._rt = setTimeout(() => headSay(h, h._main), 3200);
+    }, 9000);
+    onCleanup(() => clearInterval(thinkT));
+  }
   /* primeira vez num tipo de etapa: a mãozinha mostra onde tocar */
   if (!G.seen['tut:' + step.t] && !['dialog', 'reveal', 'tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift', 'catch', 'boss'].includes(step.t)) {
     G.seen['tut:' + step.t] = 1; saveGame();
