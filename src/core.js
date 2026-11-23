@@ -75,10 +75,18 @@ const MODES = {
 };
 
 function newGame(cfg) {
-  G = { v: 1, mode: cfg.mode, players: cfg.players, diff: cfg.diff, length: cfg.length, clueMode: cfg.clueMode || 'pass', stars: {}, bonus: {}, lastRegion: null, done: {}, album: [], medals: { colaboracao: 0, curiosidade: 0, criatividade: 0, gentileza: 0 }, earned: {}, seen: {}, challenges: [], surprise: 0, surpriseAt: [], turn: 0, current: null, finished: false, mirror: null, thanks: [], prologue: false, started: Date.now() };
+  G = { v: 1, mode: cfg.mode, players: cfg.players, diff: cfg.diff, length: cfg.length, clueMode: cfg.clueMode || 'pass', stars: {}, bonus: {}, lastRegion: null, done: {}, album: [], medals: { colaboracao: 0, curiosidade: 0, criatividade: 0, gentileza: 0 }, earned: {}, seen: {}, challenges: [], surprise: 0, surpriseAt: [], turn: 0, current: null, finished: false, mirror: null, thanks: [], prologue: false, started: Date.now(),
+    plan: JSON.parse(JSON.stringify(PLANS[cfg.length].regions)) };
   saveGame(); applySettings();
 }
-function planRegions() { const p = PLANS[G.length].regions; return REGIONS.filter(r => p[r.id]).map(r => ({ ...r, plan: p[r.id] })); }
+/* roteiro antigo (antes das novas profissões): jogos salvos antes continuam com ele, para o progresso não "voltar" */
+const PLANS_V1 = {
+  short: { casas: ['jorge'], vila: ['ze'], parque: ['marina'] },
+  medium: { casas: ['cida'], vila: ['katia'], saude: ['lucia'], mercado: ['rafa'], parque: ['joaquim'], caminhos: ['pedro'] },
+  full: { casas: ['cida', 'jorge'], vila: ['ze', 'katia'], saude: ['lucia', 'benedito'], mercado: ['zefa', 'rafa'], parque: ['marina', 'joaquim'], caminhos: ['denise', 'pedro'] }
+};
+function planOf(g) { return g.plan || (PLANS_V1[g.length] || PLANS[g.length].regions); }
+function planRegions() { const p = planOf(G); return REGIONS.filter(r => p[r.id]).map(r => ({ ...r, plan: p[r.id] })); }
 function planMissions() { return planRegions().flatMap(r => r.plan); }
 function doneCount() { return planMissions().filter(m => G.done[m]).length; }
 function progress() { const all = planMissions(); return all.length ? doneCount() / all.length : 0; }

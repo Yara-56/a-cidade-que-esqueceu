@@ -216,7 +216,7 @@ function drawMap() {
   for (let i = 0; i < 4; i++) R(ctx, 'white', 136 + i * 2, 57, 1, 6);
   /* cinza nas regiões ainda esquecidas + névoa nas bloqueadas */
   const d = ctx.getImageData(0, 0, MAP_W, MAP_H);
-  for (const r of planRegions().concat(REGIONS.filter(x => !PLANS[G.length].regions[x.id]).map(x => ({ ...x, off: true })))) {
+  for (const r of planRegions().concat(REGIONS.filter(x => !planOf(G)[x.id]).map(x => ({ ...x, off: true })))) {
     const D = DISTRICTS[r.id], st = r.off ? 'off' : regionState(r.id);
     const amt = st === 'done' ? 0 : st === 'open' ? .75 : 1;
     if (!amt) continue;
@@ -227,7 +227,7 @@ function drawMap() {
   }
   ctx.putImageData(d, 0, 0);
   for (const r of REGIONS) {
-    const st = PLANS[G.length].regions[r.id] ? regionState(r.id) : 'off';
+    const st = planOf(G)[r.id] ? regionState(r.id) : 'off';
     if (st !== 'locked' && st !== 'off') continue;
     const D = DISTRICTS[r.id];
     ctx.fillStyle = st === 'off' ? 'rgba(30,34,60,.55)' : 'rgba(215,211,228,.55)';
@@ -249,7 +249,7 @@ function screenMap() {
   const regs = planRegions(), allDone = prog >= 1;
   const next = regs.find(r => regionState(r.id) === 'open');
   const markers = REGIONS.map(r => {
-    const D = DISTRICTS[r.id], st = PLANS[G.length].regions[r.id] ? regionState(r.id) : 'off';
+    const D = DISTRICTS[r.id], st = planOf(G)[r.id] ? regionState(r.id) : 'off';
     if (st === 'off') return `<div class="marker locked" style="left:${D.mx}%;top:${D.my}%"><span class="pin" style="opacity:.8">${esc(r.name)}<span class="st">Fica para outra partida</span></span></div>`;
     const lab = { done: 'Restaurada ✓', open: 'Toque para explorar', locked: 'Coberta pela Névoa' }[st];
     return `<button class="marker ${st}" data-r="${r.id}" style="left:${D.mx}%;top:${D.my}%" aria-label="${esc(r.name)}: ${lab}"><span class="pin">${esc(r.name)}<span class="st">${lab}</span></span></button>`;
