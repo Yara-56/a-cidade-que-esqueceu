@@ -34,7 +34,7 @@ function playCutscene(frames, { title = 'Lumiara', where = 'História', onDone }
   const show = () => {
     const f = frames[i];
     $$('.mhead .dots i').forEach((d, k) => d.className = k < i ? 'done' : k === i ? 'now' : '');
-    if (f.scene && f.scene !== sceneKey) { sceneKey = f.scene; bg.src = composeScene(f.scene).toDataURL(); }
+    if (f.scene && f.scene !== sceneKey) { sceneKey = f.scene; bg.src = composeScene(f.scene).toDataURL(); const old = $('#cut .amb-layer'); if (old) old.remove(); bg.insertAdjacentHTML('afterend', ambientHTML(f.scene)); }
     bg.style.filter = `grayscale(${f.gray ?? 0}) brightness(${1 - (f.gray ?? 0) * .05})`;
     $('#dark').style.opacity = f.dark ?? 0;
     $('#fog').style.opacity = f.fog ?? 0;
@@ -56,7 +56,7 @@ function playCutscene(frames, { title = 'Lumiara', where = 'História', onDone }
     if (f.sparkle) setTimeout(() => { for (let n = 0; n < 4; n++) setTimeout(() => sparkle($('#cut'), 14), n * 250); }, 300);
     $('#cb').innerHTML = bubbleHTML(f.who || 'faisca', f.text);
     if (S.autoRead) Voice.speak(f.text);
-    setFoot(`<button class="btn" id="say" aria-label="Ouvir">${ICON.voice}<span class="lbl">Ouvir</span></button><span class="grow"></span><button class="btn ghost" id="skip" style="color:#fff">Pular</button><button class="btn primary big" id="nx">${i < frames.length - 1 ? 'Continuar' : (f.last || 'Vamos lá!')} ${ICON.next}</button>`);
+    setFoot(`<button class="btn" id="say" data-local aria-label="Ouvir">${ICON.voice}<span class="lbl">Ouvir</span></button><span class="grow"></span><button class="btn ghost" id="skip" style="color:#fff">Pular</button><button class="btn primary big" id="nx">${i < frames.length - 1 ? 'Continuar' : (f.last || 'Vamos lá!')} ${ICON.next}</button>`);
     $('#say').onclick = () => { Audio8.init(); Voice.speak(f.text); };
     $('#skip').onclick = () => onDone();
     $('#nx').onclick = () => { Audio8.sfx('page'); if (i < frames.length - 1) { i++; show(); } else onDone(); };
@@ -127,8 +127,8 @@ STEPS.days = function (step, ctx) {
   };
   const renderRun = () => {
     ctx.stage.innerHTML = promptHTML(`${step.title}. Toque em "Passar ${step.unit === 'Semana' ? 'uma semana' : 'um dia'}" e veja o que acontece.`) + `
-      <div class="two"><div><div class="scene days" id="ds"><img class="bg px" src="${composeScene(step.scene).toDataURL()}" alt="${esc(step.title)}"><div class="layer" id="dl"></div>
-        <div class="tint" id="dt" style="background:${step.tint}"></div><div class="night" id="nf"></div><div class="daycount" id="dc">${esc(step.unit)} 0</div></div>
+      <div class="two"><div><div class="scene days" id="ds"><img class="bg px" src="${composeScene(step.scene).toDataURL()}" alt="${esc(step.title)}">${ambientHTML(step.scene)}<div class="layer" id="dl"></div>
+        <div class="tint" id="dt" style="background:${step.tint}"></div><div class="night" id="nf"></div><div class="daycount" id="dc">${esc(step.unit)} 0</div><div class="vcap dcap" id="dcap"></div></div>
         <div class="meter"><span>${esc(step.meter)}</span><div class="bar"><i id="mb" style="width:0%"></i></div></div>
         <div class="row center" style="margin-top:12px" id="ctl"><button class="btn primary big" id="pass">${ICON.next} Passar ${step.unit === 'Semana' ? 'uma semana' : 'um dia'}</button></div></div>
       <div class="cons"><h3>O que aconteceu</h3><ul id="cl"><li class="muted">Ainda nada... por enquanto.</li></ul></div></div><div id="fb"></div>`;
@@ -148,6 +148,7 @@ STEPS.days = function (step, ctx) {
         sg.add.forEach(([p, x, y], k) => setTimeout(() => { const el = spriteEl(p, x, y, { cls: 'popin' + (p === 'mosca' || p === 'mosquito' ? ' buzz' : '') }); lay.appendChild(el); added.push(el); }, k * 220));
         const cl = $('#cl', ctx.stage); if (cl.querySelector('.muted')) cl.innerHTML = '';
         cl.insertAdjacentHTML('beforeend', `<li><b>${esc(step.unit)} ${day}:</b> ${esc(sg.text)}</li>`);
+        const dc = $('#dcap', ctx.stage); dc.textContent = sg.text; dc.classList.add('show');
         Audio8.sfx('soft'); if (S.autoRead) Voice.speak(`${step.unit} ${day}. ${sg.text}`);
       }
       busy = false;

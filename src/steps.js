@@ -4,7 +4,7 @@
 'use strict';
 
 function promptHTML(text) {
-  return `<div class="prompt"><img class="px" src="${SPR.url('faisca')}" alt=""><p>${esc(text)}</p><button class="ibtn" data-say aria-label="Ouvir em voz alta">${ICON.voice}</button></div>`;
+  return `<div class="prompt"><img class="px" src="${SPR.url('faisca')}" alt=""><p>${esc(text)}</p><button class="ibtn" data-say data-local aria-label="Ouvir em voz alta">${ICON.voice}</button></div>`;
 }
 function feedback(box, kind, html, prop) {
   box.innerHTML = `<div class="feedback ${kind}" role="status">${prop ? SPR.img(prop) : ''}<div>${html}</div></div>`;
@@ -75,9 +75,19 @@ const STEPS = {
   dialog(step, ctx) {
     let i = 0;
     const lines = step.lines;
-    ctx.stage.innerHTML = sceneHTML(step.scene, { items: step.items, cast: step.cast, faded: step.faded ?? !ctx.colored, alt: 'Cena da história', cap: true }) + `<div id="bub"></div>`;
+    ctx.stage.innerHTML = sceneHTML(step.scene, { items: step.items, faded: step.faded ?? !ctx.colored, alt: 'Cena da história', cap: true }) + `<div id="bub"></div>`;
+    const sc = $('.scene', ctx.stage), lay = document.createElement('div'); lay.className = 'layer'; sc.appendChild(lay);
+    const actors = (step.cast || []).map((m, k) => {
+      const big = m.id.startsWith('nevoa'), fromX = big ? m.x : (m.x < 80 ? -20 : 170);
+      const el = spriteEl(m.id, fromX, big ? m.y - 20 : m.y, { mode: m.mode }); el.dataset.who = m.id; lay.appendChild(el);
+      if (m.x >= 80 && !big) el.classList.add('flip');
+      setTimeout(() => { moveEl(el, m.x, m.y, S.reduceMotion ? 0 : 1100 + k * 150, true); setTimeout(() => el.classList.remove('flip'), 1300 + k * 150); }, 60);
+      return el;
+    });
     const show = () => {
       const l = lines[i];
+      const who = l.who.replace('?', '');
+      actors.forEach(a => a.classList.toggle('talk', a.dataset.who === who));
       $('#bub', ctx.stage).innerHTML = bubbleHTML(l.who, l.text);
       ctx.setPrimary(i < lines.length - 1 ? 'Continuar' : 'Vamos lá!');
       if (S.autoRead) Voice.speak(l.text);
@@ -97,7 +107,7 @@ const STEPS = {
     const found = new Set(), checked = new Set();
     const hots = items.map((it, k) => `<button class="hot" data-k="${k}" style="${hotStyle(it)}" aria-label="Examinar: ${esc(it.label)}"></button>`).join('');
     ctx.stage.innerHTML = promptHTML(step.prompt) +
-      `<div class="two"><div>${sceneHTML(step.scene, { items, cast: step.cast, faded: !ctx.colored, extra: hots, alt: 'Cena para investigar' })}<p class="walk-help">Toque num objeto, use o controle ou as setas do teclado para andar. Perto de um objeto, toque em Examinar (ou Enter).</p><div id="fb" style="margin-top:12px"></div></div>
+      `<div class="two"><div>${sceneHTML(step.scene, { items, cast: step.cast, faded: !ctx.colored, extra: hots, alt: 'Cena para investigar' })}<p class="nbmini">Pistas encontradas: <b id="cnt2">0</b> de ${clues.length}</p><p class="walk-help">Toque num objeto, use o controle ou as setas do teclado para andar. Perto de um objeto, toque em Examinar (ou Enter).</p><div id="fb" style="margin-top:12px"></div></div>
       <aside class="notebook"><h3>Caderno de pistas</h3><p class="muted" style="margin:0 0 8px;font-weight:700">Pistas: <b id="cnt">0</b> de ${clues.length}</p><ul id="nb">${clues.map(() => '<li class="empty"><span></span></li>').join('')}</ul></aside></div>`;
     wireSay(ctx.stage, () => step.prompt);
     const fb = $('#fb', ctx.stage), nb = $('#nb', ctx.stage);
@@ -112,7 +122,7 @@ const STEPS = {
         Audio8.sfx('found'); sparkle(b);
         feedback(fb, 'ok', `<b class="kind">Pista encontrada!</b>${esc(it.text)}`, it.prop);
         const li = nb.children[found.size - 1]; li.className = ''; li.innerHTML = `${it.prop ? SPR.img(it.prop) : ''}<span>${esc(it.label)}</span>`;
-        $('#cnt', ctx.stage).textContent = found.size;
+        $('#cnt', ctx.stage).textContent = found.size; $('#cnt2', ctx.stage).textContent = found.size;
         if (S.autoRead) Voice.speak(it.text);
         if (found.size === clues.length) { ctx.complete(); setTimeout(() => toast('Todas as pistas encontradas! Toque em <b>Continuar</b>.', 'faisca'), 600); }
         else ctx.nextTurn();
@@ -178,7 +188,9 @@ const STEPS = {
     wireSay(ctx.stage, () => step.prompt);
     const fb = $('#fb', ctx.stage);
     const A = i => $(`[data-a="${i}"]`, ctx.stage), B = i => $(`[data-b="${i}"]`, ctx.stage);
-    const clearSel = () => $$('.mcard', ctx.stage).forEach(c => { if (!c.classList.contains('done')) c.setAttribute('aria-pressed', 'false'); });
+    const one = window.innerWidth < 700; if (one) ctx.stage.classList.add('one');
+    const clearSel = () => { $$('.mcard', ctx.stage).forEach(c => { if (!c.classList.contains('done')) c.setAttribute('aria-pressed', 'false'); }); if (one) autoA(); };
+    const autoA = () => { const a = $$('[data-a]', ctx.stage).find(c => !c.classList.contains('done')); if (a) { selA = +a.dataset.a; a.setAttribute('aria-pressed', 'true'); } };
     const tryPair = () => {
       if (selA === null || selB === null) return;
       ctx.activity();
@@ -199,7 +211,8 @@ const STEPS = {
       }
       selA = selB = null; clearSel();
     };
-    $$('[data-a]', ctx.stage).forEach(c => c.onclick = () => { clearSel(); selA = +c.dataset.a; c.setAttribute('aria-pressed', 'true'); if (selB !== null) B(selB).setAttribute('aria-pressed', 'true'); Audio8.sfx('select'); tryPair(); });
+    if (one) setTimeout(autoA, 0);
+    $$('[data-a]', ctx.stage).forEach(c => c.onclick = () => { $$('[data-a]', ctx.stage).forEach(x => { if (!x.classList.contains('done')) x.setAttribute('aria-pressed', 'false'); }); selA = +c.dataset.a; c.setAttribute('aria-pressed', 'true'); if (selB !== null) B(selB).setAttribute('aria-pressed', 'true'); Audio8.sfx('select'); tryPair(); });
     $$('[data-b]', ctx.stage).forEach(c => c.onclick = () => { $$('[data-b]', ctx.stage).forEach(x => { if (!x.classList.contains('done')) x.setAttribute('aria-pressed', 'false'); }); selB = c.dataset.b[0] === 'd' ? c.dataset.b : +c.dataset.b; c.setAttribute('aria-pressed', 'true'); Audio8.sfx('select'); tryPair(); });
     return {
       speak: () => step.prompt + ' ' + pairs.map(p => p.a.label).join('. '),
@@ -396,14 +409,16 @@ const STEPS = {
     const D = DIFFS[G.diff], clues = step.clues.slice(0, D.clues);
     const others = shuffle(Object.keys(CHARACTERS).filter(c => c !== step.char)).slice(0, D.options - 1);
     const opts = shuffle([step.char, ...others]); const out = new Set();
-    const team = isJuntos(), phone = team && G.clueMode === 'phone';
+    const team = isJuntos(), phone = team && G.clueMode === 'phone', online = team && G.clueMode === 'online';
     const assign = team ? clueAssign(G.players.length, clues.length) : [];
     const owner = i => team ? G.players[assign.findIndex(a => a.includes(i))] : null;
-    let shown = team ? 0 : 1, phase = team ? (phone ? 'phone' : 'pass') : 'guess', pi = 0, opened = false;
+    let shown = team ? 0 : 1, phase = team ? (online ? 'secret' : phone ? 'phone' : 'pass') : 'guess', pi = 0, opened = false;
     const L = 'ABCDEF';
     const render = () => {
+      ctx.stage.dataset.phase = phase;
       if (phase === 'pass') return renderPass();
       if (phase === 'phone') return renderPhone();
+      if (phase === 'secret') return renderSecret();
       const teacher = G.mode === 'sala';
       const clueBox = (c, i) => {
         if (team && !opened) { const o = owner(i); return `<div class="clue locked"><span class="n">${i + 1}</span><span>Pista secreta de <b>${esc(o.name)}</b>: conte com suas palavras!</span></div>`; }
@@ -450,6 +465,14 @@ const STEPS = {
         s.onclick = () => { pi++; Audio8.sfx('select'); renderPass(); };
         s.focus();
       };
+    };
+    const renderSecret = () => {
+      const me = (typeof NET !== 'undefined' && NET.on) ? NET.me : 0, mine = assign[me] || [];
+      ctx.stage.innerHTML = `<div class="panel pass"><img class="px" src="${SPR.url(avatarOf(G.players[me]))}" style="width:56px;height:84px" alt=""><div class="bigt">Sua pista secreta</div>
+        ${mine.length ? mine.map(i => `<div class="secret">“${esc(clues[i])}”</div>`).join('') : '<div class="secret">Você é a <b>pessoa detetive-chefe</b>! Ouça as pistas dos amigos e ajude a decidir.</div>'}
+        <p style="font-weight:800;margin:0;max-width:620px">Só você está vendo isso. Conte para os amigos com as suas palavras, pela chamada ou por mensagem!</p>
+        <button class="btn primary big" id="ready" data-local>Já contei! Vamos adivinhar</button></div>`;
+      $('#ready', ctx.stage).onclick = () => { phase = 'guess'; Audio8.sfx('select'); render(); };
     };
     const renderPhone = () => {
       const code = clueCode(ctx.id, G.players.length, clues.length);
@@ -553,11 +576,12 @@ const STEPS = {
   /* ---------------- REVELAÇÃO (ficha do personagem) ---------------- */
   reveal(step, ctx) {
     const c = CHARACTERS[step.char], r = REGIONS.find(x => x.id === c.region);
+    const vscene = (DAYS[step.char] && DAYS[step.char].scene) || (MISSIONS[step.char] && MISSIONS[step.char].steps[0].scene) || 'cidade';
     unlockCharacter(step.char);
-    ctx.stage.innerHTML = `<div class="reveal">${charCardHTML(step.char)}
+    ctx.stage.innerHTML = `<div class="reveal rv">${charCardHTML(step.char)}
       <div class="facts">
         <div class="fact big1"><h4>${SPR.img('coracao')} Por que importa</h4><p>${esc(c.contribution)}</p></div>
-        <div class="fact"><h4>${SPR.img('relogio')} Um dia de trabalho</h4><ol class="routine">${c.routine.map(x => `<li>${esc(x)}</li>`).join('')}</ol></div>
+        <div class="scene vid" id="vid"><img class="bg px" src="${composeScene(vscene).toDataURL()}" alt="${esc(c.name)} trabalhando">${ambientHTML(vscene)}<div class="layer" id="vl"></div><div class="vcap" id="vc" aria-live="polite"></div><span class="vtag">${SPR.img('relogio')} Um dia de trabalho</span></div>
         <div class="row">
           <button class="btn small" data-more="hist">${SPR.img('livro')} História</button>
           <button class="btn small" data-more="des">${SPR.img('cone')} Desafios</button>
@@ -565,6 +589,14 @@ const STEPS = {
         <div id="cur"></div>
       </div></div>`;
     Audio8.sfx('reveal'); sparkle($('.cardbig', ctx.stage), 20);
+    { /* mini-vídeo: a pessoa chega com o objeto de trabalho e a rotina passa em legendas */
+      const vl = $('#vl', ctx.stage), w = spriteEl(step.char, -18, 54), tool = spriteEl(c.prop, -8, 66, { cls: 'work' });
+      vl.appendChild(w); vl.appendChild(tool);
+      setTimeout(() => { moveEl(w, 64, 54, 1600, true); moveEl(tool, 76, 64, 1600); }, 80);
+      let k = 0; const cap = $('#vc', ctx.stage);
+      const next = () => { if (!document.body.contains(cap)) return; cap.classList.remove('in'); void cap.offsetWidth; cap.textContent = c.routine[k % c.routine.length]; cap.classList.add('in'); k++; if (k % 2 === 0) sparkle(tool, 6); };
+      setTimeout(next, 1400); const iv = setInterval(next, 2600); onCleanup(() => clearInterval(iv));
+    }
     const more = { hist: ['História', 'livro', c.story], des: ['Desafios do trabalho', 'cone', c.challenges] };
     $$('[data-more]', ctx.stage).forEach(b => b.onclick = () => { const [t, p, x] = more[b.dataset.more]; $('#cur', ctx.stage).innerHTML = `<div class="fact"><h4>${SPR.img(p)} ${t}</h4><p>${esc(x)}</p></div>`; Audio8.sfx('page'); addMedal('curiosidade', 1, 'more:' + step.char + b.dataset.more); if (S.autoRead) Voice.speak(x); });
     $('#curio', ctx.stage).onclick = () => {

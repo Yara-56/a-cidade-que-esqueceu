@@ -51,7 +51,7 @@ AUTO = r"""
     case 'route': { RUN.ctrl.hint(); const c = q('.cell.hint-pulse'); click(c); return 'route'; }
     case 'whoami': {
       if (q('#see')) { q('#see').click(); return 'pass'; }
-      if (q('#ready')) { window.__code = q('.code.big').textContent; q('#ready').click(); return 'phone-ready'; }
+      if (q('#ready')) { q('#ready').click(); return 'ready'; }
       if (q('#more') && window.__tries[k] % 2) { q('#more').click(); return 'more'; }
       const s = qa('.sil:not(:disabled)'); click(s[Math.floor(Math.random() * s.length)]); return 'guess';
     }

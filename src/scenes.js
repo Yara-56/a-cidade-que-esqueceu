@@ -100,6 +100,8 @@ const SCENES = {
     house(ctx, 6, 28, 34, 30, 'yellowL', 'red'); house(ctx, 50, 22, 30, 36, 'tealL', 'blueD'); house(ctx, 92, 30, 28, 28, 'pink', 'brown'); house(ctx, 128, 26, 30, 32, 'greenL', 'redD');
     R(ctx, 'greyL', 0, 58, SW, 8); stripes(ctx, 'grey', 0, 58, SW, 8, 10);
     R(ctx, 'greyD', 0, 66, SW, 24); for (let i = 4; i < SW; i += 20) R(ctx, 'white', i, 77, 10, 2);
+    put(ctx, 'vaso', 42, 42); put(ctx, 'vaso', 84, 42); put(ctx, 'hidrante', 122, 42);
+    R(ctx, 'ink', 140, 8, 6, 2); R(ctx, 'pink', 141, 6, 4, 2);
   },
   quarto(ctx) {
     R(ctx, 'purpleL', 0, 0, SW, 64);
@@ -143,6 +145,7 @@ const SCENES = {
     R(ctx, 'tan', 0, 70, 92, 8); R(ctx, 'tan', 40, 44, 12, 34);
     tree(ctx, 4, 12, 1.5); tree(ctx, 60, 14, 1.3, 'greenD'); tree(ctx, 128, 10, 1.4);
     for (let x = 6; x < 40; x += 7) { R(ctx, 'green', x, 80, 1, 3); R(ctx, 'green', x + 3, 84, 1, 3); }
+    for (const [x, y, c] of [[30, 50, 'pink'], [36, 52, 'yellow'], [84, 46, 'red'], [140, 50, 'pink'], [150, 46, 'yellow']]) { R(ctx, 'green', x, y + 2, 1, 3); R(ctx, c, x - 1, y, 3, 2); }
   },
   rua(ctx) {
     sky(ctx, '#ffd9a8', 50); R(ctx, '#ffe9c7', 0, 0, SW, 20);
@@ -151,6 +154,9 @@ const SCENES = {
     R(ctx, 'grey', 0, 63, SW, 3);
     R(ctx, 'greyD', 0, 66, SW, 24); for (let i = 6; i < SW; i += 24) R(ctx, 'white', i, 78, 12, 2);
     R(ctx, 'greyD', 86, 18, 2, 34); R(ctx, 'greyD', 86, 18, 9, 2); R(ctx, 'greyL', 92, 20, 5, 2);
+    /* amarelinha na calçada e detalhes */
+    for (let i = 0; i < 4; i++) { R(ctx, 'white', 112 + i * 7, 56, 6, 1); R(ctx, 'white', 112 + i * 7, 61, 6, 1); R(ctx, 'white', 112 + i * 7, 56, 1, 6); }
+    put(ctx, 'hidrante', 2, 40); put(ctx, 'vaso', 36, 38);
   },
   ruanoite(ctx) {
     R(ctx, 'night', 0, 0, SW, 50); for (const [x, y] of [[10, 6], [40, 12], [70, 4], [104, 9], [140, 5], [150, 18], [24, 20]]) R(ctx, 'yellowL', x, y, 1, 1);
@@ -174,6 +180,7 @@ const SCENES = {
     }
     R(ctx, 'greyD', 0, 61, SW, 29); for (let i = 6; i < SW; i += 24) R(ctx, 'white', i, 74, 12, 2);
     tree(ctx, 30, 48, 1); tree(ctx, 118, 50, 1);
+    put(ctx, 'hidrante', 66, 46); put(ctx, 'bancoparque', 90, 50);
   }
 };
 

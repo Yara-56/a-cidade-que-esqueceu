@@ -6,8 +6,9 @@
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-const pick = a => a[Math.floor(Math.random() * a.length)];
+const RNG = { s: (Date.now() ^ 0x9e3779b9) >>> 0, seed(n) { this.s = n >>> 0; }, next() { let t = (this.s += 0x6D2B79F5) >>> 0; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; } };
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(RNG.next() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const pick = a => a[Math.floor(RNG.next() * a.length)];
 
 const ICON = {
   home: '<svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path d="M3 11 12 3l9 8v10h-6v-6H9v6H3z" fill="currentColor"/></svg>',
@@ -36,13 +37,14 @@ const Store = {
 const KEY_SET = 'cidade-esqueceu:config', KEY_GAME = 'cidade-esqueceu:partida';
 
 const prefersRM = (() => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
-let S = Object.assign({ music: .5, sfx: .7, voice: true, autoRead: true, mute: false, contrast: false, bigText: false, reduceMotion: prefersRM }, Store.get(KEY_SET, {}));
+let S = Object.assign({ music: .5, sfx: .7, voice: true, autoRead: false, mute: false, contrast: false, bigText: false, reduceMotion: prefersRM }, Store.get(KEY_SET, {}));
+if (!S._v3) { S.autoRead = false; S._v3 = true; Store.set(KEY_SET, S); }
 let G = Store.get(KEY_GAME, null);
 if (G && G.v !== 1) G = null;
 if (G) { G.stars = G.stars || {}; G.bonus = G.bonus || {}; G.clueMode = G.clueMode || 'pass'; G.thanks = G.thanks || []; G.surpriseAt = G.surpriseAt || []; G.seen = G.seen || {}; }
 
 function saveSettings() { Store.set(KEY_SET, S); applySettings(); }
-function saveGame() { if (G) Store.set(KEY_GAME, G); }
+function saveGame() { if (G && !(typeof NET !== 'undefined' && NET.on && NET.role === 'guest')) Store.set(KEY_GAME, G); }
 function applySettings() {
   const H = document.documentElement;
   H.classList.toggle('hc', !!S.contrast);
@@ -122,6 +124,11 @@ const app = () => $('#app');
 let cleanupFns = [];
 function onCleanup(fn) { cleanupFns.push(fn); }
 function go(fn, ...args) {
+  if (typeof NET !== 'undefined' && NET.on && NET.started) {
+    if (NET.role === 'guest' && !NET.applying) return; /* quem decide a tela é o anfitrião */
+    if (NET.role === 'host') { const seed = (Math.random() * 4294967296) >>> 0; RNG.seed(seed); netSend({ t: 'go', fn: fn.name, args, G, seed }); }
+    NET.screen = fn.name + JSON.stringify(args);
+  }
   Voice.stop(); cleanupFns.forEach(f => { try { f(); } catch (e) {} }); cleanupFns = [];
   closeModal(); setFoot('');
   const a = app(); a.innerHTML = ''; a.className = '';
@@ -206,9 +213,31 @@ function bubbleHTML(who, text) {
   const s = speakerInfo(who);
   return `<div class="bubble"><div class="who"><div class="face"><img class="px" src="${s.img}" alt=""></div><b>${esc(s.name)}</b></div><div class="text" aria-live="polite"><p>${esc(text)}</p></div></div>`;
 }
+/* vida na cidade: vira-lata caramelo, bicicletas, carros e passarinhos (decoração animada) */
+const AMBIENT = {
+  rua: [['dog', 47, 18], ['bike', 72, 11, 'davi'], ['bird', 8, 22]],
+  ruacasas: [['dog', 50, 16], ['carro', 72, 9], ['bird', 10, 26]],
+  cidade: [['bike', 68, 10, 'bia'], ['dog', 58, 20], ['bird', 12, 20], ['carro', 76, 13, null, 6]],
+  parque: [['dog', 64, 15], ['bike', 66, 12, 'theo'], ['bird', 10, 18], ['bird', 18, 24, null, 9]],
+  feira: [['dog', 70, 17], ['bird', 8, 24]],
+  festa: [['dog', 70, 14], ['bird', 10, 30]],
+  sala: [['sleep', 76, 0]],
+  ruanoite: [['carro', 74, 11]]
+};
+function ambientHTML(key) {
+  const list = AMBIENT[key]; if (!list) return '';
+  return '<div class="amb-layer" aria-hidden="true">' + list.map(([kind, y, dur, who, delay]) => {
+    const top = pct(y, SH), d = `--dur:${dur}s;--del:-${delay ?? (y % 7)}s;top:${top}`;
+    if (kind === 'dog') return `<div class="amb patrol" style="${d};width:${pct(16, SW)}"><img class="px f1" src="${SPR.url('dog')}" alt=""><img class="px f2" src="${SPR.url('dog2')}" alt=""></div>`;
+    if (kind === 'sleep') return `<div class="amb still" style="left:${pct(118, SW)};top:${pct(66, SH)};width:${pct(16, SW)}"><img class="px" src="${SPR.url('dogsleep')}" alt=""><span class="zz">z</span></div>`;
+    if (kind === 'bike') return `<div class="amb cross" style="${d};width:${pct(16, SW)}"><img class="px rider" src="${SPR.url(who || 'davi')}" alt=""><img class="px" src="${SPR.url('bike')}" alt=""></div>`;
+    if (kind === 'carro') return `<div class="amb cross back" style="${d};width:${pct(18, SW)}"><img class="px" src="${SPR.url('carro')}" alt=""></div>`;
+    return `<div class="amb fly" style="${d};width:${pct(8, SW)}"><img class="px f1" src="${SPR.url('passaro')}" alt=""><img class="px f2" src="${SPR.url('passaro2')}" alt=""></div>`;
+  }).join('') + '</div>';
+}
 function sceneHTML(key, { items = [], cast = [], faded = true, alt = '', extra = '', cap = false } = {}) {
   const url = composeScene(key, items, cast).toDataURL();
-  return `<div class="scene ${faded ? 'faded' : ''} ${cap ? 'cap' : ''}"><img class="bg px" src="${url}" alt="${esc(alt)}"><div class="fogl"></div>${extra}</div>`;
+  return `<div class="scene ${faded ? 'faded' : ''} ${cap ? 'cap' : ''}"><img class="bg px" src="${url}" alt="${esc(alt)}">${ambientHTML(key)}<div class="fogl"></div>${extra}</div>`;
 }
 const pct = (v, total) => (v / total * 100).toFixed(3) + '%';
 function hotStyle(it) {

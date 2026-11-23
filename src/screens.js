@@ -7,19 +7,19 @@
 function hudHTML() {
   const p = Math.round(progress() * 100);
   return `<div class="hud">
-    <button class="btn small" data-act="home" aria-label="Tela inicial">${ICON.home}</button>
+    <button class="btn small" data-act="home" data-local aria-label="Tela inicial">${ICON.home}</button>
     <button class="btn small" data-act="map" aria-label="Mapa da cidade">${ICON.map}<span class="lbl">Mapa</span></button>
     <div class="lights" role="img" aria-label="Luz de Lumiara: ${p}%"><span class="lbl">Luz de Lumiara</span><div class="bar"><i style="width:${p}%"></i></div><span class="pct">${p}%</span></div>
     ${isJuntos() ? `<span class="turn" id="turn" aria-live="polite">${turnInner()}</span>` : ''}
-    <button class="btn small" data-act="album" aria-label="Álbum e medalhas">${ICON.book}<span class="lbl">Álbum</span></button>
-    <button class="btn small" data-act="settings" aria-label="Configurações">${ICON.gear}</button>
+    <button class="btn small" data-act="album" data-local aria-label="Álbum e medalhas">${ICON.book}<span class="lbl">Álbum</span></button>
+    <button class="btn small" data-act="settings" data-local aria-label="Configurações">${ICON.gear}</button>
   </div>`;
 }
 function wireHud(root = app()) {
   $$('[data-act]', root).forEach(b => b.onclick = () => {
     Audio8.sfx('click');
     const a = b.dataset.act;
-    if (a === 'home') go(screenTitle);
+    if (a === 'home') { if (typeof NET !== 'undefined' && NET.on) { confirmBox('Sair da partida online?', 'Sair', () => { netReset(); go(screenTitle); }); return; } go(screenTitle); }
     if (a === 'map') { G.current = G.current && G.current.mission ? G.current : null; saveGame(); go(screenMap); }
     if (a === 'album') openAlbum();
     if (a === 'settings') openSettings();
@@ -44,6 +44,7 @@ function screenTitle() {
       ${has ? `<button class="btn primary big" id="cont">${ICON.next} Continuar a aventura</button>` : ''}
       <button class="btn ${has ? '' : 'primary'} big" id="new">${has ? 'Nova aventura' : 'Começar a aventura'}</button>
       <div class="row" style="justify-content:stretch"><button class="btn grow" id="guide">${ICON.book} Como jogar</button><button class="btn grow" id="cfg">${ICON.gear} Configurações</button></div>
+      <button class="btn" id="online">${SPR.img('casa')} Jogar online com amigos</button>
       <button class="btn" id="phone">${SPR.img('caderno')} Tenho um código de pista</button>
     </div>
     <p class="title-foot">Funciona sem internet depois de carregado · O progresso fica salvo neste aparelho<br>Tema: profissões e sujeitos invisíveis</p></div>`;
@@ -55,6 +56,7 @@ function screenTitle() {
   };
   $('#guide').onclick = () => { Audio8.init(); openGuide(); };
   $('#phone').onclick = () => { Audio8.init(); go(screenPhoneClue); };
+  $('#online').onclick = () => { Audio8.init(); go(screenOnline); };
   $('#cfg').onclick = () => { Audio8.init(); openSettings(); };
 }
 function resumeGame() {
@@ -124,7 +126,6 @@ function screenSetup() {
       const players = cfg.mode === 'juntos' ? Array.from({ length: cfg.count }, (_, i) => ({ name: (cfg.names[i] || '').trim() || PLAYER_DEFAULT[i], color: PLAYER_COLORS[i], avatar: cfg.avatars[i] }))
         : cfg.mode === 'sala' ? [{ name: 'Turma', color: PLAYER_COLORS[0], avatar: cfg.avatars[0] }] : [{ name: 'Você', color: PLAYER_COLORS[0], avatar: cfg.avatars[0] }];
       if (cfg.mode === 'sala' && !S._salaSet) { S.contrast = true; S._salaSet = true; saveSettings(); }
-      if (cfg.diff === 'exp' && !S._autoReadSet && cfg.mode !== 'sala') { S.autoRead = true; saveSettings(); }
       newGame({ mode: cfg.mode, players, diff: cfg.diff, length: cfg.length, clueMode: cfg.mode === 'juntos' ? cfg.clueMode : 'pass' });
       go(screenPrologue, 0);
     };
@@ -326,7 +327,7 @@ function screenRegion(rid) {
   if (S.autoRead) Voice.speak(r.intro + ' ' + r.faisca);
   $$('.mitem[data-m]').forEach(b => b.onclick = () => { Audio8.sfx('select'); G.current = { mission: b.dataset.m, step: 0 }; saveGame(); go(renderMission, b.dataset.m, 0); });
   $$('.mitem[data-b]').forEach(b => b.onclick = () => { Audio8.sfx('select'); const id = '_bonus_' + b.dataset.b; G.current = { mission: id, step: 0 }; saveGame(); go(renderMission, id, 0); });
-  setFoot(`<button class="btn" id="say" aria-label="Ouvir">${ICON.voice}<span class="lbl">Ouvir</span></button><span class="grow"></span><button class="btn" id="bk">${ICON.map} Voltar ao mapa</button>`);
+  setFoot(`<button class="btn" id="say" data-local aria-label="Ouvir">${ICON.voice}<span class="lbl">Ouvir</span></button><span class="grow"></span><button class="btn" id="bk">${ICON.map} Voltar ao mapa</button>`);
   $('#say').onclick = () => Voice.speak(r.intro + ' ' + r.faisca);
   $('#bk').onclick = () => go(screenMap);
 }
@@ -348,7 +349,7 @@ function renderMission(id, idx) {
     <div class="stage" id="stage"></div></div>`;
   wireHud();
   const sala = G.mode === 'sala';
-  setFoot(`${sala ? `<div class="teacher"><span>Professor</span><button class="btn small" id="tback">${ICON.back} Etapa anterior</button><button class="btn small" id="tpause">${ICON.pause} Pausar</button><button class="btn small" id="trep">${ICON.repeat} Repetir</button></div>` : `<button class="btn" id="say" aria-label="Ouvir">${ICON.voice}<span class="lbl">Ouvir</span></button>`}
+  setFoot(`${sala ? `<div class="teacher"><span>Professor</span><button class="btn small" id="tback">${ICON.back} Etapa anterior</button><button class="btn small" id="tpause">${ICON.pause} Pausar</button><button class="btn small" id="trep">${ICON.repeat} Repetir</button></div>` : `<button class="btn" id="say" data-local aria-label="Ouvir">${ICON.voice}<span class="lbl">Ouvir</span></button>`}
     <button class="btn" id="hint" aria-label="Dica">${ICON.hint}<span class="lbl">Dica</span></button><span class="grow"></span>
     ${sala ? `<button class="btn small" id="tskip">Pular ${ICON.next}</button>` : ''}
     <button class="btn primary big" id="prim" disabled>Continuar ${ICON.next}</button>`);
@@ -453,7 +454,7 @@ function openSurprise() {
   Audio8.sfx('reveal');
   modal(`<div style="text-align:center;display:grid;gap:12px;justify-items:center"><span class="tag">Carta surpresa</span>${SPR.img('estrela', null, 'px', '')}<h2>${esc(s.title)}</h2>
     <p style="font-size:1.15rem;font-weight:700;margin:0">${esc(s.text)}</p><p class="muted" style="font-weight:700;margin:0">Aqui não existe resposta certa ou errada. Vale usar a imaginação!</p>
-    <div class="row center"><button class="btn" id="say" aria-label="Ouvir">${ICON.voice}<span class="lbl">Ouvir</span></button><button class="btn" data-close>Pular</button><button class="btn primary" id="done">Pronto, fizemos!</button></div></div>`, { label: 'Carta surpresa' });
+    <div class="row center"><button class="btn" id="say" data-local aria-label="Ouvir">${ICON.voice}<span class="lbl">Ouvir</span></button><button class="btn" data-close>Pular</button><button class="btn primary" id="done">Pronto, fizemos!</button></div></div>`, { label: 'Carta surpresa' });
   $('#say').onclick = () => Voice.speak(s.title + '. ' + s.text);
   $('#done').onclick = () => { addMedal('criatividade', 1); Audio8.sfx('ok'); closeModal(); };
   if (S.autoRead) Voice.speak(s.title + '. ' + s.text);
@@ -485,7 +486,7 @@ function openCard(id) {
     <div class="fact"><h4>Desafios</h4><p>${esc(c.challenges)}</p></div>
     <div class="fact curio"><h4>Curiosidade</h4><p>${esc(c.curiosity)}</p></div>
     <div class="fact"><h4>Para pensar</h4><p>${esc(c.reflection)}</p></div>
-    <div class="row"><button class="btn" id="say" aria-label="Ouvir">${ICON.voice}<span class="lbl">Ouvir</span></button><button class="btn" id="bk">${ICON.back} Voltar ao álbum</button></div></div></div>`, { label: c.name });
+    <div class="row"><button class="btn" id="say" data-local aria-label="Ouvir">${ICON.voice}<span class="lbl">Ouvir</span></button><button class="btn" id="bk">${ICON.back} Voltar ao álbum</button></div></div></div>`, { label: c.name });
   $('#say').onclick = () => { Audio8.init(); Voice.speak(`${c.name}, ${c.job}. ${c.story} ${c.contribution} ${c.challenges} ${c.quote}`); };
   $('#bk').onclick = openAlbum;
 }
