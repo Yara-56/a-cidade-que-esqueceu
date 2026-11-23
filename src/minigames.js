@@ -54,6 +54,8 @@ STEPS.tidy = function (step, ctx) {
     ['louca', 'pia'], ['xicara', 'pia'], ['prato', 'pia'],
     ['bola', 'caixa'], ['brinquedos', 'caixa'],
     ['livro', 'estante'], ['caderno', 'estante']];
+  const NAMES = { roupasuja: 'Camiseta suja', meia: 'Meia', louca: 'Panela', xicara: 'Xícara', prato: 'Prato', bola: 'Bola', brinquedos: 'Carrinho', livro: 'Livro', caderno: 'Caderno' };
+  const BC = { cesto: '#8fd6cf', pia: '#a5d97f', caixa: '#e98bb0', estante: '#f4c542' };
   const SPOTS = [[10, 62], [30, 70], [52, 66], [74, 72], [96, 64], [118, 70], [138, 62], [22, 50], [64, 56], [108, 54]];
   const n = G.diff === 'exp' ? 7 : 10;
   const spots = shuffle(SPOTS.slice());
@@ -66,15 +68,15 @@ STEPS.tidy = function (step, ctx) {
     <div class="scene tidyroom" id="room"><img class="bg px" src="${composeScene('sala').toDataURL()}" alt="Sala bagunçada">
       <div class="dust" id="dust"></div><div class="layer" id="lay"></div><div class="mgsay" id="say"></div></div>
     <div class="mgbar"><span>Bagunça</span><div class="bar"><i id="mess" style="width:100%"></i></div><b id="cmb"></b></div>
-    <div class="bins" id="bins">${BINS.map(b => `<button class="tbin" data-bin="${b.id}">${SPR.img(b.prop)}<span>${b.label}</span></button>`).join('')}</div>
+    <div class="bins" id="bins">${BINS.map(b => `<button class="tbin" data-bin="${b.id}" style="--bc:${BC[b.id]}">${SPR.img(b.prop)}<span>${b.label}</span></button>`).join('')}</div>
     <div class="folds" id="folds" hidden></div></div>`;
   wireSay(ctx.stage, () => phase === 'tidy' ? 'Arruma-arruma! Toque num objeto e depois no lugar certo dele.' : 'Agora dobre as camisetas! Toque três vezes em cada uma.');
   const lay = $('#lay', ctx.stage), room = $('#room', ctx.stage), say = $('#say', ctx.stage);
   items.forEach(it => {
     const b = document.createElement('button'); b.className = 'mess-it'; b.dataset.it = it.k;
-    b.style.left = pct(it.x - 6, SW); b.style.top = pct(it.y - 8, SH); b.style.width = pct(15, SW);
+    b.style.left = pct(it.x - 6, SW); b.style.top = pct(it.y - 8, SH); b.style.width = pct(19, SW); b.style.setProperty('--bc', BC[it.bin]);
     b.style.animationDelay = (it.k * .07) + 's';
-    b.innerHTML = SPR.img(it.prop); b.setAttribute('aria-label', 'Objeto bagunçado');
+    b.innerHTML = SPR.img(it.prop) + `<span class="tag">${NAMES[it.prop] || ''}</span>`; b.setAttribute('aria-label', NAMES[it.prop] || 'Objeto');
     lay.appendChild(b); it.el = b;
     b.onclick = () => { if (it.done || phase !== 'tidy' || (b._dragged && Date.now() - b._dragged < 400)) return; ctx.activity(); Audio8.sfx('select'); if (sel) sel.el.classList.remove('sel'); sel = it; b.classList.add('sel'); $('#bins', ctx.stage).classList.add('ready'); };
   });

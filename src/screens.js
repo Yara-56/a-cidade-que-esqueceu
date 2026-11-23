@@ -26,7 +26,26 @@ function wireHud(root = app()) {
     if (a === 'map') { G.current = G.current && G.current.mission ? G.current : null; saveGame(); go(screenMap); }
     if (a === 'album') openAlbum();
     if (a === 'settings') openSettings();
+    if (a === 'menu') openGameMenu();
   });
+}
+/* menu discreto durante a missão: deixa a tela limpa */
+function openGameMenu() {
+  modal(`<div class="gmenu"><h2>Pausa</h2>
+    <button class="btn primary big" data-close>${ICON.next} Continuar jogando</button>
+    <button class="btn big" id="gm-map">${ICON.map} Mapa da cidade</button>
+    <button class="btn big" id="gm-album">${ICON.book} Álbum de heróis</button>
+    <button class="btn big" id="gm-cfg">${ICON.gear} Configurações</button>
+    <button class="btn" id="gm-home">${ICON.home} Tela inicial</button></div>`, { label: 'Pausa' });
+  $('#gm-map').onclick = () => { closeModal(); G.current = null; saveGame(); go(screenMap); };
+  $('#gm-album').onclick = () => openAlbum();
+  $('#gm-cfg').onclick = () => openSettings();
+  $('#gm-home').onclick = () => { closeModal(); if (typeof NET !== 'undefined' && NET.on) { confirmBox('Sair da partida online?', 'Sair', () => { netReset(); go(screenTitle); }); return; } go(screenTitle); };
+}
+function hudMini() {
+  return `<div class="hud mini"><button class="btn small round" data-act="menu" data-local aria-label="Pausa e menu">${ICON.pause || '☰'}</button>
+    ${isJuntos() ? `<span class="turn" id="turn" aria-live="polite">${turnInner()}</span>` : ''}<span class="grow"></span>
+    <span class="energy" id="energy" title="Energia do Obrigado">${SPR.img('raio')}<b>${G.energy || 0}</b></span></div>`;
 }
 function turnInner() { return `<span class="dot" style="background:${player().color}"><img class="px" src="${SPR.url(avatarOf())}" alt=""></span>Vez de ${esc(player().name)}`; }
 function updateTurnChip() {
@@ -45,10 +64,12 @@ function screenTitle() {
       <img class="px nevoa" src="${SPR.url('nevoa')}" alt=""><img class="px faisca" src="${SPR.url('faisca')}" alt=""></div>
     <div class="title-btns">
       ${has ? `<button class="btn primary big" id="cont">${ICON.next} Continuar a aventura</button>` : ''}
-      <button class="btn ${has ? '' : 'primary'} big" id="new">${has ? 'Nova aventura' : 'Começar a aventura'}</button>
-      <div class="row" style="justify-content:stretch"><button class="btn grow" id="guide">${ICON.book} Como jogar</button><button class="btn grow" id="cfg">${ICON.gear} Configurações</button></div>
-      <button class="btn" id="online">${SPR.img('casa')} Jogar online com amigos</button>
-      <button class="btn" id="phone">${SPR.img('caderno')} Tenho um código de pista</button>
+      <div class="quick"><p>${has ? 'Ou comece de novo:' : 'Escolha e jogue!'}</p>
+        <button class="btn big qk" data-q="exp" style="--qc:#a5d97f"><b>Fácil</b><small>~5 min</small></button>
+        <button class="btn big qk" data-q="inv" style="--qc:#f4c542"><b>Médio</b><small>~12 min</small></button>
+        <button class="btn big qk" data-q="det" style="--qc:#e98bb0"><b>Difícil</b><small>~25 min</small></button></div>
+      <div class="row" style="justify-content:stretch"><button class="btn grow" id="online">${SPR.img('casa')} Jogar com amigos</button><button class="btn grow" id="new">${ICON.gear} Mais opções</button></div>
+      <div class="row" style="justify-content:stretch"><button class="btn grow small" id="guide">${ICON.book} Como jogar</button><button class="btn grow small" id="phone">${SPR.img('caderno')} Código</button><button class="btn grow small" id="cfg">${ICON.gear} Som</button></div>
     </div>
     <p class="title-foot">Funciona sem internet depois de carregado · O progresso fica salvo neste aparelho<br>Tema: profissões e sujeitos invisíveis</p></div>`;
   if (has) $('#cont').onclick = () => { Audio8.init(); Audio8.sfx('select'); applySettings(); resumeGame(); };
@@ -57,6 +78,11 @@ function screenTitle() {
     if (has) confirmBox('Começar uma nova aventura? O progresso atual será apagado.', 'Sim, começar de novo', () => go(screenSetup));
     else go(screenSetup);
   };
+  /* início rápido: um toque e já começa (personagem sorteado, pode trocar depois) */
+  const QK = { exp: 'short', inv: 'medium', det: 'full' };
+  const quick = d => { newGame({ mode: 'solo', players: [{ name: 'Você', color: PLAYER_COLORS[0], avatar: randomAvatar() }], diff: d, length: QK[d] }); go(screenPrologue, 0); };
+  $$('.qk').forEach(b => b.onclick = () => { Audio8.init(); Audio8.sfx('select'); const d = b.dataset.q;
+    if (has) confirmBox('Começar uma nova aventura? O progresso atual será apagado.', 'Sim, começar', () => quick(d)); else quick(d); });
   $('#guide').onclick = () => { Audio8.init(); openGuide(); };
   $('#phone').onclick = () => { Audio8.init(); go(screenPhoneClue); };
   $('#online').onclick = () => { Audio8.init(); go(screenOnline); };
@@ -251,67 +277,76 @@ function screenMap() {
   const prog = progress();
   Audio8.music({ root: 60, scale: 'maj', tempo: 90, wave: 'triangle' }, prog);
   const regs = planRegions(), allDone = prog >= 1;
-  const next = regs.find(r => regionState(r.id) === 'open');
+  const target = allDone ? null : regs.find(r => regionState(r.id) === 'open');
   const markers = REGIONS.map(r => {
     const D = DISTRICTS[r.id], st = planOf(G)[r.id] ? regionState(r.id) : 'off';
-    if (st === 'off') return `<div class="marker locked" style="left:${D.mx}%;top:${D.my}%"><span class="pin" style="opacity:.8">${esc(r.name)}<span class="st">Fica para outra partida</span></span></div>`;
-    const lab = { done: 'Restaurada ✓', open: 'Toque para explorar', locked: 'Coberta pela Névoa' }[st];
-    return `<button class="marker ${st}" data-r="${r.id}" style="left:${D.mx}%;top:${D.my}%" aria-label="${esc(r.name)}: ${lab}"><span class="pin">${esc(r.name)}<span class="st">${lab}</span></span></button>`;
+    const lab = st === 'done' ? ' ✓' : '';
+    return `<button class="marker ${st} ${target && target.id === r.id ? 'next' : ''}" data-r="${r.id}" style="left:${D.mx}%;top:${D.my}%" aria-label="${esc(r.name)}"><span class="pin">${esc(r.name)}${lab}</span></button>`;
   }).join('');
-  const fx = next ? DISTRICTS[next.id] : DISTRICTS.vila;
-  const say = allDone ? 'Todas as regiões estão iluminadas! Hora do grande final.' : next ? (doneCount() === 0 ? `Vamos começar pelo ${next.name}. Toque no nome da região!` : `Próxima parada: ${next.name}.`) : '';
-  app().innerHTML = `<div class="screen">${hudHTML()}
-    <div class="mapwrap"><img class="bg px" src="${drawMap().toDataURL()}" alt="Mapa de Lumiara com seis regiões">${markers}
-      <img class="px map-faisca" src="${SPR.url('faisca')}" alt="" style="left:${fx.mx}%;top:${fx.my + 8}%">
-      <img class="px map-avatar" id="mav" src="${SPR.url(avatarOf())}" alt="Seu personagem" style="left:${G.lastRegion ? DISTRICTS[G.lastRegion].mx : 50}%;top:${G.lastRegion ? DISTRICTS[G.lastRegion].my + 22 : 50}%">
-      ${prog < 1 ? `<img class="px map-nevoa" src="${SPR.url('nevoa')}" alt="" style="left:${60 - prog * 30}%;top:${36 + prog * 10}%;opacity:${.95 - prog * .5}">` : ''}</div>
-    <div class="map-ctrl">${dpadHTML('Entrar')}<p id="near" class="near-msg">Ande com o controle ou com as setas. Chegue perto de uma região e toque em Entrar.</p></div>
-    <div class="map-list">${planRegions().map(r => { const st = regionState(r.id); return `<button class="mitem ${st === 'done' ? 'done' : ''}" data-r="${r.id}" ${st === 'locked' ? 'aria-disabled="true"' : ''}><span class="rdot" style="background:${st === 'locked' ? '#b9b6c6' : r.color}"></span><span class="grow"><b>${esc(r.name)}</b><small>${{ done: 'Restaurada ✓', open: 'Toque para explorar', locked: 'Coberta pela Névoa' }[st]}</small></span>${st === 'locked' ? '' : ICON.next}</button>`; }).join('')}</div>
-    <div class="map-foot"><div class="say">${bubbleHTML('faisca', say)}</div>
-      ${allDone ? `<button class="btn primary big" id="finale">${SPR.img('estrela')} Grande final</button>` : ''}</div></div>`;
+  const start = G.lastRegion ? DISTRICTS[G.lastRegion] : null;
+  app().innerHTML = `<div class="screen citymap">
+    <div class="hud mini"><button class="btn small round" data-act="menu" data-local aria-label="Menu">${ICON.pause}</button>
+      ${target ? `<span class="goal">${SPR.img('faisca')} Vá até: <b>${esc(target.name)}</b></span>` : allDone ? `<span class="goal">${SPR.img('estrela')} Vá até a <b>Praça</b>!</span>` : ''}<span class="grow"></span>
+      <span class="energy" id="energy">${SPR.img('raio')}<b>${G.energy || 0}</b></span></div>
+    <div class="world" id="world"><div class="mapwrap" id="wm"><img class="bg px" src="${drawMap().toDataURL()}" alt="Mapa de Lumiara">${markers}
+      ${allDone ? `<button class="marker open next plaza" id="finale" style="left:50%;top:50%"><span class="pin">${SPR.img('estrela')} Grande final</span></button>` : ''}
+      ${prog < 1 ? `<img class="px map-nevoa" src="${SPR.url('nevoa')}" alt="" style="left:${60 - prog * 30}%;top:${36 + prog * 10}%;opacity:${.95 - prog * .5}">` : ''}
+      ${regs.filter(r => regionState(r.id) === 'locked').map((r, i) => `<img class="px map-fuma fumafly" src="${SPR.url('fumacinha')}" alt="" style="left:${DISTRICTS[r.id].mx - 4 + i}%;top:${DISTRICTS[r.id].my + 10}%;animation-delay:${i * .3}s">`).join('')}
+      <img class="px map-avatar" id="mav" src="${SPR.url(avatarOf())}" alt="Seu personagem">
+      <div class="compass" id="cmp" aria-hidden="true">▲</div></div>
+      <div class="map-banner" id="mbn"></div></div></div>`;
   wireHud();
-  let walking = false;
-  $$('[data-r]').forEach(m => m.onclick = () => {
-    const rid = m.dataset.r, st = regionState(rid); Audio8.sfx('click');
-    if (walking) return;
-    if (st === 'locked') { const prev = regs[regs.findIndex(r => r.id === rid) - 1]; toast(`A Névoa ainda cobre esta região. Termine o <b>${esc(prev.name)}</b> primeiro!`, 'nevoa'); Audio8.sfx('soft'); return; }
-    const av = $('#mav'), D = DISTRICTS[rid]; walking = true;
-    if (S.reduceMotion || !av) { G.lastRegion = rid; saveGame(); go(screenRegion, rid); return; }
-    const cur = parseFloat(av.style.left); av.classList.toggle('flip', D.mx < cur);
-    let f = 0; const t = setInterval(() => { f ^= 1; av.src = SPR.url(avatarOf(), f ? 'walk' : null); }, 120);
-    av.style.transitionDuration = '.75s'; av.style.left = D.mx + '%'; av.style.top = (D.my + 22) + '%';
-    setTimeout(() => { clearInterval(t); G.lastRegion = rid; saveGame(); go(screenRegion, rid); }, 800);
-  });
-  /* andar livremente pelo mapa */
-  const av = $('#mav'); const mp = { x: parseFloat(av.style.left), y: parseFloat(av.style.top) };
-  const nearRegion = () => { let best = null, bd = 1e9; for (const r of regs) { const D = DISTRICTS[r.id]; const d = Math.hypot(D.mx - mp.x, (D.my + 22 - mp.y) * .6); if (d < bd) { bd = d; best = r; } } return bd < 13 ? best : null; };
-  const showNear = () => {
-    const r = nearRegion(), msg = $('#near'), btn = $('.map-ctrl .dp[data-act]');
-    btn.disabled = !r;
-    msg.innerHTML = r ? `Você chegou em: <b>${esc(r.name)}</b>. ${regionState(r.id) === 'locked' ? 'A Névoa ainda cobre esta região.' : 'Toque em Entrar!'}` : 'Ande com o controle ou com as setas. Chegue perto de uma região e toque em Entrar.';
+  const world = $('#world'), wm = $('#wm'), av = $('#mav'), cmp = $('#cmp'), banner = $('#mbn');
+  const P = { x: start ? start.mx : 50, y: start ? Math.min(start.my + 29, 97) : 52 }, keys = {};
+  let tgt = null, entering = false, warned = {}, cam = null, f = 0, lastT = 0;
+  const size = () => { const r = world.getBoundingClientRect(); const W = Math.max(r.width * 1.8, r.height * 200 / 120 * 1.15); return { vw: r.width, vh: r.height, W, H: W * 120 / 200 }; };
+  let Z = size(); const onRs = () => { Z = size(); }; window.addEventListener('resize', onRs); onCleanup(() => window.removeEventListener('resize', onRs));
+  const doorOf = rid => ({ x: DISTRICTS[rid].mx, y: DISTRICTS[rid].my + 22 });
+  const goal = allDone ? { x: 50, y: 50 } : target ? doorOf(target.id) : null;
+  const enter = rid => {
+    if (entering) return; const st = regionState(rid);
+    if (st === 'locked') { if (!warned[rid]) { warned[rid] = 1; toast('Os Fumacinhas ainda cobrem este bairro! Primeiro termine o que está brilhando.', 'fumacinha'); Audio8.sfx('soft'); } return; }
+    const r = regs.find(x => x.id === rid); if (!r) return;
+    const m = r.plan.find(x => !G.done[x]);
+    if (!m) { if (!warned[rid]) { warned[rid] = 1; toast(`${esc(r.name)} já brilha de novo! ✓`, 'estrela'); } return; }
+    entering = true; Audio8.sfx('select'); banner.innerHTML = `Entrando em <b>${esc(r.name)}</b>...`; banner.classList.add('on');
+    setTimeout(() => { G.lastRegion = rid; G.current = { mission: m, step: 0 }; saveGame(); go(renderMission, m, 0); }, 700);
   };
-  let mf = 0, mt = null;
-  const mapMove = (dx, dy) => {
-    mp.x = clamp(mp.x + dx * 2.2, 3, 97); mp.y = clamp(mp.y + dy * 3.6, 12, 98);
-    av.style.transitionDuration = '.12s'; av.style.left = mp.x + '%'; av.style.top = mp.y + '%';
-    if (dx) av.classList.toggle('flip', dx < 0);
-    mf ^= 1; av.src = SPR.url(avatarOf(), mf ? 'walk' : null); clearTimeout(mt); mt = setTimeout(() => { av.src = SPR.url(avatarOf()); }, 220);
-    showNear();
-  };
-  const enter = () => { const r = nearRegion(); if (!r) return; const m = $(`.marker[data-r="${r.id}"]`); G.lastRegion = r.id; saveGame(); if (regionState(r.id) === 'locked') m.click(); else go(screenRegion, r.id); };
-  wireDpad($('.map-ctrl'), mapMove, enter);
-  const mapKey = e => {
-    if ($('#modal') || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
-    const m = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0], w: [0, -1], s: [0, 1], a: [-1, 0], d: [1, 0] }[e.key];
-    if (m) { e.preventDefault(); mapMove(...m); }
-    else if ((e.key === 'Enter' || e.key === ' ') && !document.activeElement.closest('button') && nearRegion()) { e.preventDefault(); enter(); }
-  };
-  document.addEventListener('keydown', mapKey); onCleanup(() => document.removeEventListener('keydown', mapKey));
-  showNear();
-  if (allDone) $('#finale').onclick = () => { G.current = { mission: '_finale' }; saveGame(); go(screenFinale); };
-  /* carta surpresa: depois de algumas missões */
-  const dc = doneCount();
-  if (dc > 0 && !allDone && dc % 2 === 1 && !G.surpriseAt.includes(dc)) { G.surpriseAt.push(dc); saveGame(); setTimeout(openSurprise, 700); }
+  const toWorld = e => { const r = wm.getBoundingClientRect(); return { x: clamp((e.clientX - r.left) / r.width * 100, 3, 97), y: clamp((e.clientY - r.top) / r.height * 100, 10, 98) }; };
+  /* tocar ou arrastar o dedo: o personagem vai até lá */
+  let dragging = false;
+  world.addEventListener('pointerdown', e => { if (e.target.closest('.marker')) return; dragging = true; tgt = toWorld(e); });
+  world.addEventListener('pointermove', e => { if (dragging) tgt = toWorld(e); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => world.addEventListener(ev, () => { dragging = false; }));
+  $$('.marker[data-r]', wm).forEach(m => m.onclick = () => { const rid = m.dataset.r; if (regionState(rid) === 'locked') return enter(rid); tgt = doorOf(rid); tgt.rid = rid; Audio8.sfx('click'); });
+  if ($('#finale')) $('#finale').onclick = () => { G.current = { mission: '_finale' }; saveGame(); go(screenFinale); };
+  /* teclado: setas ou WASD, sem precisar de botão */
+  const KM = { ArrowUp: 'u', ArrowDown: 'd', ArrowLeft: 'l', ArrowRight: 'r', w: 'u', s: 'd', a: 'l', d: 'r', W: 'u', S: 'd', A: 'l', D: 'r' };
+  const kd = e => { if ($('#modal') || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return; const k = KM[e.key]; if (k) { e.preventDefault(); keys[k] = true; tgt = null; } };
+  const ku = e => { const k = KM[e.key]; if (k) keys[k] = false; };
+  document.addEventListener('keydown', kd); document.addEventListener('keyup', ku);
+  onCleanup(() => { document.removeEventListener('keydown', kd); document.removeEventListener('keyup', ku); });
+  const loop = setInterval(() => {
+    if (entering) return;
+    let dx = (keys.r ? 1 : 0) - (keys.l ? 1 : 0), dy = (keys.d ? 1 : 0) - (keys.u ? 1 : 0);
+    if (!dx && !dy && tgt) { const ex = tgt.x - P.x, ey = (tgt.y - P.y) * .6, d = Math.hypot(ex, ey); if (d < .6) { if (tgt.rid) enter(tgt.rid); tgt = null; } else { dx = ex / d; dy = ey / d / .6; } }
+    const moving = !!(dx || dy);
+    if (moving) { const n = Math.hypot(dx, dy * .6) || 1; P.x = clamp(P.x + dx / n * .55, 3, 97); P.y = clamp(P.y + dy / n * .55 / .6 * .6, 10, 98); if (dx) av.classList.toggle('flip', dx < 0); }
+    if (moving && Date.now() - lastT > 120) { lastT = Date.now(); f ^= 1; av.src = SPR.url(avatarOf(), f ? 'walk' : null); } else if (!moving && f) { f = 0; av.src = SPR.url(avatarOf()); }
+    av.style.left = P.x + '%'; av.style.top = P.y + '%';
+    /* câmera segue o personagem */
+    const cx = clamp(Z.vw / 2 - P.x / 100 * Z.W, Z.vw - Z.W, 0), cy = clamp(Z.vh / 2 - P.y / 100 * Z.H, Z.vh - Z.H, 0);
+    cam = cam ? { x: cam.x + (cx - cam.x) * .18, y: cam.y + (cy - cam.y) * .18 } : { x: cx, y: cy };
+    wm.style.width = Z.W + 'px'; wm.style.height = Z.H + 'px'; wm.style.transform = `translate(${cam.x}px, ${cam.y}px)`;
+    /* chegou na porta de um bairro: entra sozinho */
+    for (const r of REGIONS) { const D = doorOf(r.id); if (Math.hypot(D.x - P.x, (D.y - P.y) * .6) < 2.4 && planOf(G)[r.id]) { enter(r.id); break; } }
+    if (allDone && Math.hypot(50 - P.x, (50 - P.y) * .6) < 3) { entering = true; $('#finale').click(); }
+    /* bússola apontando para o objetivo */
+    if (goal) { const ang = Math.atan2((goal.y - P.y) * .6, goal.x - P.x), far = Math.hypot(goal.x - P.x, (goal.y - P.y) * .6) > 7; cmp.style.left = P.x + '%'; cmp.style.top = (P.y - 7) + '%'; cmp.style.transform = `translate(-50%, -50%) rotate(${ang + Math.PI / 2}rad)`; cmp.style.opacity = far ? 1 : 0; }
+  }, 30);
+  onCleanup(() => clearInterval(loop));
+  /* primeira vez: mostra como andar */
+  if (!G.seen['tut:map']) { G.seen['tut:map'] = 1; saveGame(); setTimeout(() => { banner.innerHTML = matchMedia('(pointer: coarse)').matches ? 'Arraste o dedo para andar!' : 'Use as <b>setas</b> do teclado (ou clique) para andar!'; banner.classList.add('on'); setTimeout(() => banner.classList.remove('on'), 3200); if (matchMedia('(pointer: coarse)').matches && goal) demoTap($('.marker.next') || av, 0); }, 600); }
 }
 
 /* ---------------- REGIÃO ---------------- */
@@ -343,14 +378,14 @@ function renderMission(id, idx) {
   const M = MISSIONS[id], step = M.steps[idx], r = regionOf(id);
   if (!step) { finishMission(id); return; }
   /* menos cartas e leitura: no modo sozinho, o 'Quem sou eu?' fica só no Detetive; a associação some no Explorador */
-  if ((step.t === 'whoami' && G.mode === 'solo' && G.diff !== 'det') || (step.t === 'match' && G.diff === 'exp') || (step.t === 'reflect' && flowOn() && G.diff !== 'det') || (['match', 'sequence', 'sort', 'logic'].includes(step.t) && flowOn() && G.diff !== 'det' && !MISSIONS[id].bonus)) return renderMission(id, idx + 1);
+  if ((step.t === 'whoami' && G.mode === 'solo' && G.diff !== 'det') || (step.t === 'match' && G.diff === 'exp') || (step.t === 'reflect' && flowOn() && G.diff !== 'det') || (['match', 'sequence', 'sort', 'logic', 'choice', 'investigate', 'spot'].includes(step.t) && flowOn() && G.diff !== 'det' && !MISSIONS[id].bonus)) return renderMission(id, idx + 1);
   const prev = G.current && G.current.mission === id ? G.current : {};
   G.current = { mission: id, step: idx, mistakes: prev.mistakes || 0, hints: prev.hints || 0 }; saveGame();
   Audio8.music(r.music, progress());
   const revealIdx = M.steps.findIndex(s => s.t === 'reveal');
   const known = G.album.includes(M.char);
   const label = { dialog: 'História', investigate: 'Investigação', spot: 'Antes e depois', match: 'Associação', sequence: 'Sequência', sort: 'Separação', route: 'Rota', whoami: 'Quem sou eu?', reveal: 'Descoberta', choice: 'Decisão', reflect: 'Reflexão', thanks: 'Mural do Obrigado', mirror: 'A última carta', memory: 'Desafio extra · Memória', days: 'E se ninguém fizesse?', shift: 'Um turno com a Denise', tidy: 'Minijogo · Arruma-arruma', cook: 'Minijogo · Cozinha', fire: 'Minijogo · Apagar o fogo', catch: 'Minijogo · Pega-pega', boss: 'Batalha final', water: 'Minijogo · Caminho da água', cross: 'Minijogo · Travessia segura', power: 'Minijogo · De onde vem a luz', recycle: 'Minijogo · Centro de reciclagem', logic: 'Desafio extra · Lógica' }[step.t];
-  app().innerHTML = `<div class="screen">${hudHTML()}
+  app().innerHTML = `<div class="screen mission">${flowOn() ? hudMini() : hudHTML()}
     <div class="mhead"><div><div class="where">${esc(r.name)} · ${label}</div><h2>${esc(M.title)}</h2></div>
     <div class="dots" aria-label="Etapa ${idx + 1} de ${M.steps.length}">${M.steps.map((_, i) => `<i class="${i < idx ? 'done' : i === idx ? 'now' : ''}"></i>`).join('')}</div></div>
     <div class="stage" id="stage"></div></div>`;
@@ -369,7 +404,7 @@ function renderMission(id, idx) {
       const ms = { dialog: 0, choice: 5200, reveal: 9000, thanks: 0, mirror: 0, reflect: 0, days: 3200 }[step.t] ?? 2600;
       if (ms) autoNext(prim, ms, () => prim.click()); },
     setPrimary(t) { prim.innerHTML = `${esc(t)} ${ICON.next}`; },
-    mistake() { RUN.mistakes++; G.current.mistakes++; saveGame(); refreshHint(); },
+    mistake() { RUN.mistakes++; G.current.mistakes++; saveGame(); refreshHint(); heroTip(id, step, true); },
     usedHint() { if (!RUN.auto) { G.current.hints++; saveGame(); } },
     onTurn(fn) { RUN.turnFns.push(fn); },
     nextTurn() { if (isJuntos()) { G.turn++; saveGame(); updateTurnChip(); RUN.turnFns.forEach(f => f()); } },
@@ -394,6 +429,7 @@ function renderMission(id, idx) {
   onCleanup(() => clearTimeout(RUN && RUN.idle));
   RUN.ctrl = STEPS[step.t](step, ctx) || {};
   refreshHint(); resetIdle();
+  setTimeout(() => heroTip(id, step, false), 2200);
   /* primeira vez num tipo de etapa: a mãozinha mostra onde tocar */
   if (!G.seen['tut:' + step.t] && !['dialog', 'reveal', 'tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift', 'catch', 'boss'].includes(step.t)) {
     G.seen['tut:' + step.t] = 1; saveGame();
@@ -403,7 +439,11 @@ function renderMission(id, idx) {
   const say = () => RUN.ctrl.speak && Voice.speak(RUN.ctrl.speak());
   if ($('#say')) $('#say').onclick = () => { Audio8.init(); if (!S.voice) toast('A leitura em voz alta está desligada nas configurações.'); say(); };
   hintBtn.onclick = () => { if (RUN.ctrl.hint) { Audio8.sfx('select'); RUN.ctrl.hint(); } };
+  /* rede de segurança: se travar numa etapa, aparece "Pular" (nunca fica preso) */
+  const skipT = setTimeout(() => { if (RUN.done || !prim.isConnected) return; RUN.skipOk = true; prim.disabled = false; prim.classList.add('skip'); prim.innerHTML = `Pular ${ICON.next}`; }, step.t === 'dialog' || step.t === 'reveal' ? 25000 : 75000);
+  onCleanup(() => clearTimeout(skipT));
   prim.onclick = () => {
+    if (!RUN.done && RUN.skipOk) { Audio8.sfx('step'); G.current.hints++; saveGame(); advance(id, idx); return; }
     if (!RUN.done) return;
     if (RUN.ctrl.primary && RUN.ctrl.primary()) return;
     Audio8.sfx('step'); advance(id, idx);
@@ -421,6 +461,7 @@ function renderMission(id, idx) {
 }
 /* segue direto para a próxima missão do roteiro (sem passar pelo mapa) */
 function goNextMission() {
+  if (G.prologue && G.mode !== 'sala') { go(screenMap); return; }
   if (progress() >= 1) { G.current = { mission: '_finale' }; saveGame(); go(screenFinale); return; }
   const m = planMissions().find(x => !G.done[x]);
   if (!m) { go(screenMap); return; }
@@ -463,7 +504,7 @@ function screenReward(id, first, stars = 1, info = {}) {
       <div style="display:grid;gap:10px;max-width:420px;text-align:left">
         <div class="fact" style="color:var(--ink)"><p>Sem <b>${esc(c.name)}</b>, a cidade não funciona!</p></div>
         <div class="medal-row">${medalsHTML()}</div></div></div>
-    <div class="row center"><button class="btn primary big" id="go">${regionDone && first ? 'Continuar a história' : progress() >= 1 ? 'Ir para o grande final' : 'Próxima missão'} ${ICON.next}</button></div></div>`;
+    <div class="row center"><button class="btn primary big" id="go">${regionDone && first ? 'Continuar a história' : progress() >= 1 ? 'Ir para o grande final' : 'Voltar para a cidade'} ${ICON.next}</button></div></div>`;
   $('#go').onclick = () => {
     if (regionDone && first) { const rs = planRegions(); go(screenInterlude, r.id, rs.filter(x => regionState(x.id) === 'done').length, rs.length); }
     else goNextMission();
@@ -561,16 +602,4 @@ function openGuide() {
     <ol style="font-weight:700"><li>O que você descobriu hoje?</li><li>Qual trabalho você não tinha reparado antes?</li><li>Por que esse trabalho importa?</li><li>Como essa pessoa ajuda a comunidade?</li><li>Como podemos mostrar que reconhecemos esse trabalho?</li></ol>`, { label: 'Como jogar' });
 }
 
-/* mapa: botão grande 'Próxima missão' com a mãozinha mostrando */
-(function () {
-  const m0 = screenMap;
-  screenMap = function () {
-    m0();
-    if (!G || !G.prologue || !$('.mapwrap')) return;
-    const next = planMissions().find(x => !G.done[x]);
-    if (!next && progress() < 1) return;
-    setFoot(`<span class="grow"></span><button class="btn primary big" id="nextm">${next ? 'Próxima missão' : 'Grande final'} ${ICON.next}</button>`);
-    $('#nextm').onclick = () => { Audio8.sfx('select'); goNextMission(); };
-    setTimeout(() => typeof demoTap === 'function' && demoTap($('#nextm'), 0), 1200);
-  };
-})();
+

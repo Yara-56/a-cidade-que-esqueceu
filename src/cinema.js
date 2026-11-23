@@ -157,10 +157,11 @@ STEPS.days = function (step, ctx) {
       }
       busy = false;
       if (day >= last) finishRun();
-      else $('#pass', ctx.stage).innerHTML = `${ICON.next} Passar ${step.unit === 'Semana' ? 'mais uma semana' : 'mais um dia'}`;
+      else if ($('#pass', ctx.stage)) $('#pass', ctx.stage).innerHTML = `${ICON.next} Passar ${step.unit === 'Semana' ? 'mais uma semana' : 'mais um dia'}`;
     }, S.reduceMotion ? 0 : 420);
   };
   const finishRun = () => {
+    if (auto) { setTimeout(restore, 1300); return; }
     const right = guess === step.predict.answer;
     if (right) addMedal('curiosidade', 1, 'pred:' + ctx.id);
     feedback($('#fb', ctx.stage), right ? 'ok' : 'info', `<b class="kind">${right ? 'Seu palpite estava certo!' : 'Surpreendeu?'}</b>Você tinha dito: “${esc(step.predict.options[guess])}”. ${right ? 'Você pensou como um verdadeiro detetive.' : 'Muita coisa depende de um trabalho que quase ninguém vê.'}`, right ? 'estrela' : 'oculos');
@@ -181,7 +182,15 @@ STEPS.days = function (step, ctx) {
       ctx.complete();
     }, S.reduceMotion ? 0 : total);
   };
-  renderPredict();
+  /* minifilme automático: sem palpite e sem cliques, a semana passa sozinha e a pessoa volta */
+  const auto = flowOn();
+  if (auto) {
+    guess = step.predict.answer; phase = 'run'; renderRun();
+    ctx.stage.querySelector('.two').classList.add('daysfilm');
+    $('#ctl', ctx.stage).innerHTML = ''; const pr = $('.prompt p', ctx.stage); if (pr) pr.textContent = `${step.title}...`;
+    const iv = setInterval(() => { if (day >= last) return clearInterval(iv); passDay(); }, 1250);
+    onCleanup(() => clearInterval(iv));
+  } else renderPredict();
   return {
     speak: () => phase === 'predict' ? step.predict.q : step.title,
     hint() { ctx.usedHint(); if (phase === 'predict') feedback(ctx.stage.appendChild(document.createElement('div')), 'info', 'Pense: se esse trabalho parar, o que vai se acumulando dia após dia?', 'faisca'); else { const b = $('#pass', ctx.stage) || $('#back', ctx.stage); if (b) b.classList.add('hint-pulse'); } }

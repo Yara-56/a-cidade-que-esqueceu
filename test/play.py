@@ -27,7 +27,7 @@ AUTO = r"""
   if (t === 'reveal' && q('#curio') && window.__curK !== RUN.id) { window.__curK = RUN.id; q('#curio').click(); return 'curio'; }
   if (t === 'reflect' && q('#acc:not(:disabled)')) { click(q('#talk')); q('#acc').click(); return 'reflect'; }
   if (t === 'investigate' && qa('.hot:not(.found):not(.checked)').length) { const h = qa('.hot:not(.found):not(.checked)')[0]; h.click(); return 'investigate'; }
-  if (prim && !prim.disabled) { prim.click(); return 'next'; }
+  if (prim && !prim.disabled) { const sk = prim.classList.contains('skip'); prim.click(); return sk ? 'SKIPPED:' + t : 'next'; }
   window.__tries = window.__tries || {};
   const k = RUN.id + RUN.idx; window.__tries[k] = (window.__tries[k] || 0) + 1;
   if (window.__tries[k] > 80) return 'STUCK:' + t;
@@ -98,13 +98,13 @@ async def run(mode, count, diff, length, w, h, shots_prefix=None, shot_every=())
         pg = await ctx.new_page()
         errs = []
         pg.on('console', lambda m: errs.append(f'{m.type}: {m.text}') if m.type in ('error', 'warning') else None)
-        pg.on('pageerror', lambda e: errs.append(f'PAGEERROR: {e}'))
+        pg.on('pageerror', lambda e: errs.append(f'PAGEERROR: {e} {getattr(e, "stack", "")[:300]}'))
         await pg.goto('file:///home/claude/chk/index.html')
         await pg.evaluate("() => localStorage.clear()")
         await pg.reload()
         await setup(pg, mode, count, diff, length)
         log = []; n = 0; shot_i = 0
-        while n < 12000:
+        while n < int(os.environ.get("CAP", "12000")):
             r = await pg.evaluate(AUTO)
             n += 1
             log.append(r)

@@ -1122,6 +1122,67 @@ body::before { will-change: transform; }
 .amb.smell i { position: absolute; bottom: 0; width: 22%; height: 100%; border-left: 3px solid rgba(255, 255, 255, .85); border-radius: 50%; animation: smellup 2.6s ease-out infinite; opacity: 0; }
 .amb.smell i:nth-child(2) { left: 36%; animation-delay: .8s; } .amb.smell i:nth-child(3) { left: 70%; animation-delay: 1.6s; }
 @keyframes smellup { 0% { transform: translateY(20%) scaleY(.6) skewX(10deg); opacity: 0; } 30% { opacity: .9; } 100% { transform: translateY(-60%) scaleY(1.1) skewX(-14deg); opacity: 0; } }
+.daysfilm { grid-template-columns: 1fr !important; }
+.daysfilm .cons { display: none; }
+.daysfilm .scene { max-width: min(100%, calc((100dvh - 210px) * 16 / 9)); margin-inline: auto; }
+.daysfilm .dcap { display: block; }
+.daysfilm .dcap.show { opacity: 1; font-size: clamp(.9rem, 2.4vw, 1.4rem); bottom: 6%; }
+/* missão com tela limpa */
+.hud.mini { margin-bottom: 6px; gap: 8px; }
+.hud.mini .round { width: 44px; height: 44px; padding: 0; border-radius: 50%; display: grid; place-items: center; }
+.mission .mhead .where, .mission .mhead h2 { display: none; }
+.mission .mhead { display: none; }
+.mission { position: relative; }
+.pause, .gmenu { display: grid; gap: 10px; }
+.gmenu h2 { margin: 0 0 6px; text-align: center; }
+/* herói ajudante */
+.herotip { position: fixed; left: max(10px, env(safe-area-inset-left)); bottom: 84px; z-index: 50; display: flex; align-items: flex-end; gap: 6px; max-width: min(440px, 80vw); animation: tipin .45s cubic-bezier(.2, .9, .3, 1.3) both; pointer-events: none; }
+.herotip.out { animation: tipout .35s forwards; }
+.herotip > img.px { width: 58px; height: 87px; filter: drop-shadow(0 0 8px #fff1a8) drop-shadow(2px 3px 0 #0006); animation: bob 1.2s ease-in-out infinite; }
+.htb { background: var(--paper); border: 3px solid var(--ink); border-radius: 16px 16px 16px 4px; box-shadow: 3px 3px 0 var(--ink); padding: 6px 12px; display: grid; gap: 2px; margin-bottom: 30px; }
+.htb b { font-family: var(--title); font-size: .95rem; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.htb small { font-family: var(--body); font-size: .7rem; background: #2b2233; color: var(--glow); border-radius: 99px; padding: 1px 8px 1px 2px; display: inline-flex; align-items: center; }
+.htb small img.px { width: 14px; height: 14px; }
+.htb span { font-weight: 800; font-size: 1rem; }
+@keyframes tipin { from { transform: translateY(40px) scale(.7); opacity: 0; } }
+@keyframes tipout { to { transform: translateY(30px); opacity: 0; } }
+@media (orientation: landscape) and (max-height: 520px) { .herotip { bottom: 8px; } .herotip > img.px { width: 44px; height: 66px; } .htb span { font-size: .85rem; } }
+/* cidade andável */
+.citymap { display: grid; grid-template-rows: auto 1fr; height: calc(100dvh - 28px); gap: 6px; }
+.citymap .goal { display: inline-flex; align-items: center; gap: 6px; background: var(--paper); color: var(--ink); border: 3px solid var(--ink); border-radius: 99px; padding: 2px 14px 2px 4px; font-weight: 800; box-shadow: 3px 3px 0 var(--ink); }
+.citymap .goal img.px { width: 26px; height: 26px; }
+.world { position: relative; overflow: hidden; border: var(--bw) solid var(--ink); border-radius: 18px; box-shadow: 6px 6px 0 #0008; background: #6f8f5e; touch-action: none; cursor: pointer; }
+.world .mapwrap { position: absolute; left: 0; top: 0; aspect-ratio: auto; border: 0; border-radius: 0; box-shadow: none; transform-origin: 0 0; max-width: none !important; margin: 0 !important; }
+.world .map-avatar { width: 2.6%; transition: none; z-index: 6; }
+.world .marker .pin { font-size: 1.05rem; min-width: 0; }
+.world .marker.next .pin { background: var(--glow); animation: glowp 1.2s ease-in-out infinite; }
+.world .marker.next::after { content: '▼'; position: absolute; top: -34px; left: 50%; transform: translateX(-50%); color: var(--glow); font-size: 30px; text-shadow: 2px 2px 0 var(--ink); animation: bob 1s ease-in-out infinite; }
+.world .marker.locked .pin { opacity: .85; }
+.map-fuma { position: absolute; width: 3%; z-index: 3; pointer-events: none; }
+.compass { position: absolute; z-index: 7; color: var(--glow); font-size: 28px; text-shadow: 0 0 8px #f4c542, 2px 2px 0 var(--ink); pointer-events: none; transition: opacity .3s; }
+.map-banner { position: absolute; left: 50%; bottom: 8%; transform: translate(-50%, 20px); background: var(--paper); color: var(--ink); border: 3px solid var(--ink); border-radius: 16px; padding: 8px 18px; font-weight: 800; font-size: 1.15rem; box-shadow: 4px 4px 0 var(--ink); opacity: 0; transition: .3s; pointer-events: none; z-index: 9; }
+.map-banner.on { opacity: 1; transform: translate(-50%, 0); }
+.plaza .pin { background: var(--glow) !important; font-size: 1.3rem !important; }
+@media (orientation: landscape) and (max-height: 520px) { .citymap { height: calc(100dvh - 16px); } .world .marker .pin { font-size: .8rem; padding: 3px 8px; } }
+/* itens da arrumação: nome + cor do lugar certo */
+.mess-it { display: grid; justify-items: center; }
+.mess-it img.px { width: 100%; filter: drop-shadow(0 0 0 #fff) drop-shadow(2px 2px 0 #000a); }
+.mess-it .tag { margin-top: -4px; background: var(--bc, #fff); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 0 5px; font-weight: 900; font-size: clamp(.55rem, 1.3vw, .85rem); white-space: nowrap; box-shadow: 2px 2px 0 var(--ink); }
+.tbin { background: var(--bc, var(--paper)); }
+.btn.skip { background: #ddd; color: var(--ink); }
+.herotip { pointer-events: none; }
+/* início rápido */
+.quick { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.quick p { grid-column: 1 / -1; margin: 0; text-align: center; color: #fff; font-weight: 800; font-size: 1.1rem; }
+.qk { background: var(--qc) !important; color: var(--ink) !important; display: grid !important; justify-items: center; gap: 0; padding: 10px 6px !important; }
+.qk b { font-size: 1.4rem; } .qk small { font-weight: 700; opacity: .75; }
+.title-btns { width: min(520px, 100%) !important; }
+.title-art { width: min(100%, calc(46vh * 16 / 9)); }
+.title-wrap { gap: 12px; }
+.title-btns .row .btn.small { font-size: .85rem; padding: 6px 8px; white-space: nowrap; }
+.title-btns .row { flex-wrap: nowrap; }
+@media (orientation: landscape) and (max-height: 520px) { .quick .qk { padding: 6px 4px !important; } .qk b { font-size: 1.15rem; } .title-btns { gap: 8px !important; } .title-btns .btn:not(.qk) { padding: 5px 8px; font-size: .85rem; } .title-btns .btn img.px { width: 22px; height: 22px; } }
+@media (max-width: 560px) { .title-btns .row { flex-wrap: wrap; } .title-art { width: 100%; } .title-btns { width: 100% !important; } .qk b { font-size: 1.1rem; } .title-btns .btn.grow { min-width: 0; } }
 </style>
 </head>
 <body>
@@ -3834,7 +3895,26 @@ function wireHud(root = app()) {
     if (a === 'map') { G.current = G.current && G.current.mission ? G.current : null; saveGame(); go(screenMap); }
     if (a === 'album') openAlbum();
     if (a === 'settings') openSettings();
+    if (a === 'menu') openGameMenu();
   });
+}
+/* menu discreto durante a missão: deixa a tela limpa */
+function openGameMenu() {
+  modal(`<div class="gmenu"><h2>Pausa</h2>
+    <button class="btn primary big" data-close>${ICON.next} Continuar jogando</button>
+    <button class="btn big" id="gm-map">${ICON.map} Mapa da cidade</button>
+    <button class="btn big" id="gm-album">${ICON.book} Álbum de heróis</button>
+    <button class="btn big" id="gm-cfg">${ICON.gear} Configurações</button>
+    <button class="btn" id="gm-home">${ICON.home} Tela inicial</button></div>`, { label: 'Pausa' });
+  $('#gm-map').onclick = () => { closeModal(); G.current = null; saveGame(); go(screenMap); };
+  $('#gm-album').onclick = () => openAlbum();
+  $('#gm-cfg').onclick = () => openSettings();
+  $('#gm-home').onclick = () => { closeModal(); if (typeof NET !== 'undefined' && NET.on) { confirmBox('Sair da partida online?', 'Sair', () => { netReset(); go(screenTitle); }); return; } go(screenTitle); };
+}
+function hudMini() {
+  return `<div class="hud mini"><button class="btn small round" data-act="menu" data-local aria-label="Pausa e menu">${ICON.pause || '☰'}</button>
+    ${isJuntos() ? `<span class="turn" id="turn" aria-live="polite">${turnInner()}</span>` : ''}<span class="grow"></span>
+    <span class="energy" id="energy" title="Energia do Obrigado">${SPR.img('raio')}<b>${G.energy || 0}</b></span></div>`;
 }
 function turnInner() { return `<span class="dot" style="background:${player().color}"><img class="px" src="${SPR.url(avatarOf())}" alt=""></span>Vez de ${esc(player().name)}`; }
 function updateTurnChip() {
@@ -3853,10 +3933,12 @@ function screenTitle() {
       <img class="px nevoa" src="${SPR.url('nevoa')}" alt=""><img class="px faisca" src="${SPR.url('faisca')}" alt=""></div>
     <div class="title-btns">
       ${has ? `<button class="btn primary big" id="cont">${ICON.next} Continuar a aventura</button>` : ''}
-      <button class="btn ${has ? '' : 'primary'} big" id="new">${has ? 'Nova aventura' : 'Começar a aventura'}</button>
-      <div class="row" style="justify-content:stretch"><button class="btn grow" id="guide">${ICON.book} Como jogar</button><button class="btn grow" id="cfg">${ICON.gear} Configurações</button></div>
-      <button class="btn" id="online">${SPR.img('casa')} Jogar online com amigos</button>
-      <button class="btn" id="phone">${SPR.img('caderno')} Tenho um código de pista</button>
+      <div class="quick"><p>${has ? 'Ou comece de novo:' : 'Escolha e jogue!'}</p>
+        <button class="btn big qk" data-q="exp" style="--qc:#a5d97f"><b>Fácil</b><small>~5 min</small></button>
+        <button class="btn big qk" data-q="inv" style="--qc:#f4c542"><b>Médio</b><small>~12 min</small></button>
+        <button class="btn big qk" data-q="det" style="--qc:#e98bb0"><b>Difícil</b><small>~25 min</small></button></div>
+      <div class="row" style="justify-content:stretch"><button class="btn grow" id="online">${SPR.img('casa')} Jogar com amigos</button><button class="btn grow" id="new">${ICON.gear} Mais opções</button></div>
+      <div class="row" style="justify-content:stretch"><button class="btn grow small" id="guide">${ICON.book} Como jogar</button><button class="btn grow small" id="phone">${SPR.img('caderno')} Código</button><button class="btn grow small" id="cfg">${ICON.gear} Som</button></div>
     </div>
     <p class="title-foot">Funciona sem internet depois de carregado · O progresso fica salvo neste aparelho<br>Tema: profissões e sujeitos invisíveis</p></div>`;
   if (has) $('#cont').onclick = () => { Audio8.init(); Audio8.sfx('select'); applySettings(); resumeGame(); };
@@ -3865,6 +3947,11 @@ function screenTitle() {
     if (has) confirmBox('Começar uma nova aventura? O progresso atual será apagado.', 'Sim, começar de novo', () => go(screenSetup));
     else go(screenSetup);
   };
+  /* início rápido: um toque e já começa (personagem sorteado, pode trocar depois) */
+  const QK = { exp: 'short', inv: 'medium', det: 'full' };
+  const quick = d => { newGame({ mode: 'solo', players: [{ name: 'Você', color: PLAYER_COLORS[0], avatar: randomAvatar() }], diff: d, length: QK[d] }); go(screenPrologue, 0); };
+  $$('.qk').forEach(b => b.onclick = () => { Audio8.init(); Audio8.sfx('select'); const d = b.dataset.q;
+    if (has) confirmBox('Começar uma nova aventura? O progresso atual será apagado.', 'Sim, começar', () => quick(d)); else quick(d); });
   $('#guide').onclick = () => { Audio8.init(); openGuide(); };
   $('#phone').onclick = () => { Audio8.init(); go(screenPhoneClue); };
   $('#online').onclick = () => { Audio8.init(); go(screenOnline); };
@@ -4059,67 +4146,76 @@ function screenMap() {
   const prog = progress();
   Audio8.music({ root: 60, scale: 'maj', tempo: 90, wave: 'triangle' }, prog);
   const regs = planRegions(), allDone = prog >= 1;
-  const next = regs.find(r => regionState(r.id) === 'open');
+  const target = allDone ? null : regs.find(r => regionState(r.id) === 'open');
   const markers = REGIONS.map(r => {
     const D = DISTRICTS[r.id], st = planOf(G)[r.id] ? regionState(r.id) : 'off';
-    if (st === 'off') return `<div class="marker locked" style="left:${D.mx}%;top:${D.my}%"><span class="pin" style="opacity:.8">${esc(r.name)}<span class="st">Fica para outra partida</span></span></div>`;
-    const lab = { done: 'Restaurada ✓', open: 'Toque para explorar', locked: 'Coberta pela Névoa' }[st];
-    return `<button class="marker ${st}" data-r="${r.id}" style="left:${D.mx}%;top:${D.my}%" aria-label="${esc(r.name)}: ${lab}"><span class="pin">${esc(r.name)}<span class="st">${lab}</span></span></button>`;
+    const lab = st === 'done' ? ' ✓' : '';
+    return `<button class="marker ${st} ${target && target.id === r.id ? 'next' : ''}" data-r="${r.id}" style="left:${D.mx}%;top:${D.my}%" aria-label="${esc(r.name)}"><span class="pin">${esc(r.name)}${lab}</span></button>`;
   }).join('');
-  const fx = next ? DISTRICTS[next.id] : DISTRICTS.vila;
-  const say = allDone ? 'Todas as regiões estão iluminadas! Hora do grande final.' : next ? (doneCount() === 0 ? `Vamos começar pelo ${next.name}. Toque no nome da região!` : `Próxima parada: ${next.name}.`) : '';
-  app().innerHTML = `<div class="screen">${hudHTML()}
-    <div class="mapwrap"><img class="bg px" src="${drawMap().toDataURL()}" alt="Mapa de Lumiara com seis regiões">${markers}
-      <img class="px map-faisca" src="${SPR.url('faisca')}" alt="" style="left:${fx.mx}%;top:${fx.my + 8}%">
-      <img class="px map-avatar" id="mav" src="${SPR.url(avatarOf())}" alt="Seu personagem" style="left:${G.lastRegion ? DISTRICTS[G.lastRegion].mx : 50}%;top:${G.lastRegion ? DISTRICTS[G.lastRegion].my + 22 : 50}%">
-      ${prog < 1 ? `<img class="px map-nevoa" src="${SPR.url('nevoa')}" alt="" style="left:${60 - prog * 30}%;top:${36 + prog * 10}%;opacity:${.95 - prog * .5}">` : ''}</div>
-    <div class="map-ctrl">${dpadHTML('Entrar')}<p id="near" class="near-msg">Ande com o controle ou com as setas. Chegue perto de uma região e toque em Entrar.</p></div>
-    <div class="map-list">${planRegions().map(r => { const st = regionState(r.id); return `<button class="mitem ${st === 'done' ? 'done' : ''}" data-r="${r.id}" ${st === 'locked' ? 'aria-disabled="true"' : ''}><span class="rdot" style="background:${st === 'locked' ? '#b9b6c6' : r.color}"></span><span class="grow"><b>${esc(r.name)}</b><small>${{ done: 'Restaurada ✓', open: 'Toque para explorar', locked: 'Coberta pela Névoa' }[st]}</small></span>${st === 'locked' ? '' : ICON.next}</button>`; }).join('')}</div>
-    <div class="map-foot"><div class="say">${bubbleHTML('faisca', say)}</div>
-      ${allDone ? `<button class="btn primary big" id="finale">${SPR.img('estrela')} Grande final</button>` : ''}</div></div>`;
+  const start = G.lastRegion ? DISTRICTS[G.lastRegion] : null;
+  app().innerHTML = `<div class="screen citymap">
+    <div class="hud mini"><button class="btn small round" data-act="menu" data-local aria-label="Menu">${ICON.pause}</button>
+      ${target ? `<span class="goal">${SPR.img('faisca')} Vá até: <b>${esc(target.name)}</b></span>` : allDone ? `<span class="goal">${SPR.img('estrela')} Vá até a <b>Praça</b>!</span>` : ''}<span class="grow"></span>
+      <span class="energy" id="energy">${SPR.img('raio')}<b>${G.energy || 0}</b></span></div>
+    <div class="world" id="world"><div class="mapwrap" id="wm"><img class="bg px" src="${drawMap().toDataURL()}" alt="Mapa de Lumiara">${markers}
+      ${allDone ? `<button class="marker open next plaza" id="finale" style="left:50%;top:50%"><span class="pin">${SPR.img('estrela')} Grande final</span></button>` : ''}
+      ${prog < 1 ? `<img class="px map-nevoa" src="${SPR.url('nevoa')}" alt="" style="left:${60 - prog * 30}%;top:${36 + prog * 10}%;opacity:${.95 - prog * .5}">` : ''}
+      ${regs.filter(r => regionState(r.id) === 'locked').map((r, i) => `<img class="px map-fuma fumafly" src="${SPR.url('fumacinha')}" alt="" style="left:${DISTRICTS[r.id].mx - 4 + i}%;top:${DISTRICTS[r.id].my + 10}%;animation-delay:${i * .3}s">`).join('')}
+      <img class="px map-avatar" id="mav" src="${SPR.url(avatarOf())}" alt="Seu personagem">
+      <div class="compass" id="cmp" aria-hidden="true">▲</div></div>
+      <div class="map-banner" id="mbn"></div></div></div>`;
   wireHud();
-  let walking = false;
-  $$('[data-r]').forEach(m => m.onclick = () => {
-    const rid = m.dataset.r, st = regionState(rid); Audio8.sfx('click');
-    if (walking) return;
-    if (st === 'locked') { const prev = regs[regs.findIndex(r => r.id === rid) - 1]; toast(`A Névoa ainda cobre esta região. Termine o <b>${esc(prev.name)}</b> primeiro!`, 'nevoa'); Audio8.sfx('soft'); return; }
-    const av = $('#mav'), D = DISTRICTS[rid]; walking = true;
-    if (S.reduceMotion || !av) { G.lastRegion = rid; saveGame(); go(screenRegion, rid); return; }
-    const cur = parseFloat(av.style.left); av.classList.toggle('flip', D.mx < cur);
-    let f = 0; const t = setInterval(() => { f ^= 1; av.src = SPR.url(avatarOf(), f ? 'walk' : null); }, 120);
-    av.style.transitionDuration = '.75s'; av.style.left = D.mx + '%'; av.style.top = (D.my + 22) + '%';
-    setTimeout(() => { clearInterval(t); G.lastRegion = rid; saveGame(); go(screenRegion, rid); }, 800);
-  });
-  /* andar livremente pelo mapa */
-  const av = $('#mav'); const mp = { x: parseFloat(av.style.left), y: parseFloat(av.style.top) };
-  const nearRegion = () => { let best = null, bd = 1e9; for (const r of regs) { const D = DISTRICTS[r.id]; const d = Math.hypot(D.mx - mp.x, (D.my + 22 - mp.y) * .6); if (d < bd) { bd = d; best = r; } } return bd < 13 ? best : null; };
-  const showNear = () => {
-    const r = nearRegion(), msg = $('#near'), btn = $('.map-ctrl .dp[data-act]');
-    btn.disabled = !r;
-    msg.innerHTML = r ? `Você chegou em: <b>${esc(r.name)}</b>. ${regionState(r.id) === 'locked' ? 'A Névoa ainda cobre esta região.' : 'Toque em Entrar!'}` : 'Ande com o controle ou com as setas. Chegue perto de uma região e toque em Entrar.';
+  const world = $('#world'), wm = $('#wm'), av = $('#mav'), cmp = $('#cmp'), banner = $('#mbn');
+  const P = { x: start ? start.mx : 50, y: start ? Math.min(start.my + 29, 97) : 52 }, keys = {};
+  let tgt = null, entering = false, warned = {}, cam = null, f = 0, lastT = 0;
+  const size = () => { const r = world.getBoundingClientRect(); const W = Math.max(r.width * 1.8, r.height * 200 / 120 * 1.15); return { vw: r.width, vh: r.height, W, H: W * 120 / 200 }; };
+  let Z = size(); const onRs = () => { Z = size(); }; window.addEventListener('resize', onRs); onCleanup(() => window.removeEventListener('resize', onRs));
+  const doorOf = rid => ({ x: DISTRICTS[rid].mx, y: DISTRICTS[rid].my + 22 });
+  const goal = allDone ? { x: 50, y: 50 } : target ? doorOf(target.id) : null;
+  const enter = rid => {
+    if (entering) return; const st = regionState(rid);
+    if (st === 'locked') { if (!warned[rid]) { warned[rid] = 1; toast('Os Fumacinhas ainda cobrem este bairro! Primeiro termine o que está brilhando.', 'fumacinha'); Audio8.sfx('soft'); } return; }
+    const r = regs.find(x => x.id === rid); if (!r) return;
+    const m = r.plan.find(x => !G.done[x]);
+    if (!m) { if (!warned[rid]) { warned[rid] = 1; toast(`${esc(r.name)} já brilha de novo! ✓`, 'estrela'); } return; }
+    entering = true; Audio8.sfx('select'); banner.innerHTML = `Entrando em <b>${esc(r.name)}</b>...`; banner.classList.add('on');
+    setTimeout(() => { G.lastRegion = rid; G.current = { mission: m, step: 0 }; saveGame(); go(renderMission, m, 0); }, 700);
   };
-  let mf = 0, mt = null;
-  const mapMove = (dx, dy) => {
-    mp.x = clamp(mp.x + dx * 2.2, 3, 97); mp.y = clamp(mp.y + dy * 3.6, 12, 98);
-    av.style.transitionDuration = '.12s'; av.style.left = mp.x + '%'; av.style.top = mp.y + '%';
-    if (dx) av.classList.toggle('flip', dx < 0);
-    mf ^= 1; av.src = SPR.url(avatarOf(), mf ? 'walk' : null); clearTimeout(mt); mt = setTimeout(() => { av.src = SPR.url(avatarOf()); }, 220);
-    showNear();
-  };
-  const enter = () => { const r = nearRegion(); if (!r) return; const m = $(`.marker[data-r="${r.id}"]`); G.lastRegion = r.id; saveGame(); if (regionState(r.id) === 'locked') m.click(); else go(screenRegion, r.id); };
-  wireDpad($('.map-ctrl'), mapMove, enter);
-  const mapKey = e => {
-    if ($('#modal') || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
-    const m = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0], w: [0, -1], s: [0, 1], a: [-1, 0], d: [1, 0] }[e.key];
-    if (m) { e.preventDefault(); mapMove(...m); }
-    else if ((e.key === 'Enter' || e.key === ' ') && !document.activeElement.closest('button') && nearRegion()) { e.preventDefault(); enter(); }
-  };
-  document.addEventListener('keydown', mapKey); onCleanup(() => document.removeEventListener('keydown', mapKey));
-  showNear();
-  if (allDone) $('#finale').onclick = () => { G.current = { mission: '_finale' }; saveGame(); go(screenFinale); };
-  /* carta surpresa: depois de algumas missões */
-  const dc = doneCount();
-  if (dc > 0 && !allDone && dc % 2 === 1 && !G.surpriseAt.includes(dc)) { G.surpriseAt.push(dc); saveGame(); setTimeout(openSurprise, 700); }
+  const toWorld = e => { const r = wm.getBoundingClientRect(); return { x: clamp((e.clientX - r.left) / r.width * 100, 3, 97), y: clamp((e.clientY - r.top) / r.height * 100, 10, 98) }; };
+  /* tocar ou arrastar o dedo: o personagem vai até lá */
+  let dragging = false;
+  world.addEventListener('pointerdown', e => { if (e.target.closest('.marker')) return; dragging = true; tgt = toWorld(e); });
+  world.addEventListener('pointermove', e => { if (dragging) tgt = toWorld(e); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => world.addEventListener(ev, () => { dragging = false; }));
+  $$('.marker[data-r]', wm).forEach(m => m.onclick = () => { const rid = m.dataset.r; if (regionState(rid) === 'locked') return enter(rid); tgt = doorOf(rid); tgt.rid = rid; Audio8.sfx('click'); });
+  if ($('#finale')) $('#finale').onclick = () => { G.current = { mission: '_finale' }; saveGame(); go(screenFinale); };
+  /* teclado: setas ou WASD, sem precisar de botão */
+  const KM = { ArrowUp: 'u', ArrowDown: 'd', ArrowLeft: 'l', ArrowRight: 'r', w: 'u', s: 'd', a: 'l', d: 'r', W: 'u', S: 'd', A: 'l', D: 'r' };
+  const kd = e => { if ($('#modal') || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return; const k = KM[e.key]; if (k) { e.preventDefault(); keys[k] = true; tgt = null; } };
+  const ku = e => { const k = KM[e.key]; if (k) keys[k] = false; };
+  document.addEventListener('keydown', kd); document.addEventListener('keyup', ku);
+  onCleanup(() => { document.removeEventListener('keydown', kd); document.removeEventListener('keyup', ku); });
+  const loop = setInterval(() => {
+    if (entering) return;
+    let dx = (keys.r ? 1 : 0) - (keys.l ? 1 : 0), dy = (keys.d ? 1 : 0) - (keys.u ? 1 : 0);
+    if (!dx && !dy && tgt) { const ex = tgt.x - P.x, ey = (tgt.y - P.y) * .6, d = Math.hypot(ex, ey); if (d < .6) { if (tgt.rid) enter(tgt.rid); tgt = null; } else { dx = ex / d; dy = ey / d / .6; } }
+    const moving = !!(dx || dy);
+    if (moving) { const n = Math.hypot(dx, dy * .6) || 1; P.x = clamp(P.x + dx / n * .55, 3, 97); P.y = clamp(P.y + dy / n * .55 / .6 * .6, 10, 98); if (dx) av.classList.toggle('flip', dx < 0); }
+    if (moving && Date.now() - lastT > 120) { lastT = Date.now(); f ^= 1; av.src = SPR.url(avatarOf(), f ? 'walk' : null); } else if (!moving && f) { f = 0; av.src = SPR.url(avatarOf()); }
+    av.style.left = P.x + '%'; av.style.top = P.y + '%';
+    /* câmera segue o personagem */
+    const cx = clamp(Z.vw / 2 - P.x / 100 * Z.W, Z.vw - Z.W, 0), cy = clamp(Z.vh / 2 - P.y / 100 * Z.H, Z.vh - Z.H, 0);
+    cam = cam ? { x: cam.x + (cx - cam.x) * .18, y: cam.y + (cy - cam.y) * .18 } : { x: cx, y: cy };
+    wm.style.width = Z.W + 'px'; wm.style.height = Z.H + 'px'; wm.style.transform = `translate(${cam.x}px, ${cam.y}px)`;
+    /* chegou na porta de um bairro: entra sozinho */
+    for (const r of REGIONS) { const D = doorOf(r.id); if (Math.hypot(D.x - P.x, (D.y - P.y) * .6) < 2.4 && planOf(G)[r.id]) { enter(r.id); break; } }
+    if (allDone && Math.hypot(50 - P.x, (50 - P.y) * .6) < 3) { entering = true; $('#finale').click(); }
+    /* bússola apontando para o objetivo */
+    if (goal) { const ang = Math.atan2((goal.y - P.y) * .6, goal.x - P.x), far = Math.hypot(goal.x - P.x, (goal.y - P.y) * .6) > 7; cmp.style.left = P.x + '%'; cmp.style.top = (P.y - 7) + '%'; cmp.style.transform = `translate(-50%, -50%) rotate(${ang + Math.PI / 2}rad)`; cmp.style.opacity = far ? 1 : 0; }
+  }, 30);
+  onCleanup(() => clearInterval(loop));
+  /* primeira vez: mostra como andar */
+  if (!G.seen['tut:map']) { G.seen['tut:map'] = 1; saveGame(); setTimeout(() => { banner.innerHTML = matchMedia('(pointer: coarse)').matches ? 'Arraste o dedo para andar!' : 'Use as <b>setas</b> do teclado (ou clique) para andar!'; banner.classList.add('on'); setTimeout(() => banner.classList.remove('on'), 3200); if (matchMedia('(pointer: coarse)').matches && goal) demoTap($('.marker.next') || av, 0); }, 600); }
 }
 
 /* ---------------- REGIÃO ---------------- */
@@ -4151,14 +4247,14 @@ function renderMission(id, idx) {
   const M = MISSIONS[id], step = M.steps[idx], r = regionOf(id);
   if (!step) { finishMission(id); return; }
   /* menos cartas e leitura: no modo sozinho, o 'Quem sou eu?' fica só no Detetive; a associação some no Explorador */
-  if ((step.t === 'whoami' && G.mode === 'solo' && G.diff !== 'det') || (step.t === 'match' && G.diff === 'exp') || (step.t === 'reflect' && flowOn() && G.diff !== 'det') || (['match', 'sequence', 'sort', 'logic'].includes(step.t) && flowOn() && G.diff !== 'det' && !MISSIONS[id].bonus)) return renderMission(id, idx + 1);
+  if ((step.t === 'whoami' && G.mode === 'solo' && G.diff !== 'det') || (step.t === 'match' && G.diff === 'exp') || (step.t === 'reflect' && flowOn() && G.diff !== 'det') || (['match', 'sequence', 'sort', 'logic', 'choice', 'investigate', 'spot'].includes(step.t) && flowOn() && G.diff !== 'det' && !MISSIONS[id].bonus)) return renderMission(id, idx + 1);
   const prev = G.current && G.current.mission === id ? G.current : {};
   G.current = { mission: id, step: idx, mistakes: prev.mistakes || 0, hints: prev.hints || 0 }; saveGame();
   Audio8.music(r.music, progress());
   const revealIdx = M.steps.findIndex(s => s.t === 'reveal');
   const known = G.album.includes(M.char);
   const label = { dialog: 'História', investigate: 'Investigação', spot: 'Antes e depois', match: 'Associação', sequence: 'Sequência', sort: 'Separação', route: 'Rota', whoami: 'Quem sou eu?', reveal: 'Descoberta', choice: 'Decisão', reflect: 'Reflexão', thanks: 'Mural do Obrigado', mirror: 'A última carta', memory: 'Desafio extra · Memória', days: 'E se ninguém fizesse?', shift: 'Um turno com a Denise', tidy: 'Minijogo · Arruma-arruma', cook: 'Minijogo · Cozinha', fire: 'Minijogo · Apagar o fogo', catch: 'Minijogo · Pega-pega', boss: 'Batalha final', water: 'Minijogo · Caminho da água', cross: 'Minijogo · Travessia segura', power: 'Minijogo · De onde vem a luz', recycle: 'Minijogo · Centro de reciclagem', logic: 'Desafio extra · Lógica' }[step.t];
-  app().innerHTML = `<div class="screen">${hudHTML()}
+  app().innerHTML = `<div class="screen mission">${flowOn() ? hudMini() : hudHTML()}
     <div class="mhead"><div><div class="where">${esc(r.name)} · ${label}</div><h2>${esc(M.title)}</h2></div>
     <div class="dots" aria-label="Etapa ${idx + 1} de ${M.steps.length}">${M.steps.map((_, i) => `<i class="${i < idx ? 'done' : i === idx ? 'now' : ''}"></i>`).join('')}</div></div>
     <div class="stage" id="stage"></div></div>`;
@@ -4177,7 +4273,7 @@ function renderMission(id, idx) {
       const ms = { dialog: 0, choice: 5200, reveal: 9000, thanks: 0, mirror: 0, reflect: 0, days: 3200 }[step.t] ?? 2600;
       if (ms) autoNext(prim, ms, () => prim.click()); },
     setPrimary(t) { prim.innerHTML = `${esc(t)} ${ICON.next}`; },
-    mistake() { RUN.mistakes++; G.current.mistakes++; saveGame(); refreshHint(); },
+    mistake() { RUN.mistakes++; G.current.mistakes++; saveGame(); refreshHint(); heroTip(id, step, true); },
     usedHint() { if (!RUN.auto) { G.current.hints++; saveGame(); } },
     onTurn(fn) { RUN.turnFns.push(fn); },
     nextTurn() { if (isJuntos()) { G.turn++; saveGame(); updateTurnChip(); RUN.turnFns.forEach(f => f()); } },
@@ -4202,6 +4298,7 @@ function renderMission(id, idx) {
   onCleanup(() => clearTimeout(RUN && RUN.idle));
   RUN.ctrl = STEPS[step.t](step, ctx) || {};
   refreshHint(); resetIdle();
+  setTimeout(() => heroTip(id, step, false), 2200);
   /* primeira vez num tipo de etapa: a mãozinha mostra onde tocar */
   if (!G.seen['tut:' + step.t] && !['dialog', 'reveal', 'tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift', 'catch', 'boss'].includes(step.t)) {
     G.seen['tut:' + step.t] = 1; saveGame();
@@ -4211,7 +4308,11 @@ function renderMission(id, idx) {
   const say = () => RUN.ctrl.speak && Voice.speak(RUN.ctrl.speak());
   if ($('#say')) $('#say').onclick = () => { Audio8.init(); if (!S.voice) toast('A leitura em voz alta está desligada nas configurações.'); say(); };
   hintBtn.onclick = () => { if (RUN.ctrl.hint) { Audio8.sfx('select'); RUN.ctrl.hint(); } };
+  /* rede de segurança: se travar numa etapa, aparece "Pular" (nunca fica preso) */
+  const skipT = setTimeout(() => { if (RUN.done || !prim.isConnected) return; RUN.skipOk = true; prim.disabled = false; prim.classList.add('skip'); prim.innerHTML = `Pular ${ICON.next}`; }, step.t === 'dialog' || step.t === 'reveal' ? 25000 : 75000);
+  onCleanup(() => clearTimeout(skipT));
   prim.onclick = () => {
+    if (!RUN.done && RUN.skipOk) { Audio8.sfx('step'); G.current.hints++; saveGame(); advance(id, idx); return; }
     if (!RUN.done) return;
     if (RUN.ctrl.primary && RUN.ctrl.primary()) return;
     Audio8.sfx('step'); advance(id, idx);
@@ -4229,6 +4330,7 @@ function renderMission(id, idx) {
 }
 /* segue direto para a próxima missão do roteiro (sem passar pelo mapa) */
 function goNextMission() {
+  if (G.prologue && G.mode !== 'sala') { go(screenMap); return; }
   if (progress() >= 1) { G.current = { mission: '_finale' }; saveGame(); go(screenFinale); return; }
   const m = planMissions().find(x => !G.done[x]);
   if (!m) { go(screenMap); return; }
@@ -4271,7 +4373,7 @@ function screenReward(id, first, stars = 1, info = {}) {
       <div style="display:grid;gap:10px;max-width:420px;text-align:left">
         <div class="fact" style="color:var(--ink)"><p>Sem <b>${esc(c.name)}</b>, a cidade não funciona!</p></div>
         <div class="medal-row">${medalsHTML()}</div></div></div>
-    <div class="row center"><button class="btn primary big" id="go">${regionDone && first ? 'Continuar a história' : progress() >= 1 ? 'Ir para o grande final' : 'Próxima missão'} ${ICON.next}</button></div></div>`;
+    <div class="row center"><button class="btn primary big" id="go">${regionDone && first ? 'Continuar a história' : progress() >= 1 ? 'Ir para o grande final' : 'Voltar para a cidade'} ${ICON.next}</button></div></div>`;
   $('#go').onclick = () => {
     if (regionDone && first) { const rs = planRegions(); go(screenInterlude, r.id, rs.filter(x => regionState(x.id) === 'done').length, rs.length); }
     else goNextMission();
@@ -4369,19 +4471,7 @@ function openGuide() {
     <ol style="font-weight:700"><li>O que você descobriu hoje?</li><li>Qual trabalho você não tinha reparado antes?</li><li>Por que esse trabalho importa?</li><li>Como essa pessoa ajuda a comunidade?</li><li>Como podemos mostrar que reconhecemos esse trabalho?</li></ol>`, { label: 'Como jogar' });
 }
 
-/* mapa: botão grande 'Próxima missão' com a mãozinha mostrando */
-(function () {
-  const m0 = screenMap;
-  screenMap = function () {
-    m0();
-    if (!G || !G.prologue || !$('.mapwrap')) return;
-    const next = planMissions().find(x => !G.done[x]);
-    if (!next && progress() < 1) return;
-    setFoot(`<span class="grow"></span><button class="btn primary big" id="nextm">${next ? 'Próxima missão' : 'Grande final'} ${ICON.next}</button>`);
-    $('#nextm').onclick = () => { Audio8.sfx('select'); goNextMission(); };
-    setTimeout(() => typeof demoTap === 'function' && demoTap($('#nextm'), 0), 1200);
-  };
-})();
+
 
 /* ============================================================
    GRANDE FINAL — a Festa das Luzes
@@ -4667,10 +4757,11 @@ STEPS.days = function (step, ctx) {
       }
       busy = false;
       if (day >= last) finishRun();
-      else $('#pass', ctx.stage).innerHTML = `${ICON.next} Passar ${step.unit === 'Semana' ? 'mais uma semana' : 'mais um dia'}`;
+      else if ($('#pass', ctx.stage)) $('#pass', ctx.stage).innerHTML = `${ICON.next} Passar ${step.unit === 'Semana' ? 'mais uma semana' : 'mais um dia'}`;
     }, S.reduceMotion ? 0 : 420);
   };
   const finishRun = () => {
+    if (auto) { setTimeout(restore, 1300); return; }
     const right = guess === step.predict.answer;
     if (right) addMedal('curiosidade', 1, 'pred:' + ctx.id);
     feedback($('#fb', ctx.stage), right ? 'ok' : 'info', `<b class="kind">${right ? 'Seu palpite estava certo!' : 'Surpreendeu?'}</b>Você tinha dito: “${esc(step.predict.options[guess])}”. ${right ? 'Você pensou como um verdadeiro detetive.' : 'Muita coisa depende de um trabalho que quase ninguém vê.'}`, right ? 'estrela' : 'oculos');
@@ -4691,7 +4782,15 @@ STEPS.days = function (step, ctx) {
       ctx.complete();
     }, S.reduceMotion ? 0 : total);
   };
-  renderPredict();
+  /* minifilme automático: sem palpite e sem cliques, a semana passa sozinha e a pessoa volta */
+  const auto = flowOn();
+  if (auto) {
+    guess = step.predict.answer; phase = 'run'; renderRun();
+    ctx.stage.querySelector('.two').classList.add('daysfilm');
+    $('#ctl', ctx.stage).innerHTML = ''; const pr = $('.prompt p', ctx.stage); if (pr) pr.textContent = `${step.title}...`;
+    const iv = setInterval(() => { if (day >= last) return clearInterval(iv); passDay(); }, 1250);
+    onCleanup(() => clearInterval(iv));
+  } else renderPredict();
   return {
     speak: () => phase === 'predict' ? step.predict.q : step.title,
     hint() { ctx.usedHint(); if (phase === 'predict') feedback(ctx.stage.appendChild(document.createElement('div')), 'info', 'Pense: se esse trabalho parar, o que vai se acumulando dia após dia?', 'faisca'); else { const b = $('#pass', ctx.stage) || $('#back', ctx.stage); if (b) b.classList.add('hint-pulse'); } }
@@ -4882,6 +4981,8 @@ STEPS.tidy = function (step, ctx) {
     ['louca', 'pia'], ['xicara', 'pia'], ['prato', 'pia'],
     ['bola', 'caixa'], ['brinquedos', 'caixa'],
     ['livro', 'estante'], ['caderno', 'estante']];
+  const NAMES = { roupasuja: 'Camiseta suja', meia: 'Meia', louca: 'Panela', xicara: 'Xícara', prato: 'Prato', bola: 'Bola', brinquedos: 'Carrinho', livro: 'Livro', caderno: 'Caderno' };
+  const BC = { cesto: '#8fd6cf', pia: '#a5d97f', caixa: '#e98bb0', estante: '#f4c542' };
   const SPOTS = [[10, 62], [30, 70], [52, 66], [74, 72], [96, 64], [118, 70], [138, 62], [22, 50], [64, 56], [108, 54]];
   const n = G.diff === 'exp' ? 7 : 10;
   const spots = shuffle(SPOTS.slice());
@@ -4894,15 +4995,15 @@ STEPS.tidy = function (step, ctx) {
     <div class="scene tidyroom" id="room"><img class="bg px" src="${composeScene('sala').toDataURL()}" alt="Sala bagunçada">
       <div class="dust" id="dust"></div><div class="layer" id="lay"></div><div class="mgsay" id="say"></div></div>
     <div class="mgbar"><span>Bagunça</span><div class="bar"><i id="mess" style="width:100%"></i></div><b id="cmb"></b></div>
-    <div class="bins" id="bins">${BINS.map(b => `<button class="tbin" data-bin="${b.id}">${SPR.img(b.prop)}<span>${b.label}</span></button>`).join('')}</div>
+    <div class="bins" id="bins">${BINS.map(b => `<button class="tbin" data-bin="${b.id}" style="--bc:${BC[b.id]}">${SPR.img(b.prop)}<span>${b.label}</span></button>`).join('')}</div>
     <div class="folds" id="folds" hidden></div></div>`;
   wireSay(ctx.stage, () => phase === 'tidy' ? 'Arruma-arruma! Toque num objeto e depois no lugar certo dele.' : 'Agora dobre as camisetas! Toque três vezes em cada uma.');
   const lay = $('#lay', ctx.stage), room = $('#room', ctx.stage), say = $('#say', ctx.stage);
   items.forEach(it => {
     const b = document.createElement('button'); b.className = 'mess-it'; b.dataset.it = it.k;
-    b.style.left = pct(it.x - 6, SW); b.style.top = pct(it.y - 8, SH); b.style.width = pct(15, SW);
+    b.style.left = pct(it.x - 6, SW); b.style.top = pct(it.y - 8, SH); b.style.width = pct(19, SW); b.style.setProperty('--bc', BC[it.bin]);
     b.style.animationDelay = (it.k * .07) + 's';
-    b.innerHTML = SPR.img(it.prop); b.setAttribute('aria-label', 'Objeto bagunçado');
+    b.innerHTML = SPR.img(it.prop) + `<span class="tag">${NAMES[it.prop] || ''}</span>`; b.setAttribute('aria-label', NAMES[it.prop] || 'Objeto');
     lay.appendChild(b); it.el = b;
     b.onclick = () => { if (it.done || phase !== 'tidy' || (b._dragged && Date.now() - b._dragged < 400)) return; ctx.activity(); Audio8.sfx('select'); if (sel) sel.el.classList.remove('sel'); sel = it; b.classList.add('sel'); $('#bins', ctx.stage).classList.add('ready'); };
   });
@@ -5707,6 +5808,37 @@ STEPS.boss = function (step, ctx) {
     autoStep() { if (done) return; if (charge > 0) $('#throw', ctx.stage).click(); else { const f = fumas.find(x => !x.gone); if (f) f.el.click(); } }
   };
 };
+
+/* ============================================================
+   HERÓI AJUDANTE: o próprio trabalhador aparece dando dicas
+   (no começo do minijogo e quando a criança tropeça)
+   ============================================================ */
+const HERO_TIPS = {
+  tidy: ['Roupa suja vai no cesto!', 'Louça e xícara: pia!', 'Bola e brinquedos: na caixa!', 'Livro e caderno: estante!'],
+  cook: ['Primeiro a gente lava o arroz!', 'Fogo só com um adulto, combinado?', 'O dobro de água: 2 copos para 1 de arroz!'],
+  fire: ['Liga a mangueira no hidrante primeiro!', 'Mira nas chamas que estão crescendo!'],
+  water: ['Siga a etapa que está brilhando!', 'Só uma gotinha de cloro, viu?'],
+  cross: ['Esperou as crianças chegarem? Agora: PARE!', 'Só libera os carros com a faixa vazia!'],
+  power: ['Abre a comporta: a água gira a turbina!', 'Siga o fio de torre em torre!', 'O sol também vira energia!'],
+  recycle: ['Papel azul, plástico vermelho, metal amarelo, vidro verde!', 'Bateria nunca vai no lixo comum!'],
+  catch: ['Arraste para os lados e pegue com a cesta!', 'Cuidado com os Fumacinhas!'],
+  shift: ['Chegue perto do lixo para varrer!', 'Carrinho cheio? Esvazie na lixeira grande!'],
+  route: ['Remédio é urgente: entregue primeiro!', 'Desvie da obra e da rua alagada!'],
+  boss: ['Estoure os Fumacinhas para ganhar energia!', 'Toque em OBRIGADO para atacar!']
+};
+function heroTip(id, step, err) {
+  const tips = HERO_TIPS[step.t]; if (!tips || !document.body.contains($('#stage'))) return;
+  const who = (MISSIONS[id] && MISSIONS[id].char) || 'faisca';
+  RUN.tipK = (RUN.tipK || 0) + (err ? 1 : 0);
+  if (err && RUN.tipT && Date.now() - RUN.tipT < 2500) return; RUN.tipT = Date.now();
+  const tip = tips[RUN.tipK % tips.length], name = who === 'faisca' ? 'Faísca' : CHARACTERS[who].name, pw = POWERS[who];
+  let el = $('#herotip'); if (el) el.remove();
+  el = document.createElement('div'); el.id = 'herotip'; el.className = 'herotip';
+  el.innerHTML = `<img class="px" src="${SPR.url(who)}" alt=""><div class="htb"><b>${esc(name)}${pw ? ` <small>${SPR.img('raio')} ${esc(pw)}</small>` : ''}</b><span>${esc(tip)}</span></div>`;
+  $('#stage').appendChild(el); Audio8.sfx('page');
+  clearTimeout(RUN.tipTo); RUN.tipTo = setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 400); }, err ? 3200 : 4200);
+  onCleanup(() => el.remove());
+}
 
 /* ============================================================
    JOGAR ONLINE — cada um na sua casa, na mesma partida

@@ -147,3 +147,34 @@ STEPS.boss = function (step, ctx) {
     autoStep() { if (done) return; if (charge > 0) $('#throw', ctx.stage).click(); else { const f = fumas.find(x => !x.gone); if (f) f.el.click(); } }
   };
 };
+
+/* ============================================================
+   HERÓI AJUDANTE: o próprio trabalhador aparece dando dicas
+   (no começo do minijogo e quando a criança tropeça)
+   ============================================================ */
+const HERO_TIPS = {
+  tidy: ['Roupa suja vai no cesto!', 'Louça e xícara: pia!', 'Bola e brinquedos: na caixa!', 'Livro e caderno: estante!'],
+  cook: ['Primeiro a gente lava o arroz!', 'Fogo só com um adulto, combinado?', 'O dobro de água: 2 copos para 1 de arroz!'],
+  fire: ['Liga a mangueira no hidrante primeiro!', 'Mira nas chamas que estão crescendo!'],
+  water: ['Siga a etapa que está brilhando!', 'Só uma gotinha de cloro, viu?'],
+  cross: ['Esperou as crianças chegarem? Agora: PARE!', 'Só libera os carros com a faixa vazia!'],
+  power: ['Abre a comporta: a água gira a turbina!', 'Siga o fio de torre em torre!', 'O sol também vira energia!'],
+  recycle: ['Papel azul, plástico vermelho, metal amarelo, vidro verde!', 'Bateria nunca vai no lixo comum!'],
+  catch: ['Arraste para os lados e pegue com a cesta!', 'Cuidado com os Fumacinhas!'],
+  shift: ['Chegue perto do lixo para varrer!', 'Carrinho cheio? Esvazie na lixeira grande!'],
+  route: ['Remédio é urgente: entregue primeiro!', 'Desvie da obra e da rua alagada!'],
+  boss: ['Estoure os Fumacinhas para ganhar energia!', 'Toque em OBRIGADO para atacar!']
+};
+function heroTip(id, step, err) {
+  const tips = HERO_TIPS[step.t]; if (!tips || !document.body.contains($('#stage'))) return;
+  const who = (MISSIONS[id] && MISSIONS[id].char) || 'faisca';
+  RUN.tipK = (RUN.tipK || 0) + (err ? 1 : 0);
+  if (err && RUN.tipT && Date.now() - RUN.tipT < 2500) return; RUN.tipT = Date.now();
+  const tip = tips[RUN.tipK % tips.length], name = who === 'faisca' ? 'Faísca' : CHARACTERS[who].name, pw = POWERS[who];
+  let el = $('#herotip'); if (el) el.remove();
+  el = document.createElement('div'); el.id = 'herotip'; el.className = 'herotip';
+  el.innerHTML = `<img class="px" src="${SPR.url(who)}" alt=""><div class="htb"><b>${esc(name)}${pw ? ` <small>${SPR.img('raio')} ${esc(pw)}</small>` : ''}</b><span>${esc(tip)}</span></div>`;
+  $('#stage').appendChild(el); Audio8.sfx('page');
+  clearTimeout(RUN.tipTo); RUN.tipTo = setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 400); }, err ? 3200 : 4200);
+  onCleanup(() => el.remove());
+}

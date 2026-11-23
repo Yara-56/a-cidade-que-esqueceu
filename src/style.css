@@ -1114,3 +1114,64 @@ body::before { will-change: transform; }
 .amb.smell i { position: absolute; bottom: 0; width: 22%; height: 100%; border-left: 3px solid rgba(255, 255, 255, .85); border-radius: 50%; animation: smellup 2.6s ease-out infinite; opacity: 0; }
 .amb.smell i:nth-child(2) { left: 36%; animation-delay: .8s; } .amb.smell i:nth-child(3) { left: 70%; animation-delay: 1.6s; }
 @keyframes smellup { 0% { transform: translateY(20%) scaleY(.6) skewX(10deg); opacity: 0; } 30% { opacity: .9; } 100% { transform: translateY(-60%) scaleY(1.1) skewX(-14deg); opacity: 0; } }
+.daysfilm { grid-template-columns: 1fr !important; }
+.daysfilm .cons { display: none; }
+.daysfilm .scene { max-width: min(100%, calc((100dvh - 210px) * 16 / 9)); margin-inline: auto; }
+.daysfilm .dcap { display: block; }
+.daysfilm .dcap.show { opacity: 1; font-size: clamp(.9rem, 2.4vw, 1.4rem); bottom: 6%; }
+/* missão com tela limpa */
+.hud.mini { margin-bottom: 6px; gap: 8px; }
+.hud.mini .round { width: 44px; height: 44px; padding: 0; border-radius: 50%; display: grid; place-items: center; }
+.mission .mhead .where, .mission .mhead h2 { display: none; }
+.mission .mhead { display: none; }
+.mission { position: relative; }
+.pause, .gmenu { display: grid; gap: 10px; }
+.gmenu h2 { margin: 0 0 6px; text-align: center; }
+/* herói ajudante */
+.herotip { position: fixed; left: max(10px, env(safe-area-inset-left)); bottom: 84px; z-index: 50; display: flex; align-items: flex-end; gap: 6px; max-width: min(440px, 80vw); animation: tipin .45s cubic-bezier(.2, .9, .3, 1.3) both; pointer-events: none; }
+.herotip.out { animation: tipout .35s forwards; }
+.herotip > img.px { width: 58px; height: 87px; filter: drop-shadow(0 0 8px #fff1a8) drop-shadow(2px 3px 0 #0006); animation: bob 1.2s ease-in-out infinite; }
+.htb { background: var(--paper); border: 3px solid var(--ink); border-radius: 16px 16px 16px 4px; box-shadow: 3px 3px 0 var(--ink); padding: 6px 12px; display: grid; gap: 2px; margin-bottom: 30px; }
+.htb b { font-family: var(--title); font-size: .95rem; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.htb small { font-family: var(--body); font-size: .7rem; background: #2b2233; color: var(--glow); border-radius: 99px; padding: 1px 8px 1px 2px; display: inline-flex; align-items: center; }
+.htb small img.px { width: 14px; height: 14px; }
+.htb span { font-weight: 800; font-size: 1rem; }
+@keyframes tipin { from { transform: translateY(40px) scale(.7); opacity: 0; } }
+@keyframes tipout { to { transform: translateY(30px); opacity: 0; } }
+@media (orientation: landscape) and (max-height: 520px) { .herotip { bottom: 8px; } .herotip > img.px { width: 44px; height: 66px; } .htb span { font-size: .85rem; } }
+/* cidade andável */
+.citymap { display: grid; grid-template-rows: auto 1fr; height: calc(100dvh - 28px); gap: 6px; }
+.citymap .goal { display: inline-flex; align-items: center; gap: 6px; background: var(--paper); color: var(--ink); border: 3px solid var(--ink); border-radius: 99px; padding: 2px 14px 2px 4px; font-weight: 800; box-shadow: 3px 3px 0 var(--ink); }
+.citymap .goal img.px { width: 26px; height: 26px; }
+.world { position: relative; overflow: hidden; border: var(--bw) solid var(--ink); border-radius: 18px; box-shadow: 6px 6px 0 #0008; background: #6f8f5e; touch-action: none; cursor: pointer; }
+.world .mapwrap { position: absolute; left: 0; top: 0; aspect-ratio: auto; border: 0; border-radius: 0; box-shadow: none; transform-origin: 0 0; max-width: none !important; margin: 0 !important; }
+.world .map-avatar { width: 2.6%; transition: none; z-index: 6; }
+.world .marker .pin { font-size: 1.05rem; min-width: 0; }
+.world .marker.next .pin { background: var(--glow); animation: glowp 1.2s ease-in-out infinite; }
+.world .marker.next::after { content: '▼'; position: absolute; top: -34px; left: 50%; transform: translateX(-50%); color: var(--glow); font-size: 30px; text-shadow: 2px 2px 0 var(--ink); animation: bob 1s ease-in-out infinite; }
+.world .marker.locked .pin { opacity: .85; }
+.map-fuma { position: absolute; width: 3%; z-index: 3; pointer-events: none; }
+.compass { position: absolute; z-index: 7; color: var(--glow); font-size: 28px; text-shadow: 0 0 8px #f4c542, 2px 2px 0 var(--ink); pointer-events: none; transition: opacity .3s; }
+.map-banner { position: absolute; left: 50%; bottom: 8%; transform: translate(-50%, 20px); background: var(--paper); color: var(--ink); border: 3px solid var(--ink); border-radius: 16px; padding: 8px 18px; font-weight: 800; font-size: 1.15rem; box-shadow: 4px 4px 0 var(--ink); opacity: 0; transition: .3s; pointer-events: none; z-index: 9; }
+.map-banner.on { opacity: 1; transform: translate(-50%, 0); }
+.plaza .pin { background: var(--glow) !important; font-size: 1.3rem !important; }
+@media (orientation: landscape) and (max-height: 520px) { .citymap { height: calc(100dvh - 16px); } .world .marker .pin { font-size: .8rem; padding: 3px 8px; } }
+/* itens da arrumação: nome + cor do lugar certo */
+.mess-it { display: grid; justify-items: center; }
+.mess-it img.px { width: 100%; filter: drop-shadow(0 0 0 #fff) drop-shadow(2px 2px 0 #000a); }
+.mess-it .tag { margin-top: -4px; background: var(--bc, #fff); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 0 5px; font-weight: 900; font-size: clamp(.55rem, 1.3vw, .85rem); white-space: nowrap; box-shadow: 2px 2px 0 var(--ink); }
+.tbin { background: var(--bc, var(--paper)); }
+.btn.skip { background: #ddd; color: var(--ink); }
+.herotip { pointer-events: none; }
+/* início rápido */
+.quick { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.quick p { grid-column: 1 / -1; margin: 0; text-align: center; color: #fff; font-weight: 800; font-size: 1.1rem; }
+.qk { background: var(--qc) !important; color: var(--ink) !important; display: grid !important; justify-items: center; gap: 0; padding: 10px 6px !important; }
+.qk b { font-size: 1.4rem; } .qk small { font-weight: 700; opacity: .75; }
+.title-btns { width: min(520px, 100%) !important; }
+.title-art { width: min(100%, calc(46vh * 16 / 9)); }
+.title-wrap { gap: 12px; }
+.title-btns .row .btn.small { font-size: .85rem; padding: 6px 8px; white-space: nowrap; }
+.title-btns .row { flex-wrap: nowrap; }
+@media (orientation: landscape) and (max-height: 520px) { .quick .qk { padding: 6px 4px !important; } .qk b { font-size: 1.15rem; } .title-btns { gap: 8px !important; } .title-btns .btn:not(.qk) { padding: 5px 8px; font-size: .85rem; } .title-btns .btn img.px { width: 22px; height: 22px; } }
+@media (max-width: 560px) { .title-btns .row { flex-wrap: wrap; } .title-art { width: 100%; } .title-btns { width: 100% !important; } .qk b { font-size: 1.1rem; } .title-btns .btn.grow { min-width: 0; } }
