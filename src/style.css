@@ -1337,3 +1337,7 @@ html.flowfoot #app { padding: 8px 10px 10px !important; }
 .footbar.cutfoot #nx { width: 62px; height: 62px; min-height: 0; padding: 0; border-radius: 50%; display: grid; place-items: center; }
 .footbar.cutfoot #nx.lastbtn { width: auto; height: auto; border-radius: 99px; padding: 10px 22px; display: inline-flex; font-size: 1.15rem; animation: pulse 1s infinite; }
 .footbar.cutfoot #skip { background: #1b2142cc; border-radius: 99px; padding: 6px 14px; font-size: .9rem; min-height: 0; }
+.mg.bossg, html:not(.arrows) .mg.catchg { grid-template-columns: minmax(0, 1fr) !important; }
+.mg.bossg .bossbar { display: none; }
+.mg.bossg .scene.jobscene, .mg.catchg .scene.jobscene { max-width: min(100%, calc((100dvh - 130px) * 16 / 9)) !important; }
+@media (orientation: landscape) and (max-height: 520px) { .mg.bossg .scene.jobscene, .mg.catchg .scene.jobscene { max-width: calc((100dvh - 60px) * 16 / 9) !important; } }

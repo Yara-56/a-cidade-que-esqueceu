@@ -105,7 +105,7 @@ function screenEnding() {
     <div class="teaser"><span class="tag">Continua...</span><h2>Só no Brasil, são mais de 2.600 ocupações reconhecidas.</h2>
       <p>Quantas você conhece? Lumiara ainda guarda muita gente esperando para ser lembrada:</p>
       <div class="row center">${[['costureira', 'Quem costurou a sua roupa?'], ['motorista', 'Quem dirige o seu ônibus?'], ['pedreiro', 'Quem levantou a sua casa?'], ['caixa', 'Quem passa as suas compras?']].map(([k, q], i) => `<div class="mystery"><div class="sil">${SPR.img(['theo', 'bia', 'davi', 'iara'][i], 'sil')}<b>?</b></div><small>${q}</small></div>`).join('')}</div>
-      ${met < total ? `<p style="font-weight:800;margin:6px 0 0">E ainda faltam ${total - met} pessoas desta cidade no seu álbum. Que tal a versão Difícil?</p>` : ''}</div>
+      ${met < total ? `<p style="font-weight:800;margin:6px 0 0">E ainda faltam ${total - met} pessoas de Lumiara no seu álbum: toque em <b>Conhecer mais gente da cidade</b>!</p>` : ''}</div>
     <div class="row center"><button class="btn big" id="alb">${ICON.book} Ver o álbum</button><button class="btn big" id="map">${ICON.map} Passear pelo mapa</button>${G.plan && Object.values(G.plan).flat().length < 15 ? `<button class="btn primary big" id="more">${ICON.map} Conhecer mais gente da cidade</button>` : ''}<button class="btn big" id="again">Jogar de novo</button></div></div>`;
   $('#alb').onclick = openAlbum;
   $('#map').onclick = () => go(screenMap);
