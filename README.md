@@ -74,3 +74,11 @@ Teste local: `npx peer --port 9000` e abra o jogo com `?peer=127.0.0.1:9000`.
 
 ## Vida na cidade
 Vira-lata caramelo patrulhando a rua, bicicletas, carros, passarinhos e um cachorro dormindo na sala — animações leves em cada cenário.
+
+## Minijogos
+- **Arruma-arruma (Dona Cida):** tocar no objeto bagunçado e depois no lugar dele (combo!), e dobrar camisetas com 3 toques.
+- **Cozinha do Seu Zé:** escolher os ingredientes certos e seguir a receita real de arroz (2 de água para 1 de arroz), com aviso de usar o fogão só com um adulto.
+
+## Visitar a cidade de um amigo (sem servidor)
+Em **Mandar minha cidade** (título ou álbum), o progresso vira um código de 13 letras e um link. Quem abre o link vê a cidade do amigo, o personagem dele passeando, o álbum e a comparação ("vocês dois já conhecem...", "ele já achou e você ainda não..."). Nenhum dado pessoal vai para servidor.
+Próximo passo possível: servidor (Firebase/Supabase) com lista de amigos — exige login e autorização dos responsáveis (LGPD).
