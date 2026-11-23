@@ -154,18 +154,17 @@ const MISSIONS = {
   /* ===== BAIRRO DAS CASAS ===== */
   cida: { title: 'A casa que se arruma sozinha?', char: 'cida', steps: [
     { t: 'dialog', scene: 'sala', cast: [{ id: 'theo', x: 70, y: 52 }], lines: [
-      { who: 'theo', text: 'Todo dia eu chego da escola e a casa está arrumadinha. A roupa limpa aparece na gaveta!' },
-      { who: 'theo', text: 'Acho que esta casa se arruma sozinha. Deve ser mágica!' },
-      { who: 'faisca', text: 'Sozinha? Hmm... Vamos procurar pistas. Detetives olham com atenção!' }] },
-    { t: 'investigate', scene: 'sala', need: 4, prompt: 'Encontre sinais de que alguém trabalhou nesta casa hoje.',
+      { who: 'theo', text: 'A casa fica arrumadinha sozinha?!' },
+      { who: 'faisca', text: 'Sozinha? Hmm... Vamos investigar!' }] },
+    { t: 'investigate', scene: 'sala', need: 4, prompt: 'Ache as pistas: quem trabalhou aqui?',
       items: [
-        { prop: 'roupa', x: 56, y: 35, clue: true, label: 'Roupas dobradas', text: 'Roupas lavadas, secas e dobradas. Isso leva horas de trabalho!' },
-        { prop: 'panela', x: 115, y: 24, clue: true, label: 'Panela no fogão', text: 'Feijão cozinhando! Alguém preparou o almoço da família.' },
-        { prop: 'planta', x: 22, y: 46, clue: true, label: 'Planta regada', text: 'A terra do vaso ainda está molhada. Alguém regou a planta hoje.' },
-        { prop: 'brinquedos', x: 96, y: 62, clue: true, label: 'Brinquedos guardados', text: 'Os brinquedos estavam espalhados de manhã. Agora estão guardados na caixa.' },
-        { prop: 'balde', x: 138, y: 66, clue: true, label: 'Balde e pano', text: 'O chão foi limpo há pouco tempo: o balde e o pano ainda estão aqui.', level: 'det' },
-        { prop: 'gato', x: 58, y: 66, clue: false, label: 'Gato Pipoca', text: 'É o Pipoca, dormindo. Com certeza não foi ele quem arrumou a casa!' },
-        { x: 60, y: 14, w: 22, h: 16, clue: false, label: 'Quadro', text: 'Um quadro bonito, mas está só pendurado aí. Nada mudou nele.' }] },
+        { prop: 'roupa', x: 56, y: 35, clue: true, label: 'Roupas dobradas', text: 'Lavadas, secas e dobradas: horas de trabalho!' },
+        { prop: 'panela', x: 115, y: 24, clue: true, label: 'Panela no fogão', text: 'Feijão no fogo! Alguém fez o almoço.' },
+        { prop: 'planta', x: 22, y: 46, clue: true, label: 'Planta regada', text: 'Terra molhada: alguém regou hoje!' },
+        { prop: 'brinquedos', x: 96, y: 62, clue: true, label: 'Brinquedos guardados', text: 'Estavam no chão. Agora, guardadinhos!' },
+        { prop: 'balde', x: 138, y: 66, clue: true, label: 'Balde e pano', text: 'Chão limpinho agora há pouco!', level: 'det' },
+        { prop: 'gato', x: 58, y: 66, clue: false, label: 'Gato Pipoca', text: 'O Pipoca só dormiu. Não foi ele!' },
+        { x: 60, y: 14, w: 22, h: 16, clue: false, label: 'Quadro', text: 'Só um quadro. Nada mudou.' }] },
     { t: 'sequence', prompt: 'Dona Cida cuida das roupas. Coloque o trabalho na ordem certa.',
       items: [
         { prop: 'maquina', label: 'Colocar a roupa para lavar' },
@@ -176,7 +175,7 @@ const MISSIONS = {
       ok: 'É isso! Só a roupa já dá um tempão de trabalho, e ainda tem a comida, a louça, a faxina...' },
     { t: 'reveal', char: 'cida' },
     { t: 'choice', scene: 'sala', items: [{ prop: 'mochila', x: 50, y: 68 }], cast: [{ id: 'theo', x: 70, y: 52 }, { id: 'cida', x: 120, y: 48 }],
-      prompt: 'Theo chega da escola e joga a mochila e o tênis no meio da sala. O que ele pode fazer?',
+      prompt: 'Theo largou a mochila no meio da sala. E agora?',
       options: [
         { text: 'Guardar a mochila e o tênis no lugar.', kind: true, result: 'Pequenos gestos economizam o tempo de quem cuida da casa. Dona Cida sorri: "Valeu, Theo!"' },
         { text: 'Deixar lá. Alguém guarda depois.', kind: false, result: 'Esse "alguém" tem nome: Dona Cida. E ela já tem muitas tarefas. Quando ninguém repara no trabalho, ele fica invisível.' },
@@ -188,9 +187,9 @@ const MISSIONS = {
 
   jorge: { title: 'As encomendas trocadas', char: 'jorge', steps: [
     { t: 'dialog', scene: 'portaria', cast: [{ id: 'jorge', x: 72, y: 26, mode: 'sil' }], lines: [
-      { who: 'faisca', text: 'Edifício Ipê! Chegaram muitas encomendas hoje, mas a Névoa apagou as etiquetas.' },
-      { who: '?jorge', text: 'Boa tarde! Que bom que vocês chegaram. Conheço cada morador daqui. Me ajudam a entregar tudo certinho?' }] },
-    { t: 'match', prompt: 'Leia quem mora em cada apartamento e descubra para onde vai cada encomenda.',
+      { who: 'faisca', text: 'A Névoa apagou as etiquetas das encomendas!' },
+      { who: '?jorge', text: 'Conheço todo mundo aqui. Me ajudam a entregar?' }] },
+    { t: 'match', prompt: 'Cada encomenda vai para qual apartamento?',
       left: 'Encomenda', right: 'Apartamento',
       pairs: [
         { a: { prop: 'racao', label: 'Saco de ração' }, b: { label: 'Apto 202: a família Okoye tem um cachorro chamado Bolinha.' }, ok: 'Isso! O Bolinha agradece.' },
@@ -220,18 +219,17 @@ const MISSIONS = {
   /* ===== VILA DO APRENDIZADO ===== */
   ze: { title: 'O cheiro que sumiu', char: 'ze', steps: [
     { t: 'dialog', scene: 'salaaula', cast: [{ id: 'bia', x: 60, y: 46 }], lines: [
-      { who: 'bia', text: 'Todo dia, perto do meio-dia, vem um cheirinho de arroz e feijão lá do pátio...' },
-      { who: 'bia', text: 'Hoje a Névoa apagou até o cheiro! Quem será que faz a comida da escola?' },
-      { who: 'faisca', text: 'Alguém cozinha para centenas de crianças todos os dias. Vamos até a cozinha!' }] },
-    { t: 'investigate', scene: 'cozinha', need: 4, prompt: 'Explore a cozinha da escola. O que mostra como a merenda é preparada?',
+      { who: 'bia', text: 'Sumiu o cheirinho de arroz da escola!' },
+      { who: 'faisca', text: 'Quem faz a comida? Pra cozinha!' }] },
+    { t: 'investigate', scene: 'cozinha', need: 4, prompt: 'Explore a cozinha: como a merenda é feita?',
       items: [
-        { prop: 'touca', x: 8, y: 24, clue: true, label: 'Touca e avental', text: 'Touca e avental: na cozinha da escola, higiene é regra para ninguém ficar doente.' },
-        { prop: 'panelao', x: 116, y: 22, clue: true, label: 'Panelão', text: 'Um panelão gigante! Dá para cozinhar arroz para centenas de crianças.' },
-        { prop: 'cardapio', x: 40, y: 24, clue: true, label: 'Cardápio', text: 'O cardápio foi feito com a nutricionista da escola: comida saudável e variada.' },
-        { prop: 'legumes', x: 66, y: 28, clue: true, label: 'Caixa de legumes', text: 'Legumes frescos! Alguns vieram de agricultores da própria região.' },
-        { prop: 'torneira', x: 90, y: 28, clue: true, label: 'Pia e sabão', text: 'Antes de cozinhar, lavar bem as mãos e os alimentos. Sempre!', level: 'det' },
-        { prop: 'relogio', x: 138, y: 6, clue: false, label: 'Relógio', text: 'São 10h. Faltam só duas horas para servir o almoço. Corre!' },
-        { x: 4, y: 8, w: 46, h: 12, clue: false, label: 'Prateleira', text: 'Potes de temperos bem organizados. Cozinha arrumada ajuda a trabalhar rápido.' }] },
+        { prop: 'touca', x: 8, y: 24, clue: true, label: 'Touca e avental', text: 'Touca e avental: higiene é regra!' },
+        { prop: 'panelao', x: 116, y: 22, clue: true, label: 'Panelão', text: 'Panelão gigante: arroz para centenas!' },
+        { prop: 'cardapio', x: 40, y: 24, clue: true, label: 'Cardápio', text: 'Cardápio saudável, feito com a nutricionista.' },
+        { prop: 'legumes', x: 66, y: 28, clue: true, label: 'Caixa de legumes', text: 'Legumes fresquinhos da região!' },
+        { prop: 'torneira', x: 90, y: 28, clue: true, label: 'Pia e sabão', text: 'Lavar as mãos antes de cozinhar. Sempre!', level: 'det' },
+        { prop: 'relogio', x: 138, y: 6, clue: false, label: 'Relógio', text: '10h! Faltam 2 horas pro almoço. Corre!' },
+        { x: 4, y: 8, w: 46, h: 12, clue: false, label: 'Prateleira', text: 'Temperos organizadinhos.' }] },
     { t: 'sequence', prompt: 'Prepare a merenda na ordem certa.',
       items: [
         { prop: 'cardapio', label: 'Conferir o cardápio do dia', level: 'det' },
@@ -255,8 +253,8 @@ const MISSIONS = {
 
   katia: { title: 'A sala que amanhece limpa', char: 'katia', steps: [
     { t: 'dialog', scene: 'salaaula', cast: [{ id: 'katia', x: 126, y: 42, mode: 'sil' }], items: [{ prop: 'papel', x: 30, y: 70 }, { prop: 'casaco', x: 92, y: 66 }, { prop: 'cadeira', x: 60, y: 70 }], lines: [
-      { who: 'faisca', text: 'Ontem, depois da aula, esta sala ficou uma bagunça. Hoje de manhã estava brilhando!' },
-      { who: '?katia', text: 'Psiu! Chego cedinho, antes de todo mundo. Me ajuda a separar o que ficou no chão?' }] },
+      { who: 'faisca', text: 'Ontem: bagunça. Hoje: sala brilhando!' },
+      { who: '?katia', text: 'Psiu! Chego cedinho. Me ajuda a separar?' }] },
     { t: 'sort', prompt: 'Para onde vai cada coisa que ficou na sala?',
       bins: [
         { id: 'lixo', label: 'Lixo', prop: 'lixeira' },
@@ -277,7 +275,7 @@ const MISSIONS = {
       'Guardo os objetos esquecidos até o dono vir buscar.'] },
     { t: 'reveal', char: 'katia' },
     { t: 'choice', scene: 'salaaula', cast: [{ id: 'theo', x: 50, y: 48 }, { id: 'katia', x: 120, y: 44 }],
-      prompt: 'Um colega joga papel no chão do pátio e diz: "Tem gente que é paga para limpar!". O que você faz?',
+      prompt: 'Um colega joga papel no chão: "Tem gente paga pra limpar!" E você?',
       options: [
         { text: 'Explicar que limpar não é desculpa para sujar e pedir que ele jogue no lixo.', kind: true, result: 'Isso! Respeitar o trabalho de alguém é não aumentar esse trabalho de propósito.' },
         { text: 'Rir junto com ele.', kind: false, result: 'Sujar de propósito aumenta o trabalho da Kátia e mostra falta de respeito. Ela também ouve essas piadas.' },
@@ -290,9 +288,9 @@ const MISSIONS = {
   /* ===== ESTAÇÃO DA SAÚDE ===== */
   lucia: { title: 'A visita de cada mês', char: 'lucia', steps: [
     { t: 'dialog', scene: 'ruacasas', cast: [{ id: 'neide', x: 20, y: 40 }, { id: 'lucia', x: 104, y: 44, mode: 'sil' }], lines: [
-      { who: 'neide', text: 'Ai, não lembro se a vacina do meu neto está em dia... E a rua está cheia de mosquito!' },
-      { who: '?lucia', text: 'Calma, Dona Neide! Eu passo de casa em casa todo mês. Vamos ver o que cada família precisa?' }] },
-    { t: 'match', prompt: 'Cada família tem uma situação. Ligue cada uma ao que a agente de saúde pode fazer.',
+      { who: 'neide', text: 'A vacina do meu neto está em dia?' },
+      { who: '?lucia', text: 'Calma! Vamos ver casa por casa.' }] },
+    { t: 'match', prompt: 'Ligue cada família ao que a Lúcia faz.',
       left: 'Situação', right: 'O que fazer',
       pairs: [
         { a: { prop: 'vacina', label: 'O Davi, de 4 anos, está com uma vacina atrasada.' }, b: { label: 'Avisar a família e orientar a ir ao posto vacinar.' }, ok: 'Isso! Vacina em dia protege o Davi e toda a comunidade.' },
@@ -310,7 +308,7 @@ const MISSIONS = {
       'Ando muito! Conheço quase todas as ruas e casas do bairro.'] },
     { t: 'reveal', char: 'lucia' },
     { t: 'choice', scene: 'ruacasas', cast: [{ id: 'lucia', x: 104, y: 44 }, { id: 'iara', x: 30, y: 44 }],
-      prompt: 'A Lúcia toca a campainha da sua casa para a visita do mês. O que sua família pode fazer?',
+      prompt: 'A Lúcia chegou para a visita do mês. E aí?',
       options: [
         { text: 'Receber, responder às perguntas e mostrar a carteira de vacinação.', kind: true, result: 'Ótimo! Com essas informações, a equipe consegue cuidar melhor da sua família.' },
         { text: 'Fingir que não tem ninguém em casa.', kind: false, result: 'Ela vai ter que voltar outro dia, e algum problema de saúde pode demorar para ser visto.' },
@@ -322,18 +320,18 @@ const MISSIONS = {
 
   benedito: { title: 'O dia de Dona Olímpia', char: 'benedito', steps: [
     { t: 'dialog', scene: 'quarto', cast: [{ id: 'olimpia', x: 20, y: 38 }, { id: 'benedito', x: 116, y: 40, mode: 'sil' }], lines: [
-      { who: 'olimpia', text: 'Bom dia, meu bem! Você viu meus óculos? E já está na hora do meu remédio?' },
-      { who: 'faisca', text: 'Dona Olímpia tem 84 anos. Ela mora sozinha, mas recebe ajuda todos os dias. Vamos ver como?' }] },
-    { t: 'investigate', scene: 'quarto', need: 4, prompt: 'Procure no quarto o que ajuda Dona Olímpia a viver bem e em segurança.',
+      { who: 'olimpia', text: 'Cadê meus óculos? E meu remédio?' },
+      { who: 'faisca', text: 'Alguém cuida dela todo dia. Quem?' }] },
+    { t: 'investigate', scene: 'quarto', need: 4, prompt: 'Ache o que ajuda Dona Olímpia a viver bem.',
       cast: [{ id: 'olimpia', x: 20, y: 38 }],
       items: [
-        { prop: 'oculos', x: 112, y: 36, clue: true, label: 'Óculos', text: 'Os óculos estavam no lugar de sempre. Quem cuida sabe onde ficam as coisas.' },
-        { prop: 'remedios', x: 122, y: 36, clue: true, label: 'Caixa de remédios', text: 'Remédios separados por dia e horário, do jeito que o médico receitou.' },
-        { prop: 'bengala', x: 46, y: 48, clue: true, label: 'Bengala', text: 'A bengala fica sempre por perto, para evitar quedas.' },
-        { prop: 'album', x: 140, y: 64, clue: true, label: 'Álbum de fotos', text: 'Cuidar também é conversar. Os dois olham as fotos e relembram histórias.' },
-        { x: 50, y: 75, w: 50, h: 10, clue: true, label: 'Tapete preso', text: 'O tapete foi preso no chão para ninguém escorregar. Detalhe de quem cuida!', level: 'det' },
-        { prop: 'radio', x: 86, y: 50, clue: false, label: 'Rádio', text: 'Um rádio antigo tocando samba. Dona Olímpia adora!' },
-        { x: 112, y: 12, w: 30, h: 14, clue: false, label: 'Fotos na parede', text: 'Fotos dos netos. Ela fala deles o tempo todo!' }] },
+        { prop: 'oculos', x: 112, y: 36, clue: true, label: 'Óculos', text: 'No lugar de sempre: quem cuida sabe!' },
+        { prop: 'remedios', x: 122, y: 36, clue: true, label: 'Caixa de remédios', text: 'Remédios separados por dia e hora.' },
+        { prop: 'bengala', x: 46, y: 48, clue: true, label: 'Bengala', text: 'Bengala por perto: nada de queda!' },
+        { prop: 'album', x: 140, y: 64, clue: true, label: 'Álbum de fotos', text: 'Cuidar também é conversar!' },
+        { x: 50, y: 75, w: 50, h: 10, clue: true, label: 'Tapete preso', text: 'Tapete preso: ninguém escorrega!', level: 'det' },
+        { prop: 'radio', x: 86, y: 50, clue: false, label: 'Rádio', text: 'Samba no rádio. Ela adora!' },
+        { x: 112, y: 12, w: 30, h: 14, clue: false, label: 'Fotos na parede', text: 'Fotos dos netos!' }] },
     { t: 'sequence', prompt: 'Organize a manhã de cuidados com Dona Olímpia.',
       items: [
         { prop: 'cama', label: 'Ajudar a levantar da cama com segurança' },
@@ -344,7 +342,7 @@ const MISSIONS = {
       ok: 'Isso! E o dia ainda nem chegou na hora do almoço...' },
     { t: 'reveal', char: 'benedito' },
     { t: 'choice', scene: 'quarto', cast: [{ id: 'olimpia', x: 20, y: 38 }, { id: 'benedito', x: 70, y: 44 }],
-      prompt: 'Dona Olímpia começa a contar, pela terceira vez, a história de quando dançou num baile. O que você faz?',
+      prompt: 'Dona Olímpia conta a mesma história pela 3ª vez. E você?',
       options: [
         { text: 'Ouvir com atenção e perguntar como era a música.', kind: true, result: 'Para ela, ser ouvida é tão importante quanto o remédio.' },
         { text: 'Dizer: "Você já contou essa história."', kind: false, result: 'Ela pode se sentir esquecida. As pessoas idosas também correm o risco de ficar "invisíveis".' },
@@ -358,8 +356,7 @@ const MISSIONS = {
   zefa: { title: 'O caminho do tomate', char: 'zefa', steps: [
     { t: 'dialog', scene: 'feira', cast: [{ id: 'iara', x: 40, y: 54 }], lines: [
       { who: 'iara', text: 'Mãe, o tomate nasce no mercado?' },
-      { who: 'faisca', text: 'Boa pergunta, Iara! Antes de chegar à barraca, ele fez uma viagem longa.' },
-      { who: 'faisca', text: 'Vamos descobrir quem começou essa história?' }] },
+      { who: 'faisca', text: 'Nada disso! Vamos ver a viagem dele!' },] },
     { t: 'whoami', char: 'zefa', clues: [
       'Acordo antes de o sol nascer.',
       'Trabalho com a terra, com as sementes e com a chuva.',
@@ -376,7 +373,7 @@ const MISSIONS = {
       ok: 'Meses de trabalho para o tomate chegar até a salada!' },
     { t: 'reveal', char: 'zefa' },
     { t: 'choice', scene: 'feira', cast: [{ id: 'zefa', x: 68, y: 40 }, { id: 'iara', x: 30, y: 54 }],
-      prompt: 'Na barraca, um tomate está um pouco amassado, mas ainda está bom. O que você faz?',
+      prompt: 'Um tomate está amassadinho, mas bom. E aí?',
       options: [
         { text: 'Levar assim mesmo: ele ainda serve para fazer molho.', kind: true, result: 'Alimento bom não deve ir para o lixo. Muita gente trabalhou para ele existir.' },
         { text: 'Reclamar alto com a feirante.', kind: false, result: 'Tomate amassa no transporte. Dona Zefa fica chateada: ela cuidou dele por meses.' },
@@ -388,9 +385,9 @@ const MISSIONS = {
 
   rafa: { title: 'Entregas na chuva', char: 'rafa', steps: [
     { t: 'dialog', scene: 'feira', cast: [{ id: 'rafa', x: 100, y: 52, mode: 'sil' }], lines: [
-      { who: 'faisca', text: 'Pedidos novos saindo do Mercado! Mas choveu, e a Névoa embaralhou o mapa.' },
-      { who: '?rafa', text: 'Me ajuda a planejar o caminho? Tenho que entregar tudo e chegar inteiro em casa!' }] },
-    { t: 'route', prompt: 'Toque nas ruas para levar a bicicleta e entregar todos os pedidos. Desvie da obra e da rua alagada. Se tiver remédio, ele é urgente: entregue primeiro!',
+      { who: 'faisca', text: 'Choveu e o mapa embaralhou!' },
+      { who: '?rafa', text: 'Me ajuda a planejar as entregas?' }] },
+    { t: 'route', prompt: 'Toque nas ruas e entregue tudo! Remédio primeiro.',
       grids: {
         exp: { w: 6, h: 5, start: [0, 2], drops: [{ x: 5, y: 0, prop: 'casa', label: 'Casa da Dona Neide' }, { x: 4, y: 4, prop: 'farmacia', label: 'Remédio para o Seu Osvaldo' }],
           blocks: [{ x: 2, y: 1, prop: 'obra' }, { x: 2, y: 2, prop: 'obra' }, { x: 3, y: 3, prop: 'agua' }] },
@@ -422,9 +419,9 @@ const MISSIONS = {
   /* ===== PARQUE ===== */
   marina: { title: 'A montanha de recicláveis', char: 'marina', steps: [
     { t: 'dialog', scene: 'cooperativa', cast: [{ id: 'marina', x: 66, y: 22, mode: 'sil' }], lines: [
-      { who: 'faisca', text: 'Depois da festa no parque, sobrou uma montanha de coisas! Algumas podem virar coisas novas...' },
-      { who: '?marina', text: 'Aqui na cooperativa, cada coisa vai para o seu lugar. Vamos separar juntos?' }] },
-    { t: 'sort', prompt: 'Separe cada material na lixeira certa. Leia o nome de cada uma.',
+      { who: 'faisca', text: 'Sobrou uma montanha de lixo da festa!' },
+      { who: '?marina', text: 'Vamos separar? Muita coisa vira nova!' }] },
+    { t: 'sort', prompt: 'Cada material na lixeira certa!',
       bins: [
         { id: 'papel', label: 'Papel', color: '#4a78c9', prop: 'jornal' },
         { id: 'plastico', label: 'Plástico', color: '#d9534f', prop: 'pet' },
@@ -461,18 +458,17 @@ const MISSIONS = {
 
   joaquim: { title: 'O jardim que não para de crescer', char: 'joaquim', steps: [
     { t: 'dialog', scene: 'parque', cast: [{ id: 'theo', x: 54, y: 52 }, { id: 'bia', x: 74, y: 52 }], lines: [
-      { who: 'bia', text: 'O parque está tão bonito! Será que as flores se plantam sozinhas?' },
-      { who: 'theo', text: 'Ué, as plantas não crescem sozinhas?' },
-      { who: 'faisca', text: 'Crescem... mas um jardim bonito, com grama cortada e árvores saudáveis, precisa de alguém. Vamos procurar pistas!' }] },
-    { t: 'investigate', scene: 'parque', need: 4, prompt: 'Encontre no parque sinais do trabalho de quem cuida dele.',
+      { who: 'bia', text: 'As flores se plantam sozinhas?' },
+      { who: 'faisca', text: 'Jardim bonito precisa de alguém. Vamos achar!' }] },
+    { t: 'investigate', scene: 'parque', need: 4, prompt: 'Ache sinais de quem cuida do parque.',
       items: [
-        { prop: 'muda', x: 4, y: 60, clue: true, label: 'Mudas novas', text: 'Mudas plantadas em fileira. Daqui a alguns anos, vão virar árvores!' },
-        { prop: 'regador', x: 24, y: 60, clue: true, label: 'Regador', text: 'Um regador ainda molhado. Os canteiros foram regados hoje cedo.' },
-        { prop: 'folhas', x: 76, y: 70, clue: true, label: 'Folhas amontoadas', text: 'Alguém varreu as folhas da trilha e fez um montinho.' },
-        { prop: 'carrinho', x: 108, y: 40, clue: true, label: 'Carrinho de mão', text: 'Carrinho de mão com terra: alguém está trabalhando por aqui.' },
-        { prop: 'tesoura', x: 58, y: 44, clue: true, label: 'Tesoura de poda', text: 'Tesoura de poda: serve para cortar galhos secos e deixar a árvore saudável.', level: 'det' },
-        { prop: 'pato', x: 124, y: 60, clue: false, label: 'Pato', text: 'Quá! Um pato nadando. Ele não ajudou em nada, mas é muito simpático.' },
-        { prop: 'flor', x: 40, y: 72, clue: false, label: 'Flor', text: 'Uma flor linda. Ela cresceu, mas alguém plantou e regou.' }] },
+        { prop: 'muda', x: 4, y: 60, clue: true, label: 'Mudas novas', text: 'Mudas novas: um dia, árvores!' },
+        { prop: 'regador', x: 24, y: 60, clue: true, label: 'Regador', text: 'Regador molhado: regaram hoje!' },
+        { prop: 'folhas', x: 76, y: 70, clue: true, label: 'Folhas amontoadas', text: 'Alguém varreu as folhas!' },
+        { prop: 'carrinho', x: 108, y: 40, clue: true, label: 'Carrinho de mão', text: 'Carrinho com terra: tem trabalho aqui!' },
+        { prop: 'tesoura', x: 58, y: 44, clue: true, label: 'Tesoura de poda', text: 'Tesoura de poda: tira galho seco.', level: 'det' },
+        { prop: 'pato', x: 124, y: 60, clue: false, label: 'Pato', text: 'Quá! O pato não ajudou. Mas é fofo!' },
+        { prop: 'flor', x: 40, y: 72, clue: false, label: 'Flor', text: 'Alguém plantou e regou esta flor!' }] },
     { t: 'sequence', prompt: 'Vamos plantar uma muda de ipê! Coloque os passos na ordem.',
       items: [
         { prop: 'pa', label: 'Cavar um buraco' },
@@ -496,15 +492,14 @@ const MISSIONS = {
   /* ===== CAMINHOS DA CIDADE ===== */
   denise: { title: 'A rua de antes e de depois', char: 'denise', steps: [
     { t: 'dialog', scene: 'rua', cast: [{ id: 'denise', x: 120, y: 48, mode: 'sil' }], lines: [
-      { who: 'faisca', text: 'Olha esta rua às 5h da manhã... e agora, às 7h. Alguém passou por aqui!' },
-      { who: 'faisca', text: 'Compare as duas imagens e descubra o que mudou.' }] },
-    { t: 'spot', scene: 'rua', prompt: 'Toque nas diferenças entre a rua às 5h e às 7h.',
+      { who: 'faisca', text: '5h da manhã... e agora, 7h. O que mudou?' },] },
+    { t: 'spot', scene: 'rua', prompt: 'Toque nas diferenças!',
       diffs: [
         { prop: 'papel', x: 20, y: 52, after: null, label: 'Papéis na calçada', text: 'Os papéis espalhados foram varridos.' },
-        { prop: 'saco', x: 46, y: 46, after: null, label: 'Saco de lixo rasgado', text: 'O saco rasgado foi recolhido antes que os bichos espalhassem tudo.' },
-        { prop: 'bueiro', x: 64, y: 62, after: 'bueirolimpo', label: 'Bueiro entupido', text: 'O bueiro foi desentupido. Quando chover, a água vai escoar e a rua não vai alagar!' },
-        { prop: 'lixeiracheia', x: 98, y: 44, after: 'lixeira', label: 'Lixeira cheia', text: 'A lixeira estava transbordando. Agora está vazia.', level: 'inv' },
-        { prop: 'garrafa', x: 138, y: 54, after: null, label: 'Garrafa na calçada', text: 'Uma garrafa de vidro na calçada podia machucar alguém. Foi recolhida.', level: 'det' }] },
+        { prop: 'saco', x: 46, y: 46, after: null, label: 'Saco de lixo rasgado', text: 'Saco recolhido antes dos bichos!' },
+        { prop: 'bueiro', x: 64, y: 62, after: 'bueirolimpo', label: 'Bueiro entupido', text: 'Bueiro limpo: a rua não alaga!' },
+        { prop: 'lixeiracheia', x: 98, y: 44, after: 'lixeira', label: 'Lixeira cheia', text: 'Lixeira cheia? Agora vazia!', level: 'inv' },
+        { prop: 'garrafa', x: 138, y: 54, after: null, label: 'Garrafa na calçada', text: 'Vidro recolhido: ninguém se machuca!', level: 'det' }] },
     { t: 'whoami', char: 'denise', clues: [
       'Começo a trabalhar quando a cidade ainda está dormindo.',
       'Uso uniforme laranja com faixas que brilham no escuro.',
@@ -512,7 +507,7 @@ const MISSIONS = {
       'Meu carrinho tem vassoura, pá e muitos sacos de lixo.'] },
     { t: 'reveal', char: 'denise' },
     { t: 'choice', scene: 'rua', cast: [{ id: 'denise', x: 110, y: 48 }, { id: 'iara', x: 40, y: 48 }],
-      prompt: 'Você vê alguém jogar uma lata pela janela do carro, bem perto da Denise. O que você pensa e faz?',
+      prompt: 'Alguém joga uma lata pela janela do carro. E você?',
       options: [
         { text: 'Guardar o meu lixo comigo até achar uma lixeira, sempre.', kind: true, result: 'Exemplo é tudo! Se cada um cuidar do seu lixo, o trabalho da Denise fica mais leve.' },
         { text: 'Achar normal. Afinal, o gari limpa.', kind: false, result: 'O trabalho da Denise é limpar a cidade, não aguentar falta de respeito. Lixo jogado no chão também pode entupir bueiros.' },
@@ -524,8 +519,8 @@ const MISSIONS = {
 
   pedro: { title: 'Religar as luzes', char: 'pedro', steps: [
     { t: 'dialog', scene: 'ruanoite', cast: [{ id: 'pedro', x: 64, y: 44, mode: 'sil' }], lines: [
-      { who: 'faisca', text: 'Os postes de Lumiara estão apagados. Sem luz, andar à noite fica perigoso.' },
-      { who: '?pedro', text: 'Eu conserto, mas com segurança. Cada ferramenta tem um motivo. Me ajudam?' }] },
+      { who: 'faisca', text: 'Os postes apagaram! Que perigo!' },
+      { who: '?pedro', text: 'Eu conserto, com segurança. Me ajudam?' }] },
     { t: 'match', prompt: 'Para que serve cada equipamento?', left: 'Equipamento', right: 'Para quê',
       pairs: [
         { a: { prop: 'capacete', label: 'Capacete' }, b: { label: 'Proteger a cabeça.' }, ok: 'Isso! O capacete protege contra batidas e objetos que caem.' },
@@ -582,11 +577,9 @@ const MEDALS = {
 /* ---------------- FINAL ---------------- */
 const FINALE = {
   intro: [
-    { who: 'faisca', text: 'Vocês conseguiram! Todas as regiões estão iluminadas e todo mundo foi lembrado.' },
-    { who: 'faisca', text: 'Mas olhem para o céu... a Névoa ainda está ali.' },
-    { who: 'nevoa', text: 'Eu... eu não sou má. Eu nasci de todos os "obrigados" que ninguém disse.' },
-    { who: 'nevoa', text: 'Cada vez que alguém passa por um trabalhador sem enxergar, eu cresço um pouquinho.' },
-    { who: 'faisca', text: 'Então já sabemos o que fazer. Vamos encher o céu de agradecimentos!' }],
+    { who: 'faisca', text: 'Vocês conseguiram! Lumiara acendeu!' },
+    { who: 'nevoa', text: 'Eu não sou má... nasci dos "obrigados" esquecidos.' },
+    { who: 'faisca', text: 'Vamos encher o céu de obrigados!' }],
   without: { /* o que aconteceria sem cada trabalhador */
     cida: 'A casa ficaria sem comida pronta e sem roupa limpa.', jorge: 'Ninguém saberia quem entra no prédio, e as encomendas se perderiam.',
     ze: 'Muitas crianças estudariam com fome.', katia: 'A escola ficaria suja, e muita gente poderia ficar doente.',
@@ -596,26 +589,26 @@ const FINALE = {
     denise: 'As ruas ficariam sujas e alagariam na primeira chuva.', pedro: 'As ruas ficariam escuras e perigosas à noite.' },
   thanks: ['Obrigado por cuidar da gente!', 'Seu trabalho é muito importante.', 'Eu reparei em você!', 'Obrigada por deixar tudo funcionando!', 'Sem você, a cidade parava.', 'Você faz a diferença todos os dias.'],
   outro: [
-    { who: 'nevoa', text: 'Que quentinho... Obrigada por lembrarem.' },
-    { who: 'nevoa', text: 'Agora eu não sou mais a Névoa do Esquecimento. Vou ser a Nuvem das Lembranças e guardar cada história que vocês descobriram.' },
-    { who: 'faisca', text: 'Lumiara está acesa de novo! Mas ainda falta uma carta no álbum...' }],
+    { who: 'nevoa', text: 'Que quentinho... Obrigada!' },
+    { who: 'nevoa', text: 'Agora sou a Nuvem das Lembranças!' },
+    { who: 'faisca', text: 'Falta só uma carta no álbum...' }],
   mirror: 'Tem gente que trabalha cuidando de nós sem receber salário: cozinha, lava, leva à escola, cuida quando estamos doentes. Quem faz isso na sua casa?'
 };
 
 
 /* ---------------- DESAFIOS EXTRAS (um por região, opcionais, valem estrelas) ---------------- */
 const BONUS = {
-  casas: { t: 'memory', title: 'Memória do bairro', prompt: 'Jogo da memória: encontre os pares de cada pessoa com o objeto do trabalho dela.',
+  casas: { t: 'memory', title: 'Memória do bairro', prompt: 'Memória: cada pessoa com seu objeto!',
     pairs: [['cida', 'roupa'], ['jorge', 'chaves'], ['ze', 'panelao'], ['katia', 'vassoura'], ['lucia', 'vacina'], ['benedito', 'bengala'], ['zefa', 'cesta'], ['rafa', 'bike']] },
-  vila: { t: 'logic', title: 'Quem chega primeiro?', prompt: 'Use as pistas para descobrir a hora em que cada pessoa chega à escola. Marque ✓ ou ✗ em cada quadrinho.',
+  vila: { t: 'logic', title: 'Quem chega primeiro?', prompt: 'Que horas cada um chega? Marque ✓ ou ✗.',
     people: ['Kátia', 'Seu Zé', 'Professora Rita'], options: ['6h', '6h30', '7h30'], answer: [0, 1, 2],
     clues: ['A professora Rita não chega às 6h.', 'Seu Zé chega depois da Kátia.', 'Quem chega às 7h30 dá a primeira aula do dia.'] },
-  saude: { t: 'memory', title: 'Memória da cidade', prompt: 'Jogo da memória: encontre os pares de cada pessoa com um objeto do trabalho dela.',
+  saude: { t: 'memory', title: 'Memória da cidade', prompt: 'Memória: cada pessoa com seu objeto!',
     pairs: [['lucia', 'vacina'], ['benedito', 'remedios'], ['marina', 'papelao'], ['joaquim', 'tesoura'], ['denise', 'lixeira'], ['pedro', 'lampada'], ['zefa', 'tomate'], ['rafa', 'mochila']] },
   mercado: { t: 'logic', title: 'Cada um no seu caminho', prompt: 'Descubra qual veículo cada pessoa usa no trabalho.',
     people: ['Rafa', 'Dona Zefa', 'Marina', 'Pedro'], options: ['Bicicleta', 'Caminhonete', 'Carrinho de recicláveis', 'Caminhão com cesto'], answer: [0, 1, 2, 3],
     clues: ['Quem planta usa a caminhonete para levar a colheita até a feira.', 'Rafa não usa nada com motor.', 'Pedro precisa alcançar o alto dos postes.', 'Marina não pedala nas entregas.'] },
-  parque: { t: 'memory', title: 'Memória do parque', prompt: 'Jogo da memória diferente: os pares são coisas do MESMO tipo (dois papéis, dois plásticos...). Pense no material!',
+  parque: { t: 'memory', title: 'Memória do parque', prompt: 'Memória: junte coisas do mesmo material!',
     pairs: [['jornal', 'papelao'], ['pet', 'iogurte'], ['lata', 'chaves'], ['vidro', 'garrafa'], ['banana', 'folhas'], ['guardanapo', 'espelho'], ['muda', 'regador'], ['tesoura', 'galho']],
     labels: { jornal: 'Papel', papelao: 'Papel', pet: 'Plástico', iogurte: 'Plástico', lata: 'Metal', chaves: 'Metal', vidro: 'Vidro', garrafa: 'Vidro', banana: 'Orgânico', folhas: 'Orgânico', guardanapo: 'Não reciclável', espelho: 'Não reciclável', muda: 'Jardim', regador: 'Jardim', tesoura: 'Poda', galho: 'Poda' } },
   caminhos: { t: 'logic', title: 'Os turnos da cidade', prompt: 'Descubra onde e quando cada pessoa trabalha.',
@@ -719,10 +712,10 @@ for (const mid in DAYS) {
 
 /* ---------------- INTERLÚDIOS DA NÉVOA (entre regiões) ---------------- */
 const INTERLUDES = [
-  [{ who: 'nevoa', text: 'Hmm? Uma luz acendeu lá embaixo... Por que vocês se importam tanto com essas pessoas?' }, { who: 'faisca', text: 'Porque sem elas nada funciona! Você vai ver.' }],
-  [{ who: 'nevoa', text: 'Sabe... antigamente eu era só uma nuvenzinha do tamanho de uma pipoca.' }, { who: 'nevoa', text: 'Cada vez que alguém passava por um trabalhador sem nem olhar, eu crescia um pouco.' }],
-  [{ who: 'nevoa', text: 'Quando vocês sorriem para quem trabalha... eu sinto um calorzinho estranho. Parece que eu encolho.' }, { who: 'faisca', text: 'Ela está ficando menor! Vamos continuar!' }],
-  [{ who: 'nevoa', text: 'Vocês estão me deixando pequena... e eu não sei se isso é ruim.' }, { who: 'nevoa', text: 'Ninguém nunca me disse obrigado por nada. Será que eu sirvo para alguma coisa?' }],
-  [{ who: 'nevoa', text: 'Eu vi vocês ajudando, conversando, agradecendo... Eu queria saber fazer isso também.' }, { who: 'faisca', text: 'Quem sabe ainda dá tempo, Névoa.' }],
-  [{ who: 'nevoa', text: 'Estou cansada de ser cinza. Me encontrem na praça. Eu... quero ver as luzes de perto.' }]
+  [{ who: 'nevoa', text: 'Hmm? Uma luz acendeu lá embaixo... Por que vocês se importam tanto com essas pessoas?' }, { who: 'faisca', text: 'Sem elas, nada funciona!' }],
+  [{ who: 'nevoa', text: 'Sabe... antigamente eu era só uma nuvenzinha do tamanho de uma pipoca.' }, { who: 'nevoa', text: 'Quando ninguém olha um trabalhador, eu cresço.' }],
+  [{ who: 'nevoa', text: 'Quando vocês sorriem para quem trabalha... eu sinto um calorzinho estranho. Parece que eu encolho.' }, { who: 'faisca', text: 'Ela está diminuindo! Vamos!' }],
+  [{ who: 'nevoa', text: 'Vocês estão me deixando pequena... e eu não sei se isso é ruim.' }, { who: 'nevoa', text: 'Ninguém nunca me agradeceu...' }],
+  [{ who: 'nevoa', text: 'Eu vi vocês ajudando, conversando, agradecendo... Eu queria saber fazer isso também.' }, { who: 'faisca', text: 'Ainda dá tempo, Névoa!' }],
+  [{ who: 'nevoa', text: 'Me encontrem na praça. Quero ver as luzes!' }]
 ];

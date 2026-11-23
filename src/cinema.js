@@ -66,19 +66,19 @@ function playCutscene(frames, { title = 'Lumiara', where = 'História', onDone }
 
 /* ---------- prólogo animado ---------- */
 const PROLOGUE_FRAMES = [
-  { scene: 'cidade', text: 'Esta é Lumiara. Uma cidade de janelas acesas, cheiro de comida e gente indo e vindo.',
+  { scene: 'cidade', text: 'Esta é Lumiara!',
     actors: { denise: { s: 'denise', from: [-18, 60], x: 26, y: 60, walk: true }, rafa: { s: 'rafa', from: [170, 62], x: 112, y: 62, walk: true, flip: true }, lucia: { s: 'lucia', from: [-30, 62], x: 60, y: 62, walk: true, ms: 1800 } } },
-  { scene: 'cidade', text: 'Todo dia, muita gente trabalha para tudo funcionar: varre a rua, leva entregas, visita as famílias, cozinha, conserta, planta, cuida.',
+  { scene: 'cidade', text: 'Muita gente trabalha para tudo funcionar.',
     actors: { denise: { s: 'denise', x: 40, y: 60, walk: true }, rafa: { s: 'rafa', x: 92, y: 62, walk: true, flip: true }, ze: { s: 'ze', from: [170, 58], x: 132, y: 58, walk: true, flip: true } } },
-  { scene: 'cidade', fog: .35, text: 'Até que, numa manhã, chegou a Névoa do Esquecimento. Ela não quebra nada. Ela faz as pessoas esquecerem.',
+  { scene: 'cidade', fog: .35, text: 'Até que chegou a Névoa do Esquecimento!',
     actors: { nevoa: { s: 'nevoa', from: [175, 0], x: 64, y: 2, w: 40, ms: 2600 } } },
-  { scene: 'cidade', gray: 1, fog: .5, text: 'Os trabalhadores continuaram trabalhando... mas ninguém mais reparava neles. Viraram sombras na paisagem.',
+  { scene: 'cidade', gray: 1, fog: .5, text: 'Ninguém mais via os trabalhadores.',
     actors: { denise: { s: 'denise', mode: 'sil', x: 40, y: 60 }, rafa: { s: 'rafa', mode: 'sil', x: 92, y: 62, flip: true }, lucia: { s: 'lucia', mode: 'sil', x: 60, y: 62 }, ze: { s: 'ze', mode: 'sil', x: 132, y: 58, flip: true }, nevoa: { s: 'nevoa', x: 48, y: 0, w: 64, ms: 2000 } } },
-  { scene: 'cidade', gray: 1, dark: .55, fog: .6, text: 'Sem ninguém para lembrar, as cores sumiram. E as luzes de Lumiara foram se apagando, uma por uma.',
+  { scene: 'cidade', gray: 1, dark: .55, fog: .6, text: 'As cores sumiram. As luzes apagaram.',
     actors: { nevoa: { s: 'nevoa', x: 34, y: -2, w: 92, ms: 2000 } } },
-  { scene: 'cidade', gray: 1, dark: .55, fog: .5, sparkle: true, text: 'Mas uma luzinha teimosa continuou acesa: eu, a Faísca!',
+  { scene: 'cidade', gray: 1, dark: .55, fog: .5, sparkle: true, text: 'Mas eu continuei acesa: a Faísca!',
     actors: { faisca: { s: 'faisca', from: [76, 80], x: 72, y: 34, w: 16, glow: true, ms: 1600 } } },
-  { scene: 'cidade', gray: .8, dark: .35, fog: .4, last: 'Vamos ajudar!', text: 'Sozinha eu não consigo. Você me ajuda a descobrir quem faz Lumiara funcionar e a devolver as luzes da cidade?',
+  { scene: 'cidade', gray: .8, dark: .35, fog: .4, last: 'Vamos ajudar!', text: 'Me ajuda a trazer as luzes de volta?',
     actors: { you: { s: 'avatar', from: [-18, 62], x: 56, y: 62, walk: true, ms: 1800 }, faisca: { s: 'faisca', x: 74, y: 44, w: 14, glow: true } } }
 ];
 
@@ -104,10 +104,10 @@ function screenOutro() {
   met.forEach((id, i) => { const left = i % 2 === 0; actors['c' + i] = { s: id, from: [left ? -20 : 176, 62], x: 8 + i * 18, y: 62 - (i % 2) * 4, walk: true, flip: !left, ms: 1500 + i * 200 }; });
   const you = {}; G.players.slice(0, 4).forEach((p, i) => { you['p' + i] = { s: avatarId(p.avatar), from: [70 + i * 6, 100], x: 56 + i * 14, y: 40, walk: true, ms: 1600 }; });
   const frames = [
-    { scene: 'festa', dark: .6, text: 'Naquela noite, a praça de Lumiara se encheu de gente.', actors: { nevoa: { s: 'nevoaFeliz', x: 62, y: 2, w: 34 } } },
-    { scene: 'festa', dark: .15, text: 'Cada pessoa que vocês conheceram veio para a Festa das Luzes. Desta vez, todo mundo sabia o nome delas.', actors },
-    { scene: 'festa', text: 'E no meio da festa estavam vocês: os Guardiões da Memória.', sparkle: true, actors: you },
-    { scene: 'festa', sparkle: true, who: 'nevoaFeliz', text: 'Agora eu guardo lembranças. E vou lembrar a cidade, todo dia: ninguém deveria ser invisível.', actors: { nevoa: { s: 'nevoaFeliz', x: 56, y: 0, w: 46, ms: 1600 } }, last: 'Ver o certificado' }
+    { scene: 'festa', dark: .6, text: 'À noite, a praça encheu de gente!', actors: { nevoa: { s: 'nevoaFeliz', x: 62, y: 2, w: 34 } } },
+    { scene: 'festa', dark: .15, text: 'Todo mundo veio para a Festa das Luzes!', actors },
+    { scene: 'festa', text: 'E vocês: os Guardiões da Memória!', sparkle: true, actors: you },
+    { scene: 'festa', sparkle: true, who: 'nevoaFeliz', text: 'Ninguém deveria ser invisível.', actors: { nevoa: { s: 'nevoaFeliz', x: 56, y: 0, w: 46, ms: 1600 } }, last: 'Ver o certificado' }
   ];
   Audio8.music(FINAL_REGION.music, 1);
   playCutscene(frames, { title: 'A Festa das Luzes', where: 'Final', onDone: () => go(screenEnding) });

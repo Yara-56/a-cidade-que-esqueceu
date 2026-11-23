@@ -13,7 +13,7 @@ const Audio8 = {
       const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
       this.ctx = new AC();
       this.master = this.ctx.createGain(); this.master.connect(this.ctx.destination);
-      const lp = this.ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2400; lp.connect(this.master);
+      const lp = this.ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 5200; lp.connect(this.master);
       this.musicBus = this.ctx.createGain(); this.musicBus.connect(lp);
       this.sfxBus = this.ctx.createGain(); this.sfxBus.connect(this.master);
       this.apply();
@@ -24,7 +24,7 @@ const Audio8 = {
     if (!this.ctx) return;
     const t = this.ctx.currentTime;
     this.master.gain.setTargetAtTime(this.vol.mute ? 0 : 1, t, .05);
-    this.musicBus.gain.setTargetAtTime(this.vol.music * .16, t, .1);
+    this.musicBus.gain.setTargetAtTime(this.vol.music * .13, t, .1);
     this.sfxBus.gain.setTargetAtTime(this.vol.sfx * .5, t, .02);
   },
   note(freq, start, dur, type = 'triangle', gain = .3, bus) {
@@ -36,30 +36,69 @@ const Audio8 = {
   },
   mtof(m) { return 440 * Math.pow(2, (m - 69) / 12); },
   SCALES: { maj: [0, 2, 4, 7, 9, 12, 14, 16], pent: [0, 3, 5, 7, 10, 12, 15, 17], min: [0, 3, 5, 7, 8, 12, 15, 17] },
-  /* música generativa calma; brightness 0..1 deixa mais alegre conforme a cidade se ilumina */
+  /* música chiptune ALEGRE: 4 temas originais em tom maior, com bateria, baixo saltitante e melodia.
+     brightness (0..1) acrescenta instrumentos conforme a cidade se ilumina. */
+  SONGS: [
+    { prog: [0, 4, 5, 3], mel: ['1 3 5 8 7 5 3 5', '2 5 7 5 9 - 7 -', '6 5 3 5 6 8 9 8', '4 3 4 6 5 - . .', '1 3 5 8 7 5 3 5', '2 5 7 9 A - 9 7', '8 7 6 5 6 - 5 3', '4 2 7 2 1 - . .'] },
+    { prog: [0, 3, 0, 4], mel: ['5 . 5 6 5 . 3 .', '4 . 4 6 8 . 6 .', '5 . 5 6 5 3 1 3', '2 . 2 3 2 . 7 .', '5 . 5 6 5 . 8 .', '6 . 6 8 A . 8 .', '9 8 7 6 5 3 2 3', '1 - - . 1 . . .'] },
+    { prog: [5, 3, 0, 4], mel: ['3 3 . 5 . 3 2 1', '4 4 . 6 . 4 3 2', '5 5 . 8 . 5 6 7', '9 - 8 - 7 - 5 .', '3 3 . 5 . 3 2 1', '4 4 . 6 . 8 9 A', 'B A 9 8 7 8 9 7', '8 - - - . . . .'] },
+    { prog: [0, 4, 5, 3], mel: ['1 . 3 5 . 3 5 6', '5 . 7 9 . 7 5 .', '6 . 8 6 . 5 3 .', '4 . 6 8 . 6 4 .', '8 . 9 A . 9 8 6', '7 . 5 7 9 - . .', '8 6 5 3 5 6 5 3', '2 . 3 2 1 - . .'] }],
+  MAJ: [0, 2, 4, 5, 7, 9, 11],
+  deg(d) { const i = d - 1; return 12 * Math.floor(i / 7) + this.MAJ[((i % 7) + 7) % 7]; },
+  noiseBuf() {
+    if (this._nb) return this._nb;
+    const c = this.ctx, b = c.createBuffer(1, c.sampleRate * .3, c.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    return (this._nb = b);
+  },
+  hit(kind, t) {
+    const c = this.ctx, g = c.createGain(); g.connect(this.musicBus);
+    if (kind === 'kick') {
+      const o = c.createOscillator(); o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(45, t + .12);
+      g.gain.setValueAtTime(.9, t); g.gain.exponentialRampToValueAtTime(.001, t + .18); o.connect(g); o.start(t); o.stop(t + .2);
+    } else {
+      const s = c.createBufferSource(), f = c.createBiquadFilter(); s.buffer = this.noiseBuf();
+      f.type = 'highpass'; f.frequency.value = kind === 'hat' ? 7000 : 1800; s.connect(f); f.connect(g);
+      const d = kind === 'hat' ? .04 : .12; g.gain.setValueAtTime(kind === 'hat' ? .18 : .45, t); g.gain.exponentialRampToValueAtTime(.001, t + d);
+      s.start(t); s.stop(t + d + .02);
+    }
+  },
   music(cfg, brightness = 0) {
     this.brightness = brightness;
     if (!this.ctx) { this.cfg = cfg; return; }
     if (this.cfg === cfg && this.timer) return;
     this.stopMusic(); this.cfg = cfg; if (!cfg) return;
-    const beat = 60 / cfg.tempo / 2; let next = this.ctx.currentTime + .1; this.step = 0;
-    const prog = [0, 5, 3, 4];
+    const songI = ((cfg.root || 60) + Math.round((cfg.tempo || 100) / 8)) % this.SONGS.length, song = this.SONGS[songI];
+    const bpm = Math.max(124, Math.min(150, (cfg.tempo || 100) * 1.3)), six = 60 / bpm / 4;
+    const key = 60 + (((cfg.root || 60) - 60) % 5);
+    const toks = song.mel.map(b => b.split(' '));
+    let next = this.ctx.currentTime + .12; this.step = 0;
     this.timer = setInterval(() => {
       if (!this.ctx) return;
-      while (next < this.ctx.currentTime + .4) {
-        const s = this.step++, bar = Math.floor(s / 8) % 4, chord = prog[bar];
-        const scale = this.SCALES[this.brightness < .25 ? 'min' : cfg.scale] || this.SCALES.maj;
-        const root = cfg.root + [0, -7, -3, -5][bar];
-        if (s % 8 === 0) this.note(this.mtof(root - 12), next, beat * 7, 'sine', .55, this.musicBus);
-        if (s % 4 === 2) this.note(this.mtof(root + scale[2] - 12), next, beat * 3, 'sine', .25, this.musicBus);
-        const density = .35 + this.brightness * .35;
-        if (Math.random() < density) {
-          const idx = (chord + Math.floor(Math.random() * 5)) % scale.length;
-          this.note(this.mtof(cfg.root + scale[idx]), next, beat * (1.5 + Math.random() * 2), cfg.wave, cfg.wave === 'square' ? .09 : .2, this.musicBus);
+      while (next < this.ctx.currentTime + .3) {
+        const s = this.step++, st = s % 16, bar = Math.floor(s / 16), chordDeg = song.prog[bar % 4] + 1;
+        const rootN = key - 12 + this.deg(chordDeg), br = this.brightness, full = br >= .2;
+        /* bateria */
+        if (st % 8 === 0 || (st === 10 && full)) this.hit('kick', next);
+        if ((st === 4 || st === 12) && full) this.hit('snare', next);
+        if (st % 2 === 0) this.hit('hat', next);
+        /* baixo saltitante em colcheias: fundamental / oitava */
+        if (st % 2 === 0) this.note(this.mtof(rootN - 12 + (st % 4 ? 12 : 0)), next, six * 1.6, 'square', .1, this.musicBus);
+        /* arpejo do acorde */
+        if (full && st % 2 === 1) { const tri = [0, 2, 4][((st - 1) / 2) % 3]; this.note(this.mtof(key + this.deg(chordDeg + tri)), next, six * 1.2, 'triangle', .08, this.musicBus); }
+        /* melodia (colcheias) */
+        if (st % 2 === 0) {
+          const row = toks[bar % toks.length], tk = row[st / 2];
+          if (tk && tk !== '.' && tk !== '-') {
+            let len = 1; for (let j = st / 2 + 1; j < row.length && row[j] === '-'; j++) len++;
+            const d = isNaN(+tk) ? 10 + 'ABC'.indexOf(tk) : +tk, f = this.mtof(key + 12 + this.deg(d));
+            this.note(f, next, six * 2 * len * .95, 'square', .1, this.musicBus);
+            this.note(f * 2, next + six * .5, six * 2 * len * .6, 'triangle', .035, this.musicBus);
+          }
         }
-        next += beat;
+        next += six;
       }
-    }, 120);
+    }, 80);
   },
   stopMusic() { if (this.timer) clearInterval(this.timer); this.timer = null; this.cfg = null; },
   sfx(name) {

@@ -691,6 +691,95 @@ html.rm *, html.rm *::before, html.rm *::after { animation-duration: .001ms !imp
   .reveal.rv .vtag { display: none; }
   .reveal.rv .row .btn.small { padding: 6px 10px; font-size: .85rem; }
 }
+
+/* ============ MINIJOGOS ============ */
+.mg { display: grid; gap: 10px; }
+.mghead { display: flex; align-items: center; gap: 10px; background: var(--paper); color: var(--ink); border: var(--bw) solid var(--ink); border-radius: 14px; padding: 8px 12px; box-shadow: 3px 3px 0 var(--ink); }
+.mghead img.px { width: 34px; height: 51px; flex: none; }
+.mghead b { flex: 1; font-size: 1.15rem; line-height: 1.25; }
+.mgsay { position: absolute; left: 50%; top: 8%; transform: translate(-50%, -10px); background: var(--paper); color: var(--ink); border: 3px solid var(--ink); border-radius: 12px; padding: 6px 14px; font-weight: 800; box-shadow: 3px 3px 0 var(--ink); opacity: 0; pointer-events: none; transition: .25s; z-index: 5; max-width: 86%; text-align: center; }
+.mgsay.on { opacity: 1; transform: translate(-50%, 0); }
+.mgsay.soft { background: #ffe2dc; } .mgsay.info { background: #e6f1ff; } .mgsay.ok { background: var(--glow); }
+.floattx { position: absolute; transform: translate(-50%, 0); font-family: var(--title); font-size: clamp(1.1rem, 3vw, 1.8rem); color: #fff; text-shadow: 2px 2px 0 var(--ink), -2px -2px 0 var(--ink), 2px -2px 0 var(--ink), -2px 2px 0 var(--ink); pointer-events: none; animation: floatup 1.3s ease-out forwards; z-index: 6; white-space: nowrap; }
+@keyframes floatup { 0% { opacity: 0; transform: translate(-50%, 10px) scale(.7); } 20% { opacity: 1; transform: translate(-50%, 0) scale(1.15); } 100% { opacity: 0; transform: translate(-50%, -50px) scale(1); } }
+.shake { animation: shake .35s; } @keyframes shake { 25% { transform: translateX(-6px) rotate(-3deg); } 75% { transform: translateX(6px) rotate(3deg); } }
+.glow { box-shadow: 0 0 0 4px var(--glow), 0 0 22px 6px #f4c542 !important; animation: pulse 1s infinite; }
+/* arrumar a casa */
+.tidyroom { position: relative; }
+.tidyroom .dust { position: absolute; inset: 0; background: repeating-linear-gradient(45deg, rgba(120, 100, 70, .35) 0 6px, rgba(90, 70, 50, .2) 6px 14px); mix-blend-mode: multiply; transition: opacity .5s; pointer-events: none; }
+.tidyroom.shine::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 40%, #fff8 0, transparent 60%); animation: shine 1.2s ease-out; pointer-events: none; }
+@keyframes shine { from { opacity: 0; } 30% { opacity: 1; } to { opacity: 0; } }
+.mess-it { position: absolute; padding: 0; border: 0; background: none; cursor: pointer; animation: popin .4s both, bob 1.6s ease-in-out infinite; z-index: 2; }
+.mess-it img { width: 100%; display: block; filter: drop-shadow(2px 2px 0 rgba(0,0,0,.25)); }
+.mess-it.sel { z-index: 4; animation: lift .5s ease-in-out infinite alternate; }
+.mess-it.sel img { filter: drop-shadow(0 0 4px #fff) drop-shadow(0 0 8px #f4c542); }
+.mess-it.gone { animation: gone .45s forwards; }
+@keyframes bob { 50% { transform: translateY(-4%); } }
+@keyframes lift { from { transform: translateY(-10%) scale(1.25); } to { transform: translateY(-22%) scale(1.3); } }
+@keyframes gone { to { transform: translateY(80%) scale(0); opacity: 0; } }
+.mgbar { display: flex; align-items: center; gap: 10px; color: #fff; font-weight: 800; }
+.mgbar .bar { flex: 1; height: 14px; background: #fff3; border-radius: 99px; overflow: hidden; border: 2px solid var(--ink); }
+.mgbar .bar i { display: block; height: 100%; background: linear-gradient(90deg, #d9534f, #f08a3c); transition: width .4s; }
+.mgbar b { color: var(--glow); font-family: var(--title); min-width: 90px; text-align: right; }
+.bins { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.tbin { background: var(--paper); border: var(--bw) solid var(--ink); border-radius: 14px; box-shadow: 3px 3px 0 var(--ink); padding: 6px 4px; display: grid; justify-items: center; gap: 2px; font-weight: 800; color: var(--ink); cursor: pointer; font-size: .9rem; }
+.tbin img.px { width: 52px; height: 52px; }
+.bins.ready .tbin { animation: wiggle .8s ease-in-out infinite; }
+.bins.ready .tbin:nth-child(2) { animation-delay: .1s; } .bins.ready .tbin:nth-child(3) { animation-delay: .2s; } .bins.ready .tbin:nth-child(4) { animation-delay: .3s; }
+@keyframes wiggle { 50% { transform: translateY(-4px); } }
+.tbin.gulp { animation: gulp .35s !important; } @keyframes gulp { 50% { transform: scale(1.18); background: var(--glow); } }
+.folds { display: flex; gap: 10px; justify-content: center; align-items: end; flex-wrap: wrap; }
+.shirt { background: var(--paper); border: var(--bw) solid var(--ink); border-radius: 14px; box-shadow: 3px 3px 0 var(--ink); padding: 8px; cursor: pointer; display: grid; justify-items: center; gap: 4px; }
+.shirt img.px { width: 84px; height: 84px; transition: transform .25s; }
+.shirt[data-s="1"] img { transform: scaleX(.75); } .shirt[data-s="2"] img { transform: scale(.75, .6); }
+.shirt.folded { background: var(--glow); }
+.shirt .dots { display: flex; gap: 4px; } .shirt .dots i { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--ink); background: #fff; } .shirt .dots i.on { background: var(--teal, #3fa7a0); }
+.drawer { display: grid; justify-items: center; color: #fff; font-weight: 800; } .drawer img.px { width: 64px; }
+/* cozinha */
+.kitchen { position: relative; background: linear-gradient(180deg, #ffe9c4 0 62%, #e8c08a 62%); border: var(--bw) solid var(--ink); border-radius: 16px; box-shadow: var(--shadow); padding: 10px; display: grid; place-items: center; min-height: 220px; overflow: hidden; }
+.kitchen::before { content: ''; position: absolute; inset: 0 0 38% 0; background: repeating-linear-gradient(90deg, transparent 0 38px, #f5d9a8 38px 40px), repeating-linear-gradient(0deg, transparent 0 38px, #f5d9a8 38px 40px); opacity: .7; }
+.kitchen canvas { position: relative; width: min(340px, 78%); image-rendering: pixelated; cursor: pointer; }
+.stepdots { position: absolute; left: 10px; top: 10px; display: flex; gap: 4px; }
+.stepdots i { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--ink); background: #fff; }
+.stepdots i.ok { background: var(--green, #5cae6a); } .stepdots i.now { background: var(--glow); transform: scale(1.3); }
+.clock { position: absolute; right: 12px; top: 10px; background: var(--ink); color: #fff; font-weight: 800; border-radius: 99px; padding: 4px 12px; font-size: 1.1rem; }
+.counter { display: flex; flex-wrap: wrap; gap: 6px; min-height: 30px; }
+.counter .muted { color: #fff9; font-weight: 700; }
+.chipi { display: inline-flex; align-items: center; gap: 4px; background: var(--paper); color: var(--ink); border: 2px solid var(--ink); border-radius: 99px; padding: 2px 10px 2px 4px; font-weight: 800; font-size: .85rem; animation: popin .3s both; }
+.chipi img.px { width: 22px; height: 22px; }
+.tray { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 8px; }
+.traylab { grid-column: 1 / -1; margin: 0; color: #fff; font-weight: 800; }
+.ing { background: var(--paper); border: var(--bw) solid var(--ink); border-radius: 14px; box-shadow: 3px 3px 0 var(--ink); padding: 6px 4px; display: grid; justify-items: center; gap: 2px; font-weight: 800; color: var(--ink); cursor: pointer; font-size: .88rem; }
+.ing img.px { width: 46px; height: 46px; }
+.ing:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.ing.used { opacity: .35; pointer-events: none; }
+.recipe { grid-column: 1 / -1; background: var(--paper); color: var(--ink); border: var(--bw) solid var(--ink); border-radius: 14px; padding: 12px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.recipe > b { width: 100%; font-family: var(--title); font-size: 1.2rem; }
+.recipe p { width: 100%; margin: 4px 0 0; font-weight: 700; }
+@media (max-width: 700px) {
+  .mghead b { font-size: 1rem; } .mghead img.px { width: 26px; height: 39px; }
+  .tbin img.px { width: 38px; height: 38px; } .tbin { font-size: .75rem; }
+  .tray { grid-template-columns: repeat(5, 1fr); gap: 5px; } .ing img.px { width: 34px; height: 34px; } .ing { font-size: .72rem; padding: 4px 2px; }
+  .kitchen { min-height: 170px; } .shirt img.px { width: 64px; height: 64px; }
+}
+@keyframes pulse { 50% { transform: scale(1.06); } }
+@media (min-width: 701px) {
+  .mg.tidy { grid-template-columns: minmax(0, 1fr) 150px; align-items: start; }
+  .mg.tidy .mghead, .mg.tidy .mgbar, .mg.tidy .folds { grid-column: 1 / -1; }
+  .mg.tidy .tidyroom { grid-column: 1; grid-row: 2; width: min(100%, calc(60vh * 16 / 9)); justify-self: center; }
+  .mg.tidy .bins { grid-column: 2; grid-row: 2; grid-template-columns: 1fr; }
+  .mg.tidy .folds { grid-row: 2; }
+  .mg.cook { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: start; }
+  .mg.cook .mghead { grid-column: 1 / -1; }
+  .mg.cook .kitchen { grid-row: 2 / span 2; min-height: 300px; }
+  .mg.cook .counter { grid-column: 2; grid-row: 2; } .mg.cook .tray { grid-column: 2; grid-row: 3; }
+}
+.kitchen canvas { width: min(440px, 92%); }
+
+.mg [hidden] { display: none !important; }
+
+.tidyroom .folds { position: absolute; left: 50%; bottom: 6%; transform: translateX(-50%); background: rgba(27, 33, 66, .78); border-radius: 16px; padding: 10px; z-index: 5; width: max-content; max-width: 96%; flex-wrap: nowrap; }
+@media (max-width: 700px) { .tidyroom .folds { gap: 6px; padding: 6px; } .shirt { padding: 4px; } .shirt img.px { width: 44px; height: 44px; } .drawer img.px { width: 38px; } }
 </style>
 </head>
 <body>
@@ -898,6 +987,27 @@ const PROPS = {
   murcha: { ops: [['brownL', 4, 11, 8, 5], ['brown', 3, 10, 10, 2], ['brownL', 7, 4, 2, 7], ['tan', 3, 6, 4, 2], ['tan', 9, 5, 4, 2], ['brown', 5, 3, 3, 2]] },
   vazia: { ops: [['tan', 1, 7, 14, 8], ['brownL', 1, 7, 14, 2], ['brown', 3, 10, 10, 4]] },
   carta: { ops: [['white', 1, 3, 14, 11], ['greyL', 1, 3, 14, 1], ['pink', 1, 4, 7, 5], ['pink', 8, 4, 7, 5], ['white', 2, 4, 12, 3], ['red', 6, 8, 4, 3]] },
+  /* cozinha: receita de arroz */
+  arroz: { ops: [['white', 3, 4, 10, 11], ['cream', 3, 12, 10, 3], ['yellow', 4, 7, 8, 4], ['yellowD', 4, 10, 8, 1], ['white', 5, 8, 2, 2], ['white', 8, 8, 1, 1], ['brownL', 5, 2, 6, 2], ['brown', 6, 1, 4, 1]] },
+  copoagua: { ops: [['glass', 4, 3, 8, 12], ['blueL', 4, 7, 8, 8], ['blue', 4, 13, 8, 2], ['white', 5, 4, 1, 3]] },
+  oleo: { ops: [['yellowL', 5, 5, 6, 10], ['yellow', 5, 9, 6, 6], ['white', 6, 10, 2, 3], ['red', 6, 2, 4, 3], ['redD', 6, 4, 4, 1]] },
+  alho: { ops: [['white', 3, 7, 10, 7], ['cream', 4, 8, 2, 5], ['cream', 8, 8, 2, 5], ['white', 6, 4, 4, 3], ['tan', 7, 2, 2, 2], ['tan', 6, 14, 4, 1]] },
+  sal: { ops: [['white', 4, 5, 8, 10], ['blueL', 4, 9, 8, 3], ['greyL', 5, 2, 6, 3], ['greyD', 6, 3, 1, 1], ['greyD', 9, 3, 1, 1]] },
+  escorredor: { ops: [['greyL', 1, 6, 14, 6], ['white', 2, 6, 12, 1], ['greyD', 3, 8, 1, 1], ['greyD', 6, 8, 1, 1], ['greyD', 9, 8, 1, 1], ['greyD', 12, 8, 1, 1], ['greyD', 4, 10, 1, 1], ['greyD', 7, 10, 1, 1], ['greyD', 10, 10, 1, 1], ['grey', 4, 12, 8, 2]] },
+  colher: { ops: [['brownL', 7, 1, 2, 9], ['brownL', 5, 9, 6, 5], ['brown', 6, 10, 4, 3]] },
+  tampa: { ops: [['greyL', 1, 9, 14, 3], ['white', 2, 9, 12, 1], ['grey', 3, 8, 10, 1], ['greyD', 7, 5, 2, 3]] },
+  fogo: { ops: [['red', 4, 6, 8, 9], ['orange', 5, 4, 6, 10], ['yellow', 6, 8, 4, 6], ['yellowL', 7, 11, 2, 3], ['orange', 3, 9, 2, 5], ['orange', 11, 8, 2, 6]] },
+  chocolate: { ops: [['brownD', 3, 2, 10, 12], ['brown', 4, 3, 3, 3], ['brown', 8, 3, 3, 3], ['brown', 4, 7, 3, 3], ['brown', 8, 7, 3, 3], ['red', 3, 11, 10, 4], ['yellow', 5, 12, 6, 1]] },
+  meia: { ops: [['pink', 5, 1, 5, 9], ['pink', 5, 9, 9, 4], ['white', 5, 1, 5, 2], ['pinkD', 11, 10, 3, 3], ['white', 6, 5, 3, 1]] },
+  sorvete: { ops: [['tan', 6, 9, 4, 6], ['brownL', 7, 10, 2, 1], ['pink', 4, 3, 8, 6], ['white', 5, 4, 2, 2], ['red', 7, 1, 2, 2]] },
+  /* casa: arrumação */
+  tenis: { ops: [['red', 2, 8, 10, 4], ['red', 9, 6, 4, 3], ['white', 1, 12, 14, 2], ['white', 4, 9, 2, 1], ['white', 7, 9, 2, 1], ['redD', 2, 11, 10, 1]] },
+  bola: { ops: [['white', 4, 4, 9, 9], ['red', 4, 7, 9, 3], ['white', 7, 7, 3, 3], ['ink', 8, 8, 1, 1]] },
+  camiseta: { ops: [['teal', 4, 4, 8, 11], ['teal', 1, 4, 3, 5], ['teal', 12, 4, 3, 5], ['tealD', 6, 4, 4, 1], ['white', 6, 8, 4, 2]] },
+  dobrada: { ops: [['teal', 2, 7, 12, 7], ['tealD', 2, 9, 12, 1], ['tealD', 2, 12, 12, 1], ['white', 6, 8, 4, 1]] },
+  estante: { ops: [['brown', 1, 1, 14, 14], ['brownD', 2, 2, 12, 5], ['brownD', 2, 9, 12, 5], ['purple', 3, 3, 2, 4], ['yellow', 5, 3, 2, 4], ['teal', 7, 3, 2, 4], ['red', 3, 10, 2, 4], ['blue', 5, 10, 3, 4]] },
+  pia: { ops: [['greyL', 1, 7, 14, 6], ['grey', 2, 8, 12, 3], ['blueL', 3, 9, 10, 1], ['grey', 10, 2, 2, 5], ['grey', 7, 2, 5, 2], ['greyD', 2, 13, 12, 2]] },
+  caixabrinq: { ops: [['tan', 1, 6, 14, 9], ['brownL', 1, 6, 14, 2], ['brown', 6, 9, 4, 2], ['red', 3, 3, 4, 3], ['blue', 9, 2, 3, 4]] },
 };
 
 /* ============================================================
@@ -1469,18 +1579,17 @@ const MISSIONS = {
   /* ===== BAIRRO DAS CASAS ===== */
   cida: { title: 'A casa que se arruma sozinha?', char: 'cida', steps: [
     { t: 'dialog', scene: 'sala', cast: [{ id: 'theo', x: 70, y: 52 }], lines: [
-      { who: 'theo', text: 'Todo dia eu chego da escola e a casa está arrumadinha. A roupa limpa aparece na gaveta!' },
-      { who: 'theo', text: 'Acho que esta casa se arruma sozinha. Deve ser mágica!' },
-      { who: 'faisca', text: 'Sozinha? Hmm... Vamos procurar pistas. Detetives olham com atenção!' }] },
-    { t: 'investigate', scene: 'sala', need: 4, prompt: 'Encontre sinais de que alguém trabalhou nesta casa hoje.',
+      { who: 'theo', text: 'A casa fica arrumadinha sozinha?!' },
+      { who: 'faisca', text: 'Sozinha? Hmm... Vamos investigar!' }] },
+    { t: 'investigate', scene: 'sala', need: 4, prompt: 'Ache as pistas: quem trabalhou aqui?',
       items: [
-        { prop: 'roupa', x: 56, y: 35, clue: true, label: 'Roupas dobradas', text: 'Roupas lavadas, secas e dobradas. Isso leva horas de trabalho!' },
-        { prop: 'panela', x: 115, y: 24, clue: true, label: 'Panela no fogão', text: 'Feijão cozinhando! Alguém preparou o almoço da família.' },
-        { prop: 'planta', x: 22, y: 46, clue: true, label: 'Planta regada', text: 'A terra do vaso ainda está molhada. Alguém regou a planta hoje.' },
-        { prop: 'brinquedos', x: 96, y: 62, clue: true, label: 'Brinquedos guardados', text: 'Os brinquedos estavam espalhados de manhã. Agora estão guardados na caixa.' },
-        { prop: 'balde', x: 138, y: 66, clue: true, label: 'Balde e pano', text: 'O chão foi limpo há pouco tempo: o balde e o pano ainda estão aqui.', level: 'det' },
-        { prop: 'gato', x: 58, y: 66, clue: false, label: 'Gato Pipoca', text: 'É o Pipoca, dormindo. Com certeza não foi ele quem arrumou a casa!' },
-        { x: 60, y: 14, w: 22, h: 16, clue: false, label: 'Quadro', text: 'Um quadro bonito, mas está só pendurado aí. Nada mudou nele.' }] },
+        { prop: 'roupa', x: 56, y: 35, clue: true, label: 'Roupas dobradas', text: 'Lavadas, secas e dobradas: horas de trabalho!' },
+        { prop: 'panela', x: 115, y: 24, clue: true, label: 'Panela no fogão', text: 'Feijão no fogo! Alguém fez o almoço.' },
+        { prop: 'planta', x: 22, y: 46, clue: true, label: 'Planta regada', text: 'Terra molhada: alguém regou hoje!' },
+        { prop: 'brinquedos', x: 96, y: 62, clue: true, label: 'Brinquedos guardados', text: 'Estavam no chão. Agora, guardadinhos!' },
+        { prop: 'balde', x: 138, y: 66, clue: true, label: 'Balde e pano', text: 'Chão limpinho agora há pouco!', level: 'det' },
+        { prop: 'gato', x: 58, y: 66, clue: false, label: 'Gato Pipoca', text: 'O Pipoca só dormiu. Não foi ele!' },
+        { x: 60, y: 14, w: 22, h: 16, clue: false, label: 'Quadro', text: 'Só um quadro. Nada mudou.' }] },
     { t: 'sequence', prompt: 'Dona Cida cuida das roupas. Coloque o trabalho na ordem certa.',
       items: [
         { prop: 'maquina', label: 'Colocar a roupa para lavar' },
@@ -1491,7 +1600,7 @@ const MISSIONS = {
       ok: 'É isso! Só a roupa já dá um tempão de trabalho, e ainda tem a comida, a louça, a faxina...' },
     { t: 'reveal', char: 'cida' },
     { t: 'choice', scene: 'sala', items: [{ prop: 'mochila', x: 50, y: 68 }], cast: [{ id: 'theo', x: 70, y: 52 }, { id: 'cida', x: 120, y: 48 }],
-      prompt: 'Theo chega da escola e joga a mochila e o tênis no meio da sala. O que ele pode fazer?',
+      prompt: 'Theo largou a mochila no meio da sala. E agora?',
       options: [
         { text: 'Guardar a mochila e o tênis no lugar.', kind: true, result: 'Pequenos gestos economizam o tempo de quem cuida da casa. Dona Cida sorri: "Valeu, Theo!"' },
         { text: 'Deixar lá. Alguém guarda depois.', kind: false, result: 'Esse "alguém" tem nome: Dona Cida. E ela já tem muitas tarefas. Quando ninguém repara no trabalho, ele fica invisível.' },
@@ -1503,9 +1612,9 @@ const MISSIONS = {
 
   jorge: { title: 'As encomendas trocadas', char: 'jorge', steps: [
     { t: 'dialog', scene: 'portaria', cast: [{ id: 'jorge', x: 72, y: 26, mode: 'sil' }], lines: [
-      { who: 'faisca', text: 'Edifício Ipê! Chegaram muitas encomendas hoje, mas a Névoa apagou as etiquetas.' },
-      { who: '?jorge', text: 'Boa tarde! Que bom que vocês chegaram. Conheço cada morador daqui. Me ajudam a entregar tudo certinho?' }] },
-    { t: 'match', prompt: 'Leia quem mora em cada apartamento e descubra para onde vai cada encomenda.',
+      { who: 'faisca', text: 'A Névoa apagou as etiquetas das encomendas!' },
+      { who: '?jorge', text: 'Conheço todo mundo aqui. Me ajudam a entregar?' }] },
+    { t: 'match', prompt: 'Cada encomenda vai para qual apartamento?',
       left: 'Encomenda', right: 'Apartamento',
       pairs: [
         { a: { prop: 'racao', label: 'Saco de ração' }, b: { label: 'Apto 202: a família Okoye tem um cachorro chamado Bolinha.' }, ok: 'Isso! O Bolinha agradece.' },
@@ -1535,18 +1644,17 @@ const MISSIONS = {
   /* ===== VILA DO APRENDIZADO ===== */
   ze: { title: 'O cheiro que sumiu', char: 'ze', steps: [
     { t: 'dialog', scene: 'salaaula', cast: [{ id: 'bia', x: 60, y: 46 }], lines: [
-      { who: 'bia', text: 'Todo dia, perto do meio-dia, vem um cheirinho de arroz e feijão lá do pátio...' },
-      { who: 'bia', text: 'Hoje a Névoa apagou até o cheiro! Quem será que faz a comida da escola?' },
-      { who: 'faisca', text: 'Alguém cozinha para centenas de crianças todos os dias. Vamos até a cozinha!' }] },
-    { t: 'investigate', scene: 'cozinha', need: 4, prompt: 'Explore a cozinha da escola. O que mostra como a merenda é preparada?',
+      { who: 'bia', text: 'Sumiu o cheirinho de arroz da escola!' },
+      { who: 'faisca', text: 'Quem faz a comida? Pra cozinha!' }] },
+    { t: 'investigate', scene: 'cozinha', need: 4, prompt: 'Explore a cozinha: como a merenda é feita?',
       items: [
-        { prop: 'touca', x: 8, y: 24, clue: true, label: 'Touca e avental', text: 'Touca e avental: na cozinha da escola, higiene é regra para ninguém ficar doente.' },
-        { prop: 'panelao', x: 116, y: 22, clue: true, label: 'Panelão', text: 'Um panelão gigante! Dá para cozinhar arroz para centenas de crianças.' },
-        { prop: 'cardapio', x: 40, y: 24, clue: true, label: 'Cardápio', text: 'O cardápio foi feito com a nutricionista da escola: comida saudável e variada.' },
-        { prop: 'legumes', x: 66, y: 28, clue: true, label: 'Caixa de legumes', text: 'Legumes frescos! Alguns vieram de agricultores da própria região.' },
-        { prop: 'torneira', x: 90, y: 28, clue: true, label: 'Pia e sabão', text: 'Antes de cozinhar, lavar bem as mãos e os alimentos. Sempre!', level: 'det' },
-        { prop: 'relogio', x: 138, y: 6, clue: false, label: 'Relógio', text: 'São 10h. Faltam só duas horas para servir o almoço. Corre!' },
-        { x: 4, y: 8, w: 46, h: 12, clue: false, label: 'Prateleira', text: 'Potes de temperos bem organizados. Cozinha arrumada ajuda a trabalhar rápido.' }] },
+        { prop: 'touca', x: 8, y: 24, clue: true, label: 'Touca e avental', text: 'Touca e avental: higiene é regra!' },
+        { prop: 'panelao', x: 116, y: 22, clue: true, label: 'Panelão', text: 'Panelão gigante: arroz para centenas!' },
+        { prop: 'cardapio', x: 40, y: 24, clue: true, label: 'Cardápio', text: 'Cardápio saudável, feito com a nutricionista.' },
+        { prop: 'legumes', x: 66, y: 28, clue: true, label: 'Caixa de legumes', text: 'Legumes fresquinhos da região!' },
+        { prop: 'torneira', x: 90, y: 28, clue: true, label: 'Pia e sabão', text: 'Lavar as mãos antes de cozinhar. Sempre!', level: 'det' },
+        { prop: 'relogio', x: 138, y: 6, clue: false, label: 'Relógio', text: '10h! Faltam 2 horas pro almoço. Corre!' },
+        { x: 4, y: 8, w: 46, h: 12, clue: false, label: 'Prateleira', text: 'Temperos organizadinhos.' }] },
     { t: 'sequence', prompt: 'Prepare a merenda na ordem certa.',
       items: [
         { prop: 'cardapio', label: 'Conferir o cardápio do dia', level: 'det' },
@@ -1570,8 +1678,8 @@ const MISSIONS = {
 
   katia: { title: 'A sala que amanhece limpa', char: 'katia', steps: [
     { t: 'dialog', scene: 'salaaula', cast: [{ id: 'katia', x: 126, y: 42, mode: 'sil' }], items: [{ prop: 'papel', x: 30, y: 70 }, { prop: 'casaco', x: 92, y: 66 }, { prop: 'cadeira', x: 60, y: 70 }], lines: [
-      { who: 'faisca', text: 'Ontem, depois da aula, esta sala ficou uma bagunça. Hoje de manhã estava brilhando!' },
-      { who: '?katia', text: 'Psiu! Chego cedinho, antes de todo mundo. Me ajuda a separar o que ficou no chão?' }] },
+      { who: 'faisca', text: 'Ontem: bagunça. Hoje: sala brilhando!' },
+      { who: '?katia', text: 'Psiu! Chego cedinho. Me ajuda a separar?' }] },
     { t: 'sort', prompt: 'Para onde vai cada coisa que ficou na sala?',
       bins: [
         { id: 'lixo', label: 'Lixo', prop: 'lixeira' },
@@ -1592,7 +1700,7 @@ const MISSIONS = {
       'Guardo os objetos esquecidos até o dono vir buscar.'] },
     { t: 'reveal', char: 'katia' },
     { t: 'choice', scene: 'salaaula', cast: [{ id: 'theo', x: 50, y: 48 }, { id: 'katia', x: 120, y: 44 }],
-      prompt: 'Um colega joga papel no chão do pátio e diz: "Tem gente que é paga para limpar!". O que você faz?',
+      prompt: 'Um colega joga papel no chão: "Tem gente paga pra limpar!" E você?',
       options: [
         { text: 'Explicar que limpar não é desculpa para sujar e pedir que ele jogue no lixo.', kind: true, result: 'Isso! Respeitar o trabalho de alguém é não aumentar esse trabalho de propósito.' },
         { text: 'Rir junto com ele.', kind: false, result: 'Sujar de propósito aumenta o trabalho da Kátia e mostra falta de respeito. Ela também ouve essas piadas.' },
@@ -1605,9 +1713,9 @@ const MISSIONS = {
   /* ===== ESTAÇÃO DA SAÚDE ===== */
   lucia: { title: 'A visita de cada mês', char: 'lucia', steps: [
     { t: 'dialog', scene: 'ruacasas', cast: [{ id: 'neide', x: 20, y: 40 }, { id: 'lucia', x: 104, y: 44, mode: 'sil' }], lines: [
-      { who: 'neide', text: 'Ai, não lembro se a vacina do meu neto está em dia... E a rua está cheia de mosquito!' },
-      { who: '?lucia', text: 'Calma, Dona Neide! Eu passo de casa em casa todo mês. Vamos ver o que cada família precisa?' }] },
-    { t: 'match', prompt: 'Cada família tem uma situação. Ligue cada uma ao que a agente de saúde pode fazer.',
+      { who: 'neide', text: 'A vacina do meu neto está em dia?' },
+      { who: '?lucia', text: 'Calma! Vamos ver casa por casa.' }] },
+    { t: 'match', prompt: 'Ligue cada família ao que a Lúcia faz.',
       left: 'Situação', right: 'O que fazer',
       pairs: [
         { a: { prop: 'vacina', label: 'O Davi, de 4 anos, está com uma vacina atrasada.' }, b: { label: 'Avisar a família e orientar a ir ao posto vacinar.' }, ok: 'Isso! Vacina em dia protege o Davi e toda a comunidade.' },
@@ -1625,7 +1733,7 @@ const MISSIONS = {
       'Ando muito! Conheço quase todas as ruas e casas do bairro.'] },
     { t: 'reveal', char: 'lucia' },
     { t: 'choice', scene: 'ruacasas', cast: [{ id: 'lucia', x: 104, y: 44 }, { id: 'iara', x: 30, y: 44 }],
-      prompt: 'A Lúcia toca a campainha da sua casa para a visita do mês. O que sua família pode fazer?',
+      prompt: 'A Lúcia chegou para a visita do mês. E aí?',
       options: [
         { text: 'Receber, responder às perguntas e mostrar a carteira de vacinação.', kind: true, result: 'Ótimo! Com essas informações, a equipe consegue cuidar melhor da sua família.' },
         { text: 'Fingir que não tem ninguém em casa.', kind: false, result: 'Ela vai ter que voltar outro dia, e algum problema de saúde pode demorar para ser visto.' },
@@ -1637,18 +1745,18 @@ const MISSIONS = {
 
   benedito: { title: 'O dia de Dona Olímpia', char: 'benedito', steps: [
     { t: 'dialog', scene: 'quarto', cast: [{ id: 'olimpia', x: 20, y: 38 }, { id: 'benedito', x: 116, y: 40, mode: 'sil' }], lines: [
-      { who: 'olimpia', text: 'Bom dia, meu bem! Você viu meus óculos? E já está na hora do meu remédio?' },
-      { who: 'faisca', text: 'Dona Olímpia tem 84 anos. Ela mora sozinha, mas recebe ajuda todos os dias. Vamos ver como?' }] },
-    { t: 'investigate', scene: 'quarto', need: 4, prompt: 'Procure no quarto o que ajuda Dona Olímpia a viver bem e em segurança.',
+      { who: 'olimpia', text: 'Cadê meus óculos? E meu remédio?' },
+      { who: 'faisca', text: 'Alguém cuida dela todo dia. Quem?' }] },
+    { t: 'investigate', scene: 'quarto', need: 4, prompt: 'Ache o que ajuda Dona Olímpia a viver bem.',
       cast: [{ id: 'olimpia', x: 20, y: 38 }],
       items: [
-        { prop: 'oculos', x: 112, y: 36, clue: true, label: 'Óculos', text: 'Os óculos estavam no lugar de sempre. Quem cuida sabe onde ficam as coisas.' },
-        { prop: 'remedios', x: 122, y: 36, clue: true, label: 'Caixa de remédios', text: 'Remédios separados por dia e horário, do jeito que o médico receitou.' },
-        { prop: 'bengala', x: 46, y: 48, clue: true, label: 'Bengala', text: 'A bengala fica sempre por perto, para evitar quedas.' },
-        { prop: 'album', x: 140, y: 64, clue: true, label: 'Álbum de fotos', text: 'Cuidar também é conversar. Os dois olham as fotos e relembram histórias.' },
-        { x: 50, y: 75, w: 50, h: 10, clue: true, label: 'Tapete preso', text: 'O tapete foi preso no chão para ninguém escorregar. Detalhe de quem cuida!', level: 'det' },
-        { prop: 'radio', x: 86, y: 50, clue: false, label: 'Rádio', text: 'Um rádio antigo tocando samba. Dona Olímpia adora!' },
-        { x: 112, y: 12, w: 30, h: 14, clue: false, label: 'Fotos na parede', text: 'Fotos dos netos. Ela fala deles o tempo todo!' }] },
+        { prop: 'oculos', x: 112, y: 36, clue: true, label: 'Óculos', text: 'No lugar de sempre: quem cuida sabe!' },
+        { prop: 'remedios', x: 122, y: 36, clue: true, label: 'Caixa de remédios', text: 'Remédios separados por dia e hora.' },
+        { prop: 'bengala', x: 46, y: 48, clue: true, label: 'Bengala', text: 'Bengala por perto: nada de queda!' },
+        { prop: 'album', x: 140, y: 64, clue: true, label: 'Álbum de fotos', text: 'Cuidar também é conversar!' },
+        { x: 50, y: 75, w: 50, h: 10, clue: true, label: 'Tapete preso', text: 'Tapete preso: ninguém escorrega!', level: 'det' },
+        { prop: 'radio', x: 86, y: 50, clue: false, label: 'Rádio', text: 'Samba no rádio. Ela adora!' },
+        { x: 112, y: 12, w: 30, h: 14, clue: false, label: 'Fotos na parede', text: 'Fotos dos netos!' }] },
     { t: 'sequence', prompt: 'Organize a manhã de cuidados com Dona Olímpia.',
       items: [
         { prop: 'cama', label: 'Ajudar a levantar da cama com segurança' },
@@ -1659,7 +1767,7 @@ const MISSIONS = {
       ok: 'Isso! E o dia ainda nem chegou na hora do almoço...' },
     { t: 'reveal', char: 'benedito' },
     { t: 'choice', scene: 'quarto', cast: [{ id: 'olimpia', x: 20, y: 38 }, { id: 'benedito', x: 70, y: 44 }],
-      prompt: 'Dona Olímpia começa a contar, pela terceira vez, a história de quando dançou num baile. O que você faz?',
+      prompt: 'Dona Olímpia conta a mesma história pela 3ª vez. E você?',
       options: [
         { text: 'Ouvir com atenção e perguntar como era a música.', kind: true, result: 'Para ela, ser ouvida é tão importante quanto o remédio.' },
         { text: 'Dizer: "Você já contou essa história."', kind: false, result: 'Ela pode se sentir esquecida. As pessoas idosas também correm o risco de ficar "invisíveis".' },
@@ -1673,8 +1781,7 @@ const MISSIONS = {
   zefa: { title: 'O caminho do tomate', char: 'zefa', steps: [
     { t: 'dialog', scene: 'feira', cast: [{ id: 'iara', x: 40, y: 54 }], lines: [
       { who: 'iara', text: 'Mãe, o tomate nasce no mercado?' },
-      { who: 'faisca', text: 'Boa pergunta, Iara! Antes de chegar à barraca, ele fez uma viagem longa.' },
-      { who: 'faisca', text: 'Vamos descobrir quem começou essa história?' }] },
+      { who: 'faisca', text: 'Nada disso! Vamos ver a viagem dele!' },] },
     { t: 'whoami', char: 'zefa', clues: [
       'Acordo antes de o sol nascer.',
       'Trabalho com a terra, com as sementes e com a chuva.',
@@ -1691,7 +1798,7 @@ const MISSIONS = {
       ok: 'Meses de trabalho para o tomate chegar até a salada!' },
     { t: 'reveal', char: 'zefa' },
     { t: 'choice', scene: 'feira', cast: [{ id: 'zefa', x: 68, y: 40 }, { id: 'iara', x: 30, y: 54 }],
-      prompt: 'Na barraca, um tomate está um pouco amassado, mas ainda está bom. O que você faz?',
+      prompt: 'Um tomate está amassadinho, mas bom. E aí?',
       options: [
         { text: 'Levar assim mesmo: ele ainda serve para fazer molho.', kind: true, result: 'Alimento bom não deve ir para o lixo. Muita gente trabalhou para ele existir.' },
         { text: 'Reclamar alto com a feirante.', kind: false, result: 'Tomate amassa no transporte. Dona Zefa fica chateada: ela cuidou dele por meses.' },
@@ -1703,9 +1810,9 @@ const MISSIONS = {
 
   rafa: { title: 'Entregas na chuva', char: 'rafa', steps: [
     { t: 'dialog', scene: 'feira', cast: [{ id: 'rafa', x: 100, y: 52, mode: 'sil' }], lines: [
-      { who: 'faisca', text: 'Pedidos novos saindo do Mercado! Mas choveu, e a Névoa embaralhou o mapa.' },
-      { who: '?rafa', text: 'Me ajuda a planejar o caminho? Tenho que entregar tudo e chegar inteiro em casa!' }] },
-    { t: 'route', prompt: 'Toque nas ruas para levar a bicicleta e entregar todos os pedidos. Desvie da obra e da rua alagada. Se tiver remédio, ele é urgente: entregue primeiro!',
+      { who: 'faisca', text: 'Choveu e o mapa embaralhou!' },
+      { who: '?rafa', text: 'Me ajuda a planejar as entregas?' }] },
+    { t: 'route', prompt: 'Toque nas ruas e entregue tudo! Remédio primeiro.',
       grids: {
         exp: { w: 6, h: 5, start: [0, 2], drops: [{ x: 5, y: 0, prop: 'casa', label: 'Casa da Dona Neide' }, { x: 4, y: 4, prop: 'farmacia', label: 'Remédio para o Seu Osvaldo' }],
           blocks: [{ x: 2, y: 1, prop: 'obra' }, { x: 2, y: 2, prop: 'obra' }, { x: 3, y: 3, prop: 'agua' }] },
@@ -1737,9 +1844,9 @@ const MISSIONS = {
   /* ===== PARQUE ===== */
   marina: { title: 'A montanha de recicláveis', char: 'marina', steps: [
     { t: 'dialog', scene: 'cooperativa', cast: [{ id: 'marina', x: 66, y: 22, mode: 'sil' }], lines: [
-      { who: 'faisca', text: 'Depois da festa no parque, sobrou uma montanha de coisas! Algumas podem virar coisas novas...' },
-      { who: '?marina', text: 'Aqui na cooperativa, cada coisa vai para o seu lugar. Vamos separar juntos?' }] },
-    { t: 'sort', prompt: 'Separe cada material na lixeira certa. Leia o nome de cada uma.',
+      { who: 'faisca', text: 'Sobrou uma montanha de lixo da festa!' },
+      { who: '?marina', text: 'Vamos separar? Muita coisa vira nova!' }] },
+    { t: 'sort', prompt: 'Cada material na lixeira certa!',
       bins: [
         { id: 'papel', label: 'Papel', color: '#4a78c9', prop: 'jornal' },
         { id: 'plastico', label: 'Plástico', color: '#d9534f', prop: 'pet' },
@@ -1776,18 +1883,17 @@ const MISSIONS = {
 
   joaquim: { title: 'O jardim que não para de crescer', char: 'joaquim', steps: [
     { t: 'dialog', scene: 'parque', cast: [{ id: 'theo', x: 54, y: 52 }, { id: 'bia', x: 74, y: 52 }], lines: [
-      { who: 'bia', text: 'O parque está tão bonito! Será que as flores se plantam sozinhas?' },
-      { who: 'theo', text: 'Ué, as plantas não crescem sozinhas?' },
-      { who: 'faisca', text: 'Crescem... mas um jardim bonito, com grama cortada e árvores saudáveis, precisa de alguém. Vamos procurar pistas!' }] },
-    { t: 'investigate', scene: 'parque', need: 4, prompt: 'Encontre no parque sinais do trabalho de quem cuida dele.',
+      { who: 'bia', text: 'As flores se plantam sozinhas?' },
+      { who: 'faisca', text: 'Jardim bonito precisa de alguém. Vamos achar!' }] },
+    { t: 'investigate', scene: 'parque', need: 4, prompt: 'Ache sinais de quem cuida do parque.',
       items: [
-        { prop: 'muda', x: 4, y: 60, clue: true, label: 'Mudas novas', text: 'Mudas plantadas em fileira. Daqui a alguns anos, vão virar árvores!' },
-        { prop: 'regador', x: 24, y: 60, clue: true, label: 'Regador', text: 'Um regador ainda molhado. Os canteiros foram regados hoje cedo.' },
-        { prop: 'folhas', x: 76, y: 70, clue: true, label: 'Folhas amontoadas', text: 'Alguém varreu as folhas da trilha e fez um montinho.' },
-        { prop: 'carrinho', x: 108, y: 40, clue: true, label: 'Carrinho de mão', text: 'Carrinho de mão com terra: alguém está trabalhando por aqui.' },
-        { prop: 'tesoura', x: 58, y: 44, clue: true, label: 'Tesoura de poda', text: 'Tesoura de poda: serve para cortar galhos secos e deixar a árvore saudável.', level: 'det' },
-        { prop: 'pato', x: 124, y: 60, clue: false, label: 'Pato', text: 'Quá! Um pato nadando. Ele não ajudou em nada, mas é muito simpático.' },
-        { prop: 'flor', x: 40, y: 72, clue: false, label: 'Flor', text: 'Uma flor linda. Ela cresceu, mas alguém plantou e regou.' }] },
+        { prop: 'muda', x: 4, y: 60, clue: true, label: 'Mudas novas', text: 'Mudas novas: um dia, árvores!' },
+        { prop: 'regador', x: 24, y: 60, clue: true, label: 'Regador', text: 'Regador molhado: regaram hoje!' },
+        { prop: 'folhas', x: 76, y: 70, clue: true, label: 'Folhas amontoadas', text: 'Alguém varreu as folhas!' },
+        { prop: 'carrinho', x: 108, y: 40, clue: true, label: 'Carrinho de mão', text: 'Carrinho com terra: tem trabalho aqui!' },
+        { prop: 'tesoura', x: 58, y: 44, clue: true, label: 'Tesoura de poda', text: 'Tesoura de poda: tira galho seco.', level: 'det' },
+        { prop: 'pato', x: 124, y: 60, clue: false, label: 'Pato', text: 'Quá! O pato não ajudou. Mas é fofo!' },
+        { prop: 'flor', x: 40, y: 72, clue: false, label: 'Flor', text: 'Alguém plantou e regou esta flor!' }] },
     { t: 'sequence', prompt: 'Vamos plantar uma muda de ipê! Coloque os passos na ordem.',
       items: [
         { prop: 'pa', label: 'Cavar um buraco' },
@@ -1811,15 +1917,14 @@ const MISSIONS = {
   /* ===== CAMINHOS DA CIDADE ===== */
   denise: { title: 'A rua de antes e de depois', char: 'denise', steps: [
     { t: 'dialog', scene: 'rua', cast: [{ id: 'denise', x: 120, y: 48, mode: 'sil' }], lines: [
-      { who: 'faisca', text: 'Olha esta rua às 5h da manhã... e agora, às 7h. Alguém passou por aqui!' },
-      { who: 'faisca', text: 'Compare as duas imagens e descubra o que mudou.' }] },
-    { t: 'spot', scene: 'rua', prompt: 'Toque nas diferenças entre a rua às 5h e às 7h.',
+      { who: 'faisca', text: '5h da manhã... e agora, 7h. O que mudou?' },] },
+    { t: 'spot', scene: 'rua', prompt: 'Toque nas diferenças!',
       diffs: [
         { prop: 'papel', x: 20, y: 52, after: null, label: 'Papéis na calçada', text: 'Os papéis espalhados foram varridos.' },
-        { prop: 'saco', x: 46, y: 46, after: null, label: 'Saco de lixo rasgado', text: 'O saco rasgado foi recolhido antes que os bichos espalhassem tudo.' },
-        { prop: 'bueiro', x: 64, y: 62, after: 'bueirolimpo', label: 'Bueiro entupido', text: 'O bueiro foi desentupido. Quando chover, a água vai escoar e a rua não vai alagar!' },
-        { prop: 'lixeiracheia', x: 98, y: 44, after: 'lixeira', label: 'Lixeira cheia', text: 'A lixeira estava transbordando. Agora está vazia.', level: 'inv' },
-        { prop: 'garrafa', x: 138, y: 54, after: null, label: 'Garrafa na calçada', text: 'Uma garrafa de vidro na calçada podia machucar alguém. Foi recolhida.', level: 'det' }] },
+        { prop: 'saco', x: 46, y: 46, after: null, label: 'Saco de lixo rasgado', text: 'Saco recolhido antes dos bichos!' },
+        { prop: 'bueiro', x: 64, y: 62, after: 'bueirolimpo', label: 'Bueiro entupido', text: 'Bueiro limpo: a rua não alaga!' },
+        { prop: 'lixeiracheia', x: 98, y: 44, after: 'lixeira', label: 'Lixeira cheia', text: 'Lixeira cheia? Agora vazia!', level: 'inv' },
+        { prop: 'garrafa', x: 138, y: 54, after: null, label: 'Garrafa na calçada', text: 'Vidro recolhido: ninguém se machuca!', level: 'det' }] },
     { t: 'whoami', char: 'denise', clues: [
       'Começo a trabalhar quando a cidade ainda está dormindo.',
       'Uso uniforme laranja com faixas que brilham no escuro.',
@@ -1827,7 +1932,7 @@ const MISSIONS = {
       'Meu carrinho tem vassoura, pá e muitos sacos de lixo.'] },
     { t: 'reveal', char: 'denise' },
     { t: 'choice', scene: 'rua', cast: [{ id: 'denise', x: 110, y: 48 }, { id: 'iara', x: 40, y: 48 }],
-      prompt: 'Você vê alguém jogar uma lata pela janela do carro, bem perto da Denise. O que você pensa e faz?',
+      prompt: 'Alguém joga uma lata pela janela do carro. E você?',
       options: [
         { text: 'Guardar o meu lixo comigo até achar uma lixeira, sempre.', kind: true, result: 'Exemplo é tudo! Se cada um cuidar do seu lixo, o trabalho da Denise fica mais leve.' },
         { text: 'Achar normal. Afinal, o gari limpa.', kind: false, result: 'O trabalho da Denise é limpar a cidade, não aguentar falta de respeito. Lixo jogado no chão também pode entupir bueiros.' },
@@ -1839,8 +1944,8 @@ const MISSIONS = {
 
   pedro: { title: 'Religar as luzes', char: 'pedro', steps: [
     { t: 'dialog', scene: 'ruanoite', cast: [{ id: 'pedro', x: 64, y: 44, mode: 'sil' }], lines: [
-      { who: 'faisca', text: 'Os postes de Lumiara estão apagados. Sem luz, andar à noite fica perigoso.' },
-      { who: '?pedro', text: 'Eu conserto, mas com segurança. Cada ferramenta tem um motivo. Me ajudam?' }] },
+      { who: 'faisca', text: 'Os postes apagaram! Que perigo!' },
+      { who: '?pedro', text: 'Eu conserto, com segurança. Me ajudam?' }] },
     { t: 'match', prompt: 'Para que serve cada equipamento?', left: 'Equipamento', right: 'Para quê',
       pairs: [
         { a: { prop: 'capacete', label: 'Capacete' }, b: { label: 'Proteger a cabeça.' }, ok: 'Isso! O capacete protege contra batidas e objetos que caem.' },
@@ -1897,11 +2002,9 @@ const MEDALS = {
 /* ---------------- FINAL ---------------- */
 const FINALE = {
   intro: [
-    { who: 'faisca', text: 'Vocês conseguiram! Todas as regiões estão iluminadas e todo mundo foi lembrado.' },
-    { who: 'faisca', text: 'Mas olhem para o céu... a Névoa ainda está ali.' },
-    { who: 'nevoa', text: 'Eu... eu não sou má. Eu nasci de todos os "obrigados" que ninguém disse.' },
-    { who: 'nevoa', text: 'Cada vez que alguém passa por um trabalhador sem enxergar, eu cresço um pouquinho.' },
-    { who: 'faisca', text: 'Então já sabemos o que fazer. Vamos encher o céu de agradecimentos!' }],
+    { who: 'faisca', text: 'Vocês conseguiram! Lumiara acendeu!' },
+    { who: 'nevoa', text: 'Eu não sou má... nasci dos "obrigados" esquecidos.' },
+    { who: 'faisca', text: 'Vamos encher o céu de obrigados!' }],
   without: { /* o que aconteceria sem cada trabalhador */
     cida: 'A casa ficaria sem comida pronta e sem roupa limpa.', jorge: 'Ninguém saberia quem entra no prédio, e as encomendas se perderiam.',
     ze: 'Muitas crianças estudariam com fome.', katia: 'A escola ficaria suja, e muita gente poderia ficar doente.',
@@ -1911,26 +2014,26 @@ const FINALE = {
     denise: 'As ruas ficariam sujas e alagariam na primeira chuva.', pedro: 'As ruas ficariam escuras e perigosas à noite.' },
   thanks: ['Obrigado por cuidar da gente!', 'Seu trabalho é muito importante.', 'Eu reparei em você!', 'Obrigada por deixar tudo funcionando!', 'Sem você, a cidade parava.', 'Você faz a diferença todos os dias.'],
   outro: [
-    { who: 'nevoa', text: 'Que quentinho... Obrigada por lembrarem.' },
-    { who: 'nevoa', text: 'Agora eu não sou mais a Névoa do Esquecimento. Vou ser a Nuvem das Lembranças e guardar cada história que vocês descobriram.' },
-    { who: 'faisca', text: 'Lumiara está acesa de novo! Mas ainda falta uma carta no álbum...' }],
+    { who: 'nevoa', text: 'Que quentinho... Obrigada!' },
+    { who: 'nevoa', text: 'Agora sou a Nuvem das Lembranças!' },
+    { who: 'faisca', text: 'Falta só uma carta no álbum...' }],
   mirror: 'Tem gente que trabalha cuidando de nós sem receber salário: cozinha, lava, leva à escola, cuida quando estamos doentes. Quem faz isso na sua casa?'
 };
 
 
 /* ---------------- DESAFIOS EXTRAS (um por região, opcionais, valem estrelas) ---------------- */
 const BONUS = {
-  casas: { t: 'memory', title: 'Memória do bairro', prompt: 'Jogo da memória: encontre os pares de cada pessoa com o objeto do trabalho dela.',
+  casas: { t: 'memory', title: 'Memória do bairro', prompt: 'Memória: cada pessoa com seu objeto!',
     pairs: [['cida', 'roupa'], ['jorge', 'chaves'], ['ze', 'panelao'], ['katia', 'vassoura'], ['lucia', 'vacina'], ['benedito', 'bengala'], ['zefa', 'cesta'], ['rafa', 'bike']] },
-  vila: { t: 'logic', title: 'Quem chega primeiro?', prompt: 'Use as pistas para descobrir a hora em que cada pessoa chega à escola. Marque ✓ ou ✗ em cada quadrinho.',
+  vila: { t: 'logic', title: 'Quem chega primeiro?', prompt: 'Que horas cada um chega? Marque ✓ ou ✗.',
     people: ['Kátia', 'Seu Zé', 'Professora Rita'], options: ['6h', '6h30', '7h30'], answer: [0, 1, 2],
     clues: ['A professora Rita não chega às 6h.', 'Seu Zé chega depois da Kátia.', 'Quem chega às 7h30 dá a primeira aula do dia.'] },
-  saude: { t: 'memory', title: 'Memória da cidade', prompt: 'Jogo da memória: encontre os pares de cada pessoa com um objeto do trabalho dela.',
+  saude: { t: 'memory', title: 'Memória da cidade', prompt: 'Memória: cada pessoa com seu objeto!',
     pairs: [['lucia', 'vacina'], ['benedito', 'remedios'], ['marina', 'papelao'], ['joaquim', 'tesoura'], ['denise', 'lixeira'], ['pedro', 'lampada'], ['zefa', 'tomate'], ['rafa', 'mochila']] },
   mercado: { t: 'logic', title: 'Cada um no seu caminho', prompt: 'Descubra qual veículo cada pessoa usa no trabalho.',
     people: ['Rafa', 'Dona Zefa', 'Marina', 'Pedro'], options: ['Bicicleta', 'Caminhonete', 'Carrinho de recicláveis', 'Caminhão com cesto'], answer: [0, 1, 2, 3],
     clues: ['Quem planta usa a caminhonete para levar a colheita até a feira.', 'Rafa não usa nada com motor.', 'Pedro precisa alcançar o alto dos postes.', 'Marina não pedala nas entregas.'] },
-  parque: { t: 'memory', title: 'Memória do parque', prompt: 'Jogo da memória diferente: os pares são coisas do MESMO tipo (dois papéis, dois plásticos...). Pense no material!',
+  parque: { t: 'memory', title: 'Memória do parque', prompt: 'Memória: junte coisas do mesmo material!',
     pairs: [['jornal', 'papelao'], ['pet', 'iogurte'], ['lata', 'chaves'], ['vidro', 'garrafa'], ['banana', 'folhas'], ['guardanapo', 'espelho'], ['muda', 'regador'], ['tesoura', 'galho']],
     labels: { jornal: 'Papel', papelao: 'Papel', pet: 'Plástico', iogurte: 'Plástico', lata: 'Metal', chaves: 'Metal', vidro: 'Vidro', garrafa: 'Vidro', banana: 'Orgânico', folhas: 'Orgânico', guardanapo: 'Não reciclável', espelho: 'Não reciclável', muda: 'Jardim', regador: 'Jardim', tesoura: 'Poda', galho: 'Poda' } },
   caminhos: { t: 'logic', title: 'Os turnos da cidade', prompt: 'Descubra onde e quando cada pessoa trabalha.',
@@ -2034,12 +2137,12 @@ for (const mid in DAYS) {
 
 /* ---------------- INTERLÚDIOS DA NÉVOA (entre regiões) ---------------- */
 const INTERLUDES = [
-  [{ who: 'nevoa', text: 'Hmm? Uma luz acendeu lá embaixo... Por que vocês se importam tanto com essas pessoas?' }, { who: 'faisca', text: 'Porque sem elas nada funciona! Você vai ver.' }],
-  [{ who: 'nevoa', text: 'Sabe... antigamente eu era só uma nuvenzinha do tamanho de uma pipoca.' }, { who: 'nevoa', text: 'Cada vez que alguém passava por um trabalhador sem nem olhar, eu crescia um pouco.' }],
-  [{ who: 'nevoa', text: 'Quando vocês sorriem para quem trabalha... eu sinto um calorzinho estranho. Parece que eu encolho.' }, { who: 'faisca', text: 'Ela está ficando menor! Vamos continuar!' }],
-  [{ who: 'nevoa', text: 'Vocês estão me deixando pequena... e eu não sei se isso é ruim.' }, { who: 'nevoa', text: 'Ninguém nunca me disse obrigado por nada. Será que eu sirvo para alguma coisa?' }],
-  [{ who: 'nevoa', text: 'Eu vi vocês ajudando, conversando, agradecendo... Eu queria saber fazer isso também.' }, { who: 'faisca', text: 'Quem sabe ainda dá tempo, Névoa.' }],
-  [{ who: 'nevoa', text: 'Estou cansada de ser cinza. Me encontrem na praça. Eu... quero ver as luzes de perto.' }]
+  [{ who: 'nevoa', text: 'Hmm? Uma luz acendeu lá embaixo... Por que vocês se importam tanto com essas pessoas?' }, { who: 'faisca', text: 'Sem elas, nada funciona!' }],
+  [{ who: 'nevoa', text: 'Sabe... antigamente eu era só uma nuvenzinha do tamanho de uma pipoca.' }, { who: 'nevoa', text: 'Quando ninguém olha um trabalhador, eu cresço.' }],
+  [{ who: 'nevoa', text: 'Quando vocês sorriem para quem trabalha... eu sinto um calorzinho estranho. Parece que eu encolho.' }, { who: 'faisca', text: 'Ela está diminuindo! Vamos!' }],
+  [{ who: 'nevoa', text: 'Vocês estão me deixando pequena... e eu não sei se isso é ruim.' }, { who: 'nevoa', text: 'Ninguém nunca me agradeceu...' }],
+  [{ who: 'nevoa', text: 'Eu vi vocês ajudando, conversando, agradecendo... Eu queria saber fazer isso também.' }, { who: 'faisca', text: 'Ainda dá tempo, Névoa!' }],
+  [{ who: 'nevoa', text: 'Me encontrem na praça. Quero ver as luzes!' }]
 ];
 
 /* ============================================================
@@ -2057,7 +2160,7 @@ const Audio8 = {
       const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
       this.ctx = new AC();
       this.master = this.ctx.createGain(); this.master.connect(this.ctx.destination);
-      const lp = this.ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2400; lp.connect(this.master);
+      const lp = this.ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 5200; lp.connect(this.master);
       this.musicBus = this.ctx.createGain(); this.musicBus.connect(lp);
       this.sfxBus = this.ctx.createGain(); this.sfxBus.connect(this.master);
       this.apply();
@@ -2068,7 +2171,7 @@ const Audio8 = {
     if (!this.ctx) return;
     const t = this.ctx.currentTime;
     this.master.gain.setTargetAtTime(this.vol.mute ? 0 : 1, t, .05);
-    this.musicBus.gain.setTargetAtTime(this.vol.music * .16, t, .1);
+    this.musicBus.gain.setTargetAtTime(this.vol.music * .13, t, .1);
     this.sfxBus.gain.setTargetAtTime(this.vol.sfx * .5, t, .02);
   },
   note(freq, start, dur, type = 'triangle', gain = .3, bus) {
@@ -2080,30 +2183,69 @@ const Audio8 = {
   },
   mtof(m) { return 440 * Math.pow(2, (m - 69) / 12); },
   SCALES: { maj: [0, 2, 4, 7, 9, 12, 14, 16], pent: [0, 3, 5, 7, 10, 12, 15, 17], min: [0, 3, 5, 7, 8, 12, 15, 17] },
-  /* música generativa calma; brightness 0..1 deixa mais alegre conforme a cidade se ilumina */
+  /* música chiptune ALEGRE: 4 temas originais em tom maior, com bateria, baixo saltitante e melodia.
+     brightness (0..1) acrescenta instrumentos conforme a cidade se ilumina. */
+  SONGS: [
+    { prog: [0, 4, 5, 3], mel: ['1 3 5 8 7 5 3 5', '2 5 7 5 9 - 7 -', '6 5 3 5 6 8 9 8', '4 3 4 6 5 - . .', '1 3 5 8 7 5 3 5', '2 5 7 9 A - 9 7', '8 7 6 5 6 - 5 3', '4 2 7 2 1 - . .'] },
+    { prog: [0, 3, 0, 4], mel: ['5 . 5 6 5 . 3 .', '4 . 4 6 8 . 6 .', '5 . 5 6 5 3 1 3', '2 . 2 3 2 . 7 .', '5 . 5 6 5 . 8 .', '6 . 6 8 A . 8 .', '9 8 7 6 5 3 2 3', '1 - - . 1 . . .'] },
+    { prog: [5, 3, 0, 4], mel: ['3 3 . 5 . 3 2 1', '4 4 . 6 . 4 3 2', '5 5 . 8 . 5 6 7', '9 - 8 - 7 - 5 .', '3 3 . 5 . 3 2 1', '4 4 . 6 . 8 9 A', 'B A 9 8 7 8 9 7', '8 - - - . . . .'] },
+    { prog: [0, 4, 5, 3], mel: ['1 . 3 5 . 3 5 6', '5 . 7 9 . 7 5 .', '6 . 8 6 . 5 3 .', '4 . 6 8 . 6 4 .', '8 . 9 A . 9 8 6', '7 . 5 7 9 - . .', '8 6 5 3 5 6 5 3', '2 . 3 2 1 - . .'] }],
+  MAJ: [0, 2, 4, 5, 7, 9, 11],
+  deg(d) { const i = d - 1; return 12 * Math.floor(i / 7) + this.MAJ[((i % 7) + 7) % 7]; },
+  noiseBuf() {
+    if (this._nb) return this._nb;
+    const c = this.ctx, b = c.createBuffer(1, c.sampleRate * .3, c.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    return (this._nb = b);
+  },
+  hit(kind, t) {
+    const c = this.ctx, g = c.createGain(); g.connect(this.musicBus);
+    if (kind === 'kick') {
+      const o = c.createOscillator(); o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(45, t + .12);
+      g.gain.setValueAtTime(.9, t); g.gain.exponentialRampToValueAtTime(.001, t + .18); o.connect(g); o.start(t); o.stop(t + .2);
+    } else {
+      const s = c.createBufferSource(), f = c.createBiquadFilter(); s.buffer = this.noiseBuf();
+      f.type = 'highpass'; f.frequency.value = kind === 'hat' ? 7000 : 1800; s.connect(f); f.connect(g);
+      const d = kind === 'hat' ? .04 : .12; g.gain.setValueAtTime(kind === 'hat' ? .18 : .45, t); g.gain.exponentialRampToValueAtTime(.001, t + d);
+      s.start(t); s.stop(t + d + .02);
+    }
+  },
   music(cfg, brightness = 0) {
     this.brightness = brightness;
     if (!this.ctx) { this.cfg = cfg; return; }
     if (this.cfg === cfg && this.timer) return;
     this.stopMusic(); this.cfg = cfg; if (!cfg) return;
-    const beat = 60 / cfg.tempo / 2; let next = this.ctx.currentTime + .1; this.step = 0;
-    const prog = [0, 5, 3, 4];
+    const songI = ((cfg.root || 60) + Math.round((cfg.tempo || 100) / 8)) % this.SONGS.length, song = this.SONGS[songI];
+    const bpm = Math.max(124, Math.min(150, (cfg.tempo || 100) * 1.3)), six = 60 / bpm / 4;
+    const key = 60 + (((cfg.root || 60) - 60) % 5);
+    const toks = song.mel.map(b => b.split(' '));
+    let next = this.ctx.currentTime + .12; this.step = 0;
     this.timer = setInterval(() => {
       if (!this.ctx) return;
-      while (next < this.ctx.currentTime + .4) {
-        const s = this.step++, bar = Math.floor(s / 8) % 4, chord = prog[bar];
-        const scale = this.SCALES[this.brightness < .25 ? 'min' : cfg.scale] || this.SCALES.maj;
-        const root = cfg.root + [0, -7, -3, -5][bar];
-        if (s % 8 === 0) this.note(this.mtof(root - 12), next, beat * 7, 'sine', .55, this.musicBus);
-        if (s % 4 === 2) this.note(this.mtof(root + scale[2] - 12), next, beat * 3, 'sine', .25, this.musicBus);
-        const density = .35 + this.brightness * .35;
-        if (Math.random() < density) {
-          const idx = (chord + Math.floor(Math.random() * 5)) % scale.length;
-          this.note(this.mtof(cfg.root + scale[idx]), next, beat * (1.5 + Math.random() * 2), cfg.wave, cfg.wave === 'square' ? .09 : .2, this.musicBus);
+      while (next < this.ctx.currentTime + .3) {
+        const s = this.step++, st = s % 16, bar = Math.floor(s / 16), chordDeg = song.prog[bar % 4] + 1;
+        const rootN = key - 12 + this.deg(chordDeg), br = this.brightness, full = br >= .2;
+        /* bateria */
+        if (st % 8 === 0 || (st === 10 && full)) this.hit('kick', next);
+        if ((st === 4 || st === 12) && full) this.hit('snare', next);
+        if (st % 2 === 0) this.hit('hat', next);
+        /* baixo saltitante em colcheias: fundamental / oitava */
+        if (st % 2 === 0) this.note(this.mtof(rootN - 12 + (st % 4 ? 12 : 0)), next, six * 1.6, 'square', .1, this.musicBus);
+        /* arpejo do acorde */
+        if (full && st % 2 === 1) { const tri = [0, 2, 4][((st - 1) / 2) % 3]; this.note(this.mtof(key + this.deg(chordDeg + tri)), next, six * 1.2, 'triangle', .08, this.musicBus); }
+        /* melodia (colcheias) */
+        if (st % 2 === 0) {
+          const row = toks[bar % toks.length], tk = row[st / 2];
+          if (tk && tk !== '.' && tk !== '-') {
+            let len = 1; for (let j = st / 2 + 1; j < row.length && row[j] === '-'; j++) len++;
+            const d = isNaN(+tk) ? 10 + 'ABC'.indexOf(tk) : +tk, f = this.mtof(key + 12 + this.deg(d));
+            this.note(f, next, six * 2 * len * .95, 'square', .1, this.musicBus);
+            this.note(f * 2, next + six * .5, six * 2 * len * .6, 'triangle', .035, this.musicBus);
+          }
         }
-        next += beat;
+        next += six;
       }
-    }, 120);
+    }, 80);
   },
   stopMusic() { if (this.timer) clearInterval(this.timer); this.timer = null; this.cfg = null; },
   sfx(name) {
@@ -3396,7 +3538,7 @@ function renderMission(id, idx) {
   Audio8.music(r.music, progress());
   const revealIdx = M.steps.findIndex(s => s.t === 'reveal');
   const known = G.album.includes(M.char);
-  const label = { dialog: 'História', investigate: 'Investigação', spot: 'Antes e depois', match: 'Associação', sequence: 'Sequência', sort: 'Separação', route: 'Rota', whoami: 'Quem sou eu?', reveal: 'Descoberta', choice: 'Decisão', reflect: 'Reflexão', thanks: 'Mural do Obrigado', mirror: 'A última carta', memory: 'Desafio extra · Memória', days: 'E se ninguém fizesse?', shift: 'Um turno com a Denise', logic: 'Desafio extra · Lógica' }[step.t];
+  const label = { dialog: 'História', investigate: 'Investigação', spot: 'Antes e depois', match: 'Associação', sequence: 'Sequência', sort: 'Separação', route: 'Rota', whoami: 'Quem sou eu?', reveal: 'Descoberta', choice: 'Decisão', reflect: 'Reflexão', thanks: 'Mural do Obrigado', mirror: 'A última carta', memory: 'Desafio extra · Memória', days: 'E se ninguém fizesse?', shift: 'Um turno com a Denise', tidy: 'Minijogo · Arruma-arruma', cook: 'Minijogo · Cozinha', logic: 'Desafio extra · Lógica' }[step.t];
   app().innerHTML = `<div class="screen">${hudHTML()}
     <div class="mhead"><div><div class="where">${esc(r.name)} · ${label}</div><h2>${esc(M.title)}</h2></div>
     <div class="dots" aria-label="Etapa ${idx + 1} de ${M.steps.length}">${M.steps.map((_, i) => `<i class="${i < idx ? 'done' : i === idx ? 'now' : ''}"></i>`).join('')}</div></div>
@@ -3777,19 +3919,19 @@ function playCutscene(frames, { title = 'Lumiara', where = 'História', onDone }
 
 /* ---------- prólogo animado ---------- */
 const PROLOGUE_FRAMES = [
-  { scene: 'cidade', text: 'Esta é Lumiara. Uma cidade de janelas acesas, cheiro de comida e gente indo e vindo.',
+  { scene: 'cidade', text: 'Esta é Lumiara!',
     actors: { denise: { s: 'denise', from: [-18, 60], x: 26, y: 60, walk: true }, rafa: { s: 'rafa', from: [170, 62], x: 112, y: 62, walk: true, flip: true }, lucia: { s: 'lucia', from: [-30, 62], x: 60, y: 62, walk: true, ms: 1800 } } },
-  { scene: 'cidade', text: 'Todo dia, muita gente trabalha para tudo funcionar: varre a rua, leva entregas, visita as famílias, cozinha, conserta, planta, cuida.',
+  { scene: 'cidade', text: 'Muita gente trabalha para tudo funcionar.',
     actors: { denise: { s: 'denise', x: 40, y: 60, walk: true }, rafa: { s: 'rafa', x: 92, y: 62, walk: true, flip: true }, ze: { s: 'ze', from: [170, 58], x: 132, y: 58, walk: true, flip: true } } },
-  { scene: 'cidade', fog: .35, text: 'Até que, numa manhã, chegou a Névoa do Esquecimento. Ela não quebra nada. Ela faz as pessoas esquecerem.',
+  { scene: 'cidade', fog: .35, text: 'Até que chegou a Névoa do Esquecimento!',
     actors: { nevoa: { s: 'nevoa', from: [175, 0], x: 64, y: 2, w: 40, ms: 2600 } } },
-  { scene: 'cidade', gray: 1, fog: .5, text: 'Os trabalhadores continuaram trabalhando... mas ninguém mais reparava neles. Viraram sombras na paisagem.',
+  { scene: 'cidade', gray: 1, fog: .5, text: 'Ninguém mais via os trabalhadores.',
     actors: { denise: { s: 'denise', mode: 'sil', x: 40, y: 60 }, rafa: { s: 'rafa', mode: 'sil', x: 92, y: 62, flip: true }, lucia: { s: 'lucia', mode: 'sil', x: 60, y: 62 }, ze: { s: 'ze', mode: 'sil', x: 132, y: 58, flip: true }, nevoa: { s: 'nevoa', x: 48, y: 0, w: 64, ms: 2000 } } },
-  { scene: 'cidade', gray: 1, dark: .55, fog: .6, text: 'Sem ninguém para lembrar, as cores sumiram. E as luzes de Lumiara foram se apagando, uma por uma.',
+  { scene: 'cidade', gray: 1, dark: .55, fog: .6, text: 'As cores sumiram. As luzes apagaram.',
     actors: { nevoa: { s: 'nevoa', x: 34, y: -2, w: 92, ms: 2000 } } },
-  { scene: 'cidade', gray: 1, dark: .55, fog: .5, sparkle: true, text: 'Mas uma luzinha teimosa continuou acesa: eu, a Faísca!',
+  { scene: 'cidade', gray: 1, dark: .55, fog: .5, sparkle: true, text: 'Mas eu continuei acesa: a Faísca!',
     actors: { faisca: { s: 'faisca', from: [76, 80], x: 72, y: 34, w: 16, glow: true, ms: 1600 } } },
-  { scene: 'cidade', gray: .8, dark: .35, fog: .4, last: 'Vamos ajudar!', text: 'Sozinha eu não consigo. Você me ajuda a descobrir quem faz Lumiara funcionar e a devolver as luzes da cidade?',
+  { scene: 'cidade', gray: .8, dark: .35, fog: .4, last: 'Vamos ajudar!', text: 'Me ajuda a trazer as luzes de volta?',
     actors: { you: { s: 'avatar', from: [-18, 62], x: 56, y: 62, walk: true, ms: 1800 }, faisca: { s: 'faisca', x: 74, y: 44, w: 14, glow: true } } }
 ];
 
@@ -3815,10 +3957,10 @@ function screenOutro() {
   met.forEach((id, i) => { const left = i % 2 === 0; actors['c' + i] = { s: id, from: [left ? -20 : 176, 62], x: 8 + i * 18, y: 62 - (i % 2) * 4, walk: true, flip: !left, ms: 1500 + i * 200 }; });
   const you = {}; G.players.slice(0, 4).forEach((p, i) => { you['p' + i] = { s: avatarId(p.avatar), from: [70 + i * 6, 100], x: 56 + i * 14, y: 40, walk: true, ms: 1600 }; });
   const frames = [
-    { scene: 'festa', dark: .6, text: 'Naquela noite, a praça de Lumiara se encheu de gente.', actors: { nevoa: { s: 'nevoaFeliz', x: 62, y: 2, w: 34 } } },
-    { scene: 'festa', dark: .15, text: 'Cada pessoa que vocês conheceram veio para a Festa das Luzes. Desta vez, todo mundo sabia o nome delas.', actors },
-    { scene: 'festa', text: 'E no meio da festa estavam vocês: os Guardiões da Memória.', sparkle: true, actors: you },
-    { scene: 'festa', sparkle: true, who: 'nevoaFeliz', text: 'Agora eu guardo lembranças. E vou lembrar a cidade, todo dia: ninguém deveria ser invisível.', actors: { nevoa: { s: 'nevoaFeliz', x: 56, y: 0, w: 46, ms: 1600 } }, last: 'Ver o certificado' }
+    { scene: 'festa', dark: .6, text: 'À noite, a praça encheu de gente!', actors: { nevoa: { s: 'nevoaFeliz', x: 62, y: 2, w: 34 } } },
+    { scene: 'festa', dark: .15, text: 'Todo mundo veio para a Festa das Luzes!', actors },
+    { scene: 'festa', text: 'E vocês: os Guardiões da Memória!', sparkle: true, actors: you },
+    { scene: 'festa', sparkle: true, who: 'nevoaFeliz', text: 'Ninguém deveria ser invisível.', actors: { nevoa: { s: 'nevoaFeliz', x: 56, y: 0, w: 46, ms: 1600 } }, last: 'Ver o certificado' }
   ];
   Audio8.music(FINAL_REGION.music, 1);
   playCutscene(frames, { title: 'A Festa das Luzes', where: 'Final', onDone: () => go(screenEnding) });
@@ -4021,6 +4163,266 @@ STEPS.shift = function (step, ctx) {
   };
 };
 (function () { const st = MISSIONS.denise.steps, i = st.findIndex(s => s.t === 'days'); st.splice(i + 1, 0, { t: 'shift' }); })();
+
+/* ============================================================
+   MINIJOGOS — rápidos, com ação e pouco texto
+   tidy: arrumar a casa com a Dona Cida (tocar e guardar + dobrar roupa)
+   cook: fazer arroz de verdade com o Seu Zé (ingredientes + receita)
+   ============================================================ */
+
+
+function mgSay(box, html, kind = 'ok') {
+  if (!box) return;
+  box.innerHTML = html; box.className = 'mgsay on ' + kind;
+  clearTimeout(box._t); box._t = setTimeout(() => box.className = 'mgsay', 2400);
+}
+function floatText(root, html, x = 50, y = 40) {
+  if (!root) return;
+  const e = document.createElement('div'); e.className = 'floattx'; e.innerHTML = html;
+  e.style.left = x + '%'; e.style.top = y + '%'; root.appendChild(e); setTimeout(() => e.remove(), 1300);
+}
+
+/* ---------------- ARRUMA-ARRUMA (Dona Cida) ---------------- */
+STEPS.tidy = function (step, ctx) {
+  const BINS = [
+    { id: 'cesto', prop: 'cesto', label: 'Roupa suja' },
+    { id: 'pia', prop: 'pia', label: 'Pia' },
+    { id: 'caixa', prop: 'caixabrinq', label: 'Brinquedos' },
+    { id: 'estante', prop: 'estante', label: 'Estante' }];
+  const ALL = [
+    ['roupasuja', 'cesto'], ['meia', 'cesto'], ['roupasuja', 'cesto'],
+    ['louca', 'pia'], ['xicara', 'pia'], ['prato', 'pia'],
+    ['bola', 'caixa'], ['brinquedos', 'caixa'],
+    ['livro', 'estante'], ['caderno', 'estante']];
+  const SPOTS = [[10, 62], [30, 70], [52, 66], [74, 72], [96, 64], [118, 70], [138, 62], [22, 50], [64, 56], [108, 54]];
+  const n = G.diff === 'exp' ? 7 : 10;
+  const spots = shuffle(SPOTS.slice());
+  const items = shuffle(ALL.slice()).slice(0, n).map(([prop, bin], k) => ({ prop, bin, k, x: spots[k][0], y: spots[k][1], done: false }));
+  let sel = null, combo = 0, lastOk = 0, phase = 'tidy', folds = [0, 0, 0], left = items.length;
+
+  ctx.stage.innerHTML = `<div class="mg tidy">
+    <div class="mghead"><img class="px" src="${SPR.url('cida')}" alt=""><b id="mgt">Arruma-arruma! Toque num objeto e depois no lugar dele.</b>
+      <button class="ibtn" data-say data-local aria-label="Ouvir">${ICON.voice}</button></div>
+    <div class="scene tidyroom" id="room"><img class="bg px" src="${composeScene('sala').toDataURL()}" alt="Sala bagunçada">
+      <div class="dust" id="dust"></div><div class="layer" id="lay"></div><div class="mgsay" id="say"></div></div>
+    <div class="mgbar"><span>Bagunça</span><div class="bar"><i id="mess" style="width:100%"></i></div><b id="cmb"></b></div>
+    <div class="bins" id="bins">${BINS.map(b => `<button class="tbin" data-bin="${b.id}">${SPR.img(b.prop)}<span>${b.label}</span></button>`).join('')}</div>
+    <div class="folds" id="folds" hidden></div></div>`;
+  wireSay(ctx.stage, () => phase === 'tidy' ? 'Arruma-arruma! Toque num objeto e depois no lugar certo dele.' : 'Agora dobre as camisetas! Toque três vezes em cada uma.');
+  const lay = $('#lay', ctx.stage), room = $('#room', ctx.stage), say = $('#say', ctx.stage);
+  items.forEach(it => {
+    const b = document.createElement('button'); b.className = 'mess-it'; b.dataset.it = it.k;
+    b.style.left = pct(it.x - 6, SW); b.style.top = pct(it.y - 8, SH); b.style.width = pct(15, SW);
+    b.style.animationDelay = (it.k * .07) + 's';
+    b.innerHTML = SPR.img(it.prop); b.setAttribute('aria-label', 'Objeto bagunçado');
+    lay.appendChild(b); it.el = b;
+    b.onclick = () => { if (it.done || phase !== 'tidy') return; ctx.activity(); Audio8.sfx('select'); if (sel) sel.el.classList.remove('sel'); sel = it; b.classList.add('sel'); $('#bins', ctx.stage).classList.add('ready'); };
+  });
+  const upd = () => {
+    const p = left / items.length; $('#mess', ctx.stage).style.width = (p * 100) + '%';
+    $('#dust', ctx.stage).style.opacity = .55 * p;
+  };
+  $$('.tbin', ctx.stage).forEach(b => b.onclick = () => {
+    if (phase !== 'tidy') return; ctx.activity();
+    if (!sel) { mgSay(say, 'Primeiro toque num objeto bagunçado!', 'info'); b.classList.add('shake'); setTimeout(() => b.classList.remove('shake'), 400); return; }
+    const it = sel;
+    if (b.dataset.bin === it.bin) {
+      it.done = true; sel = null; left--; it.el.classList.remove('sel'); it.el.classList.add('gone');
+      setTimeout(() => it.el.remove(), 450); b.classList.add('gulp'); setTimeout(() => b.classList.remove('gulp'), 350);
+      const now = Date.now(); combo = now - lastOk < 3500 ? combo + 1 : 1; lastOk = now;
+      Audio8.sfx(combo >= 3 ? 'medal' : 'found'); sparkle(b, 6);
+      floatText(room, combo >= 2 ? `Combo x${combo}!` : pick(['Isso!', 'Boa!', 'Guardado!', 'Uhuu!']), (it.x / SW) * 100, (it.y / SH) * 100 - 10);
+      $('#cmb', ctx.stage).textContent = combo >= 2 ? `Combo x${combo}` : '';
+      $('#bins', ctx.stage).classList.remove('ready'); upd(); ctx.nextTurn();
+      if (!left) setTimeout(foldPhase, 600);
+    } else {
+      ctx.mistake(); combo = 0; Audio8.sfx('soft'); b.classList.add('shake'); setTimeout(() => b.classList.remove('shake'), 400);
+      const nm = BINS.find(x => x.id === it.bin).label;
+      mgSay(say, ctx.colored || G.diff === 'exp' ? `Ops! Esse vai em <b>${nm}</b>.` : 'Ops! Não é aí. Tente outro lugar!', 'soft');
+    }
+  });
+  const foldPhase = () => {
+    phase = 'fold'; Audio8.sfx('ok'); confetti(20);
+    $('#mgt', ctx.stage).textContent = 'Sala arrumada! Agora dobre as camisetas: toque 3 vezes em cada uma.';
+    $('#bins', ctx.stage).hidden = true; $('.mgbar', ctx.stage).hidden = true;
+    const f = $('#folds', ctx.stage); room.appendChild(f); f.hidden = false;
+    f.innerHTML = folds.map((_, i) => `<button class="shirt" data-f="${i}">${SPR.img('camiseta')}<span class="dots"><i></i><i></i><i></i></span></button>`).join('') + `<div class="drawer">${SPR.img('roupa')}<span>Gaveta</span></div>`;
+    $$('.shirt', ctx.stage).forEach(b => b.onclick = () => {
+      const i = +b.dataset.f; if (folds[i] >= 3) return; ctx.activity();
+      folds[i]++; Audio8.sfx('step'); b.dataset.s = folds[i]; $$('.dots i', b)[folds[i] - 1].className = 'on';
+      if (folds[i] === 3) { b.querySelector('img').src = SPR.url('dobrada'); b.classList.add('folded'); Audio8.sfx('found'); sparkle(b, 6); floatText(room, 'Dobradinha!', 30 + i * 20, 30); }
+      if (folds.every(v => v >= 3)) finish();
+    });
+  };
+  const finish = () => {
+    phase = 'done'; Audio8.sfx('win'); confetti(40);
+    const c = spriteEl('cida', 170, 40); lay.appendChild(c); c.classList.add('flip'); setTimeout(() => moveEl(c, 110, 40, 1400, true), 60);
+    room.classList.add('shine');
+    $('#mgt', ctx.stage).innerHTML = '<b>Casa brilhando!</b> A Dona Cida faz isso <b>todo dia</b>, e ainda cozinha, lava e passa.';
+    if (S.autoRead) Voice.speak('Casa brilhando! A Dona Cida faz isso todo dia, e ainda cozinha, lava e passa.');
+    ctx.complete();
+  };
+  upd();
+  return {
+    speak: () => phase === 'tidy' ? 'Toque num objeto e depois no lugar certo dele.' : 'Toque três vezes em cada camiseta para dobrar.',
+    hint() {
+      ctx.usedHint();
+      if (phase === 'tidy') { const it = sel || items.find(i => !i.done); if (!it) return; if (!sel) it.el.click(); const b = $(`.tbin[data-bin="${it.bin}"]`, ctx.stage); b.classList.add('glow'); setTimeout(() => b.classList.remove('glow'), 1800); }
+      else mgSay(say, 'Toque 3 vezes em cada camiseta!', 'info');
+    },
+    autoStep() {
+      if (phase === 'tidy') { const it = items.find(i => !i.done); if (!it) return; it.el.click(); $(`.tbin[data-bin="${it.bin}"]`, ctx.stage).click(); }
+      else if (phase === 'fold') { const b = $$('.shirt', ctx.stage).find(x => +(x.dataset.s || 0) < 3); if (b) b.click(); }
+    }
+  };
+};
+
+/* ---------------- COZINHA DO SEU ZÉ: arroz de verdade ---------------- */
+STEPS.cook = function (step, ctx) {
+  const ING = { arroz: '1 copo de arroz', copoagua: '2 copos de água', oleo: '1 colher de óleo', alho: '1 dente de alho', sal: '1 pitada de sal' };
+  const SILLY = { chocolate: 'Arroz de chocolate? Hoje não!', meia: 'Eca! Meia não é comida!', sorvete: 'Sorvete derrete na panela!' };
+  const LABEL = { arroz: 'Arroz', copoagua: 'Água', oleo: 'Óleo', alho: 'Alho', sal: 'Sal', chocolate: 'Chocolate', meia: 'Meia', sorvete: 'Sorvete' };
+  const PLAN = [
+    { say: 'Lave o arroz no escorredor!', need: 'escorredor', fx: 'wash', tip: 'Lavar tira o pozinho: o arroz fica soltinho.' },
+    { say: 'Chame um adulto para acender o fogo!', need: 'fogo', fx: 'fire', tip: 'Fogão, só com um adulto junto!' },
+    { say: 'Um fio de óleo na panela.', need: 'oleo', fx: 'oil' },
+    { say: 'Agora o alho amassado!', need: 'alho', fx: 'garlic' },
+    { say: 'Mexa até o alho dourar!', stir: 4, fx: 'golden' },
+    { say: 'Junte o arroz lavado.', need: 'arroz', fx: 'rice' },
+    { say: 'Mexa mais um pouquinho!', stir: 3, fx: 'toast' },
+    { say: 'Água: o dobro do arroz!', need: 'copoagua', fx: 'water', tip: 'A regra de ouro: 2 copos de água para 1 de arroz.' },
+    { say: 'Uma pitadinha de sal.', need: 'sal', fx: 'salt' },
+    { say: 'Tampe e espere a água secar.', need: 'tampa', fx: 'lid' },
+    { say: 'Desligue o fogo!', need: 'fogo', fx: 'off', tip: 'Depois, 5 minutinhos tampado e é só soltar com um garfo.' }];
+  const TOOLS = ['escorredor', 'fogo', 'colher', 'tampa'];
+  const shelf = shuffle(Object.keys(ING).concat(Object.keys(SILLY)));
+  let phase = 'shop', got = new Set(), k = 0, stirs = 0, wrongInRow = 0;
+  const pot = { fill: 'none', fire: false, lid: false, stir: 0, bub: false, done: false, wash: 0 };
+
+  ctx.stage.innerHTML = `<div class="mg cook">
+    <div class="mghead"><img class="px" src="${SPR.url('ze')}" alt=""><b id="mgt">Vamos fazer arroz! Pegue só o que vai na receita.</b>
+      <button class="ibtn" data-say data-local aria-label="Ouvir">${ICON.voice}</button></div>
+    <div class="kitchen" id="kit"><canvas id="pot" width="64" height="48" aria-label="Panela no fogão"></canvas>
+      <div class="stepdots" id="dots">${PLAN.map(() => '<i></i>').join('')}</div><div class="mgsay" id="say"></div><div class="clock" id="clk" hidden></div></div>
+    <div class="counter" id="ctr"></div>
+    <div class="tray" id="tray"></div></div>`;
+  wireSay(ctx.stage, () => phase === 'shop' ? 'Vamos fazer arroz! Pegue só o que vai na receita.' : PLAN[k] ? PLAN[k].say : 'Arroz pronto!');
+  const say = $('#say', ctx.stage), tray = $('#tray', ctx.stage), kit = $('#kit', ctx.stage);
+  const cv = $('#pot', ctx.stage), g = cv.getContext('2d');
+
+  /* --- desenho da panela (pixel art animada) --- */
+  const C = PAL; let tk = 0;
+  const px = (c, x, y, w = 1, h = 1) => { g.fillStyle = c; g.fillRect(x, y, w, h); };
+  const draw = () => {
+    tk++; g.clearRect(0, 0, 64, 48);
+    px(C.greyD, 0, 40, 64, 8); px(C.grey, 0, 40, 64, 1); px(C.ink, 20, 38, 24, 2);
+    if (pot.fire) for (let i = 0; i < 9; i++) { const h = 2 + ((tk + i * 3) % 4); px(i % 2 ? C.orange : C.yellow, 21 + i * 2.5, 38 - h + 2, 2, h); }
+    /* corpo */
+    px(C.greyD, 6, 21, 6, 3); px(C.greyD, 52, 21, 6, 3);
+    px(C.grey, 12, 18, 40, 20); px(C.greyL, 14, 20, 3, 14); px(C.greyD, 12, 36, 40, 2);
+    /* boca (vista de cima) */
+    px(C.greyL, 10, 14, 44, 5); px(C.white, 11, 14, 42, 1);
+    const fills = { none: C.greyD, oil: C.yellowL, garlic: C.yellow, golden: C.yellowD, rice: C.cream, toast: C.tan, water: C.blueL, cooked: C.white };
+    px(fills[pot.fill] || C.greyD, 13, 15, 38, 3);
+    if (['garlic', 'golden'].includes(pot.fill)) for (let i = 0; i < 6; i++) px(pot.fill === 'golden' ? C.brownL : C.white, 15 + i * 6, 15 + (i % 2), 2, 1);
+    if (['rice', 'toast', 'water', 'cooked'].includes(pot.fill)) for (let i = 0; i < 14; i++) px(pot.fill === 'toast' ? C.cream : C.white, 14 + ((i * 7 + (pot.bub ? tk : 0)) % 36), 15 + (i % 3), 2, 1);
+    if (pot.fill === 'water' && pot.fire) for (let i = 0; i < 4; i++) if ((tk + i * 5) % 8 < 4) px(C.white, 16 + i * 9, 15, 2, 2);
+    if (pot.lid) { px(C.greyL, 9, 11, 46, 4); px(C.white, 10, 11, 44, 1); px(C.greyD, 29, 8, 6, 3); }
+    if (pot.stir > 0) { const sx = 22 + Math.sin(tk / 2) * 12; px(C.brownL, sx, 2, 2, 14); px(C.brown, sx - 1, 14, 4, 3); pot.stir--; }
+    if (pot.wash > 0) { for (let i = 0; i < 8; i++) px(C.blueL, 18 + ((i * 11 + tk * 2) % 28), (tk * 2 + i * 5) % 14, 1, 2); pot.wash--; }
+    if ((pot.bub && pot.fire) || pot.done) for (let i = 0; i < 4; i++) { const y = 10 - ((tk + i * 6) % 12); px('rgba(255,255,255,.75)', 18 + i * 9 + Math.sin((tk + i * 4) / 3) * 2, pot.lid ? y - 2 : y, 2, 2); }
+  };
+  const loop = setInterval(draw, 90); onCleanup(() => clearInterval(loop)); draw();
+
+  const btn = (id, label, cls = '') => `<button class="ing ${cls}" data-ing="${id}">${SPR.img(id)}<span>${label}</span></button>`;
+  const renderShop = () => {
+    tray.innerHTML = `<p class="traylab">Despensa</p>` + shelf.map(id => btn(id, LABEL[id], got.has(id) ? 'used' : '')).join('');
+    $('#ctr', ctx.stage).innerHTML = [...got].map(id => `<span class="chipi">${SPR.img(id)}${ING[id]}</span>`).join('') || '<span class="muted">Ingredientes aparecem aqui</span>';
+    $$('.ing', tray).forEach(b => b.onclick = () => shopPick(b.dataset.ing, b));
+  };
+  const shopPick = (id, b) => {
+    ctx.activity(); if (got.has(id)) return;
+    if (ING[id]) { got.add(id); Audio8.sfx('found'); floatText(kit, ING[id], 50, 30); renderShop(); if (got.size === 5) setTimeout(startCook, 500); }
+    else { ctx.mistake(); Audio8.sfx('soft'); mgSay(say, SILLY[id], 'soft'); b.classList.add('shake'); setTimeout(() => b.classList.remove('shake'), 400); }
+  };
+  const startCook = () => {
+    phase = 'cook'; Audio8.sfx('ok');
+    tray.innerHTML = `<p class="traylab">Ferramentas e ingredientes</p>` + TOOLS.concat(Object.keys(ING)).map(id => btn(id, id === 'fogo' ? 'Fogo' : id === 'colher' ? 'Mexer' : id === 'escorredor' ? 'Escorredor' : id === 'tampa' ? 'Tampa' : LABEL[id])).join('');
+    $$('.ing', tray).forEach(b => b.onclick = () => act(b.dataset.ing, b));
+    cv.onclick = () => act('colher', $('[data-ing="colher"]', tray));
+    showStep();
+  };
+  const showStep = () => {
+    const s = PLAN[k]; $('#mgt', ctx.stage).textContent = s.say; stirs = 0; wrongInRow = 0;
+    $$('#dots i', ctx.stage).forEach((d, i) => d.className = i < k ? 'ok' : i === k ? 'now' : '');
+    $$('.ing', tray).forEach(b => b.classList.remove('glow'));
+    if (s.need === 'fogo') $('[data-ing="fogo"] span', tray).textContent = pot.fire ? 'Desligar' : 'Fogo';
+    if (S.autoRead) Voice.speak(s.say);
+  };
+  const FX = {
+    wash: () => { pot.wash = 22; Audio8.sfx('page'); },
+    fire: () => { pot.fire = true; }, oil: () => { pot.fill = 'oil'; }, garlic: () => { pot.fill = 'garlic'; },
+    golden: () => { pot.fill = 'golden'; }, rice: () => { pot.fill = 'rice'; }, toast: () => { pot.fill = 'toast'; },
+    water: () => { pot.fill = 'water'; pot.bub = true; }, salt: () => {},
+    lid: () => { pot.lid = true; }, off: () => { pot.fire = false; pot.fill = 'cooked'; pot.done = true; }
+  };
+  let busy = false;
+  const act = (id, b) => {
+    if (phase !== 'cook' || busy) return; ctx.activity();
+    const s = PLAN[k];
+    if (s.stir) {
+      if (id !== 'colher') return wrong(b, 'Agora é hora de mexer!');
+      stirs++; pot.stir = 8; Audio8.sfx('step'); floatText(kit, 'Mexe!', 25 + stirs * 12, 35);
+      if (stirs >= s.stir) { FX[s.fx](); ok(); }
+      return;
+    }
+    if (id !== s.need) return wrong(b, id === 'fogo' && !pot.fire ? 'Calma! Siga o passo da receita.' : 'Ainda não! Leia o passo de cima.');
+    FX[s.fx](); Audio8.sfx('found'); sparkle(b, 6);
+    if (s.fx === 'lid') { busy = true; const clk = $('#clk', ctx.stage); clk.hidden = false; let m = 0; const iv = setInterval(() => { m += 2; clk.textContent = `⏱ ${m} min`; if (m >= 20) { clearInterval(iv); clk.textContent = 'Secou!'; setTimeout(() => { clk.hidden = true; busy = false; ok(); }, 600); } }, 160); onCleanup(() => clearInterval(iv)); return; }
+    ok();
+  };
+  const ok = () => {
+    const s = PLAN[k]; if (s.tip) mgSay(say, s.tip, 'info'); else mgSay(say, pick(['Isso!', 'Perfeito!', 'Muito bem!', 'Cheirinho bom!']));
+    k++; ctx.nextTurn();
+    if (k >= PLAN.length) return finish();
+    showStep();
+  };
+  const wrong = (b, msg) => {
+    ctx.mistake(); wrongInRow++; Audio8.sfx('soft'); mgSay(say, msg, 'soft');
+    if (b) { b.classList.add('shake'); setTimeout(() => b.classList.remove('shake'), 400); }
+    if (wrongInRow >= 2 || G.diff === 'exp') { const s = PLAN[k]; const t = $(`[data-ing="${s.stir ? 'colher' : s.need}"]`, tray); if (t) t.classList.add('glow'); }
+  };
+  const finish = () => {
+    phase = 'done'; Audio8.sfx('win'); confetti(50);
+    $$('#dots i', ctx.stage).forEach(d => d.className = 'ok');
+    $('#mgt', ctx.stage).innerHTML = '<b>Arroz soltinho!</b> Na escola, o Seu Zé faz <b>30 quilos</b> disso todo dia.';
+    tray.innerHTML = `<div class="recipe"><b>Sua receita</b>${Object.keys(ING).map(id => `<span class="chipi">${SPR.img(id)}${ING[id]}</span>`).join('')}<p>Lavar · refogar o alho · refogar o arroz · água e sal · tampar até secar. <b>Sempre com um adulto no fogão!</b></p></div>`;
+    $('#ctr', ctx.stage).innerHTML = '';
+    if (S.autoRead) Voice.speak('Arroz soltinho! Na escola, o Seu Zé faz trinta quilos disso todo dia.');
+    addMedal('curiosidade', 1, 'cook:' + ctx.id);
+    ctx.complete();
+  };
+  renderShop();
+  return {
+    speak: () => phase === 'shop' ? 'Pegue só o que vai na receita de arroz.' : PLAN[k] ? PLAN[k].say : 'Arroz pronto!',
+    hint() {
+      ctx.usedHint();
+      if (phase === 'shop') { const id = Object.keys(ING).find(i => !got.has(i)); const b = $(`[data-ing="${id}"]`, tray); if (b) b.classList.add('glow'); }
+      else if (PLAN[k]) { const s = PLAN[k]; const b = $(`[data-ing="${s.stir ? 'colher' : s.need}"]`, tray); if (b) b.classList.add('glow'); }
+    },
+    autoStep() {
+      if (busy) return;
+      if (phase === 'shop') { const id = Object.keys(ING).find(i => !got.has(i)); const b = $(`[data-ing="${id}"]`, tray); if (b) b.click(); }
+      else if (phase === 'cook' && PLAN[k]) { const s = PLAN[k]; const b = $(`[data-ing="${s.stir ? 'colher' : s.need}"]`, tray); if (b) b.click(); }
+    }
+  };
+};
+
+/* encaixa os minijogos nas missões (no lugar das listas de ordenar) */
+(function () {
+  const swap = (id, type) => { const st = MISSIONS[id].steps, i = st.findIndex(s => s.t === 'sequence'); if (i >= 0) st.splice(i, 1, { t: type }); else st.splice(2, 0, { t: type }); };
+  swap('cida', 'tidy'); swap('ze', 'cook');
+})();
 
 /* ============================================================
    JOGAR ONLINE — cada um na sua casa, na mesma partida

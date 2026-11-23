@@ -62,6 +62,7 @@ AUTO = r"""
     case 'mirror': { const i = q('#mn'); if (i) i.value = 'Vó Fátima'; click(q('[data-t="0"]')); click(q('#put')); return 'mirror'; }
     case 'dialog': return 'dialog-wait';
     case 'shift': { if (q('[data-ch]')) { q('[data-ch]').click(); return 'shift-choice'; } RUN.ctrl.autoStep(); window.__tries[k]--; return 'shift'; }
+    case 'tidy': case 'cook': { RUN.ctrl.autoStep(); window.__tries[k]--; return t; }
     case 'days': { if (q('[data-g]')) { q('[data-g="' + (window.__tries[k] % 3) + '"]').click(); return 'predict'; } if (q('#back')) { q('#back').click(); return 'days-back'; } if (q('#pass')) { q('#pass').click(); window.__tries[k]--; return 'day'; } window.__tries[k]--; return 'days-wait'; }
     case 'memory': {
       if (q('.mem.up:not(.done)')) { window.__tries[k]--; return 'mem-wait'; }

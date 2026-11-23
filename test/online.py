@@ -15,7 +15,7 @@ async def main():
         for pg in (A, B):
             await pg.goto(URL); await pg.evaluate("() => localStorage.clear()"); await pg.reload()
         # anfitrião cria a sala
-        await A.click('#online'); await A.click('#mk'); await A.fill('#on', 'Yara'); await A.click('[data-l="short"]'); await A.click('#go')
+        await A.click('#online'); await A.click('#mk'); await A.fill('#on', 'Yara'); await A.click('[data-l="medium"]'); await A.click('#go')
         await A.wait_for_function("() => document.querySelector('.code.big') && /^[A-Z0-9]{4}$/.test(document.querySelector('.code.big').textContent)", timeout=15000)
         code = await A.inner_text('.code.big'); print('código da sala:', code)
         # convidada entra

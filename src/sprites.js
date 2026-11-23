@@ -191,6 +191,27 @@ const PROPS = {
   murcha: { ops: [['brownL', 4, 11, 8, 5], ['brown', 3, 10, 10, 2], ['brownL', 7, 4, 2, 7], ['tan', 3, 6, 4, 2], ['tan', 9, 5, 4, 2], ['brown', 5, 3, 3, 2]] },
   vazia: { ops: [['tan', 1, 7, 14, 8], ['brownL', 1, 7, 14, 2], ['brown', 3, 10, 10, 4]] },
   carta: { ops: [['white', 1, 3, 14, 11], ['greyL', 1, 3, 14, 1], ['pink', 1, 4, 7, 5], ['pink', 8, 4, 7, 5], ['white', 2, 4, 12, 3], ['red', 6, 8, 4, 3]] },
+  /* cozinha: receita de arroz */
+  arroz: { ops: [['white', 3, 4, 10, 11], ['cream', 3, 12, 10, 3], ['yellow', 4, 7, 8, 4], ['yellowD', 4, 10, 8, 1], ['white', 5, 8, 2, 2], ['white', 8, 8, 1, 1], ['brownL', 5, 2, 6, 2], ['brown', 6, 1, 4, 1]] },
+  copoagua: { ops: [['glass', 4, 3, 8, 12], ['blueL', 4, 7, 8, 8], ['blue', 4, 13, 8, 2], ['white', 5, 4, 1, 3]] },
+  oleo: { ops: [['yellowL', 5, 5, 6, 10], ['yellow', 5, 9, 6, 6], ['white', 6, 10, 2, 3], ['red', 6, 2, 4, 3], ['redD', 6, 4, 4, 1]] },
+  alho: { ops: [['white', 3, 7, 10, 7], ['cream', 4, 8, 2, 5], ['cream', 8, 8, 2, 5], ['white', 6, 4, 4, 3], ['tan', 7, 2, 2, 2], ['tan', 6, 14, 4, 1]] },
+  sal: { ops: [['white', 4, 5, 8, 10], ['blueL', 4, 9, 8, 3], ['greyL', 5, 2, 6, 3], ['greyD', 6, 3, 1, 1], ['greyD', 9, 3, 1, 1]] },
+  escorredor: { ops: [['greyL', 1, 6, 14, 6], ['white', 2, 6, 12, 1], ['greyD', 3, 8, 1, 1], ['greyD', 6, 8, 1, 1], ['greyD', 9, 8, 1, 1], ['greyD', 12, 8, 1, 1], ['greyD', 4, 10, 1, 1], ['greyD', 7, 10, 1, 1], ['greyD', 10, 10, 1, 1], ['grey', 4, 12, 8, 2]] },
+  colher: { ops: [['brownL', 7, 1, 2, 9], ['brownL', 5, 9, 6, 5], ['brown', 6, 10, 4, 3]] },
+  tampa: { ops: [['greyL', 1, 9, 14, 3], ['white', 2, 9, 12, 1], ['grey', 3, 8, 10, 1], ['greyD', 7, 5, 2, 3]] },
+  fogo: { ops: [['red', 4, 6, 8, 9], ['orange', 5, 4, 6, 10], ['yellow', 6, 8, 4, 6], ['yellowL', 7, 11, 2, 3], ['orange', 3, 9, 2, 5], ['orange', 11, 8, 2, 6]] },
+  chocolate: { ops: [['brownD', 3, 2, 10, 12], ['brown', 4, 3, 3, 3], ['brown', 8, 3, 3, 3], ['brown', 4, 7, 3, 3], ['brown', 8, 7, 3, 3], ['red', 3, 11, 10, 4], ['yellow', 5, 12, 6, 1]] },
+  meia: { ops: [['pink', 5, 1, 5, 9], ['pink', 5, 9, 9, 4], ['white', 5, 1, 5, 2], ['pinkD', 11, 10, 3, 3], ['white', 6, 5, 3, 1]] },
+  sorvete: { ops: [['tan', 6, 9, 4, 6], ['brownL', 7, 10, 2, 1], ['pink', 4, 3, 8, 6], ['white', 5, 4, 2, 2], ['red', 7, 1, 2, 2]] },
+  /* casa: arrumação */
+  tenis: { ops: [['red', 2, 8, 10, 4], ['red', 9, 6, 4, 3], ['white', 1, 12, 14, 2], ['white', 4, 9, 2, 1], ['white', 7, 9, 2, 1], ['redD', 2, 11, 10, 1]] },
+  bola: { ops: [['white', 4, 4, 9, 9], ['red', 4, 7, 9, 3], ['white', 7, 7, 3, 3], ['ink', 8, 8, 1, 1]] },
+  camiseta: { ops: [['teal', 4, 4, 8, 11], ['teal', 1, 4, 3, 5], ['teal', 12, 4, 3, 5], ['tealD', 6, 4, 4, 1], ['white', 6, 8, 4, 2]] },
+  dobrada: { ops: [['teal', 2, 7, 12, 7], ['tealD', 2, 9, 12, 1], ['tealD', 2, 12, 12, 1], ['white', 6, 8, 4, 1]] },
+  estante: { ops: [['brown', 1, 1, 14, 14], ['brownD', 2, 2, 12, 5], ['brownD', 2, 9, 12, 5], ['purple', 3, 3, 2, 4], ['yellow', 5, 3, 2, 4], ['teal', 7, 3, 2, 4], ['red', 3, 10, 2, 4], ['blue', 5, 10, 3, 4]] },
+  pia: { ops: [['greyL', 1, 7, 14, 6], ['grey', 2, 8, 12, 3], ['blueL', 3, 9, 10, 1], ['grey', 10, 2, 2, 5], ['grey', 7, 2, 5, 2], ['greyD', 2, 13, 12, 2]] },
+  caixabrinq: { ops: [['tan', 1, 6, 14, 9], ['brownL', 1, 6, 14, 2], ['brown', 6, 9, 4, 2], ['red', 3, 3, 4, 3], ['blue', 9, 2, 3, 4]] },
 };
 
 /* ============================================================
