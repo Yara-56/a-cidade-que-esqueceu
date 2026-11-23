@@ -73,7 +73,7 @@ function makeWalker(ctx, sceneKey, items, onExamine) {
 const STEPS = {
   /* ---------------- DIÁLOGO ---------------- */
   dialog(step, ctx) {
-    let i = 0;
+    let i = 0, cancelT = null;
     const lines = step.lines;
     ctx.stage.innerHTML = sceneHTML(step.scene, { items: step.items, faded: step.faded ?? !ctx.colored, alt: 'Cena da história', cap: true }) + `<div id="bub"></div>`;
     const sc = $('.scene', ctx.stage), lay = document.createElement('div'); lay.className = 'layer'; sc.appendChild(lay);
@@ -91,8 +91,10 @@ const STEPS = {
       $('#bub', ctx.stage).innerHTML = bubbleHTML(l.who, l.text);
       ctx.setPrimary(i < lines.length - 1 ? 'Continuar' : 'Vamos lá!');
       if (S.autoRead) Voice.speak(l.text);
+      if (cancelT) cancelT(); cancelT = autoNext($('#prim'), Math.max(2400, l.text.length * 70) + (i === 0 ? 900 : 0), () => $('#prim').click());
     };
     show(); ctx.complete();
+    ctx.stage.onclick = e => { if (e.isTrusted && !e.target.closest('button')) $('#prim').click(); };
     return {
       speak: () => lines[i].text,
       primary() { if (i < lines.length - 1) { i++; Audio8.sfx('page'); show(); return true; } return false; },
@@ -104,11 +106,12 @@ const STEPS = {
   investigate(step, ctx) {
     const items = step.items.filter(lvlOk);
     const clues = items.filter(i => i.clue);
+    const goal = Math.min(clues.length, G.diff === 'exp' ? 2 : G.diff === 'inv' ? 3 : clues.length);
     const found = new Set(), checked = new Set();
     const hots = items.map((it, k) => `<button class="hot" data-k="${k}" style="${hotStyle(it)}" aria-label="Examinar: ${esc(it.label)}"></button>`).join('');
     ctx.stage.innerHTML = promptHTML(step.prompt) +
-      `<div class="two"><div>${sceneHTML(step.scene, { items, cast: step.cast, faded: !ctx.colored, extra: hots, alt: 'Cena para investigar' })}<p class="nbmini">Pistas encontradas: <b id="cnt2">0</b> de ${clues.length}</p><p class="walk-help">Toque num objeto, use o controle ou as setas do teclado para andar. Perto de um objeto, toque em Examinar (ou Enter).</p><div id="fb" style="margin-top:12px"></div></div>
-      <aside class="notebook"><h3>Caderno de pistas</h3><p class="muted" style="margin:0 0 8px;font-weight:700">Pistas: <b id="cnt">0</b> de ${clues.length}</p><ul id="nb">${clues.map(() => '<li class="empty"><span></span></li>').join('')}</ul></aside></div>`;
+      `<div class="two"><div>${sceneHTML(step.scene, { items, cast: step.cast, faded: !ctx.colored, extra: hots, alt: 'Cena para investigar' })}<p class="nbmini">Pistas encontradas: <b id="cnt2">0</b> de ${goal}</p><p class="walk-help">Toque num objeto, use o controle ou as setas do teclado para andar. Perto de um objeto, toque em Examinar (ou Enter).</p><div id="fb" style="margin-top:12px"></div></div>
+      <aside class="notebook"><h3>Caderno de pistas</h3><p class="muted" style="margin:0 0 8px;font-weight:700">Pistas: <b id="cnt">0</b> de ${goal}</p><ul id="nb">${Array.from({ length: goal }, () => '<li class="empty"><span></span></li>').join('')}</ul></aside></div>`;
     wireSay(ctx.stage, () => step.prompt);
     const fb = $('#fb', ctx.stage), nb = $('#nb', ctx.stage);
     const examine = k => {
@@ -117,14 +120,15 @@ const STEPS = {
       if (it.clue) {
         if (found.has(it)) { feedback(fb, 'info', `<b>${esc(it.label)}</b> já está no caderno.`, it.prop); return; }
         found.add(it); b.classList.add('found'); b.classList.remove('hint-pulse');
+        if (typeof floatText === 'function') floatText($('.scene', ctx.stage), esc(it.label) + '!', ((it.x + (it.w || 18) / 2) / SW) * 100, Math.max(8, (it.y / SH) * 100 - 6));
         if (it.prop && !ctx.colored) b.insertAdjacentHTML('afterbegin', `<img class="px colorize" src="${SPR.url(it.prop)}" alt="">`);
         b.insertAdjacentHTML('beforeend', `<span class="badge">${found.size}</span>`);
         Audio8.sfx('found'); sparkle(b);
         feedback(fb, 'ok', `<b class="kind">Pista encontrada!</b>${esc(it.text)}`, it.prop);
-        const li = nb.children[found.size - 1]; li.className = ''; li.innerHTML = `${it.prop ? SPR.img(it.prop) : ''}<span>${esc(it.label)}</span>`;
+        const li = nb.children[found.size - 1]; if (li) li.className = ''; if (li) li.innerHTML = `${it.prop ? SPR.img(it.prop) : ''}<span>${esc(it.label)}</span>`;
         $('#cnt', ctx.stage).textContent = found.size; $('#cnt2', ctx.stage).textContent = found.size;
         if (S.autoRead) Voice.speak(it.text);
-        if (found.size === clues.length) { ctx.complete(); setTimeout(() => toast('Todas as pistas encontradas! Toque em <b>Continuar</b>.', 'faisca'), 600); }
+        if (found.size === goal) { ctx.complete(); Audio8.sfx('ok'); }
         else ctx.nextTurn();
       } else {
         b.classList.add('checked'); Audio8.sfx('select');

@@ -164,7 +164,7 @@ function screenPhoneClue(prefill) {
 /* ---------------- PRÓLOGO (animado, ver cinema.js) ---------------- */
 function screenPrologue() {
   Audio8.music({ root: 57, scale: 'min', tempo: 80, wave: 'sine' }, 0);
-  playCutscene(PROLOGUE_FRAMES, { title: 'Lumiara', where: 'Prólogo', onDone: () => { G.prologue = true; saveGame(); go(screenMap); } });
+  playCutscene(PROLOGUE_FRAMES, { title: 'Lumiara', where: 'Prólogo', onDone: () => { G.prologue = true; saveGame(); goNextMission(); } });
 }
 
 /* ---------------- MAPA ---------------- */
@@ -341,7 +341,7 @@ function renderMission(id, idx) {
   const M = MISSIONS[id], step = M.steps[idx], r = regionOf(id);
   if (!step) { finishMission(id); return; }
   /* menos cartas e leitura: no modo sozinho, o 'Quem sou eu?' fica só no Detetive; a associação some no Explorador */
-  if ((step.t === 'whoami' && G.mode === 'solo' && G.diff !== 'det') || (step.t === 'match' && G.diff === 'exp')) return renderMission(id, idx + 1);
+  if ((step.t === 'whoami' && G.mode === 'solo' && G.diff !== 'det') || (step.t === 'match' && G.diff === 'exp') || (step.t === 'reflect' && flowOn() && G.diff !== 'det')) return renderMission(id, idx + 1);
   const prev = G.current && G.current.mission === id ? G.current : {};
   G.current = { mission: id, step: idx, mistakes: prev.mistakes || 0, hints: prev.hints || 0 }; saveGame();
   Audio8.music(r.music, progress());
@@ -362,7 +362,10 @@ function renderMission(id, idx) {
   const prim = $('#prim'), hintBtn = $('#hint');
   const ctx = {
     stage: $('#stage'), id, idx, step, colored: idx > revealIdx,
-    complete() { RUN.done = true; prim.disabled = false; prim.classList.add('ready'); },
+    complete() { RUN.done = true; prim.disabled = false; prim.classList.add('ready');
+      if (['tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift'].includes(step.t)) addMedal('criatividade', 1, 'mg:' + id);
+      const ms = { dialog: 0, choice: 5200, reveal: 9000, thanks: 0, mirror: 0, reflect: 0, days: 3200 }[step.t] ?? 2600;
+      if (ms) autoNext(prim, ms, () => prim.click()); },
     setPrimary(t) { prim.innerHTML = `${esc(t)} ${ICON.next}`; },
     mistake() { RUN.mistakes++; G.current.mistakes++; saveGame(); refreshHint(); },
     usedHint() { if (!RUN.auto) { G.current.hints++; saveGame(); } },
@@ -377,12 +380,23 @@ function renderMission(id, idx) {
   };
   const resetIdle = () => {
     clearTimeout(RUN.idle);
-    if (G.diff === 'exp' && RUN.ctrl && RUN.ctrl.hint && !RUN.done) RUN.idle = setTimeout(() => { if (!RUN.done && !$('#modal')) { RUN.auto = true; RUN.ctrl.hint(); RUN.auto = false; toast('A Faísca deu uma dica!', 'faisca'); } }, 25000);
+    if (G.diff !== 'det' && RUN.ctrl && !RUN.done) RUN.idle = setTimeout(() => {
+      if (RUN.done || $('#modal')) return;
+      if (RUN.ctrl.hint) { RUN.auto = true; RUN.ctrl.hint(); RUN.auto = false; }
+      const t = $('#stage .glow, #stage .hint-pulse, #stage .hot:not(.found):not(.checked), #stage .opt:not(:disabled), #stage button:not(:disabled):not([data-say])');
+      if (t && typeof demoTap === 'function') demoTap(t, 100);
+      resetIdle();
+    }, G.diff === 'exp' ? 7000 : 11000);
     if (G.diff === 'det') RUN.idle = setTimeout(() => { RUN.hinted = true; refreshHint(); }, 45000);
   };
   onCleanup(() => clearTimeout(RUN && RUN.idle));
   RUN.ctrl = STEPS[step.t](step, ctx) || {};
   refreshHint(); resetIdle();
+  /* primeira vez num tipo de etapa: a mãozinha mostra onde tocar */
+  if (!G.seen['tut:' + step.t] && !['dialog', 'reveal', 'tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift'].includes(step.t)) {
+    G.seen['tut:' + step.t] = 1; saveGame();
+    setTimeout(() => { const t = $('#stage .hot:not(.found), #stage .opt, #stage .mcard, #stage .scard, #stage .sil, #stage .sort-item, #stage .cell.hint-pulse, #stage [data-g], #stage #pass, #stage .mem, #stage .chip'); if (t && typeof demoTap === 'function') demoTap(t, 0); }, 1300);
+  }
   if (S.autoRead && step.t !== 'dialog' && RUN.ctrl.speak) setTimeout(() => Voice.speak(RUN.ctrl.speak()), 300);
   const say = () => RUN.ctrl.speak && Voice.speak(RUN.ctrl.speak());
   if ($('#say')) $('#say').onclick = () => { Audio8.init(); if (!S.voice) toast('A leitura em voz alta está desligada nas configurações.'); say(); };
@@ -402,6 +416,13 @@ function renderMission(id, idx) {
     $('#trep').onclick = () => { Audio8.init(); Voice.enabled = true; say(); Voice.enabled = S.voice && !S.mute; };
     $('#tskip').onclick = () => { if (!RUN.done) { G.current.hints++; G.current.mistakes += 99; saveGame(); } advance(id, idx); };
   }
+}
+/* segue direto para a próxima missão do roteiro (sem passar pelo mapa) */
+function goNextMission() {
+  if (progress() >= 1) { G.current = { mission: '_finale' }; saveGame(); go(screenFinale); return; }
+  const m = planMissions().find(x => !G.done[x]);
+  if (!m) { go(screenMap); return; }
+  G.current = { mission: m, step: 0 }; saveGame(); go(renderMission, m, 0);
 }
 function advance(id, idx) {
   const M = MISSIONS[id], step = M.steps[idx];
@@ -431,20 +452,21 @@ function screenReward(id, first, stars = 1, info = {}) {
   const p = Math.round(progress() * 100);
   app().innerHTML = `<div class="screen reward">
     <h2>${regionDone ? `${esc(r.name)} restaurado!` : 'Lumiara ganhou mais luz!'}</h2>
-    <p style="font-weight:700;font-size:1.15rem;margin:0;max-width:640px">${regionDone ? 'As cores voltaram e as janelas se acenderam. Quem trabalha aqui foi lembrado!' : 'Uma janela de cada vez, a cidade volta a brilhar.'}</p>
+
     <div class="star-big">${starsHTML(stars)}</div>
     <p class="star-why">${starsHTML(1, 1)} Missão concluída &nbsp; ${starsHTML((info.mistakes || 0) <= DIFFS[G.diff].star ? 1 : 0, 1)} Poucos tropeços (${info.mistakes || 0}) &nbsp; ${starsHTML((info.hints || 0) === 0 ? 1 : 0, 1)} Sem pedir dica${stars < 3 ? '<br><span style="opacity:.85">Quer as 3 estrelas? Dá para jogar a missão de novo pela região.</span>' : ''}</p>
     <div class="windows" aria-label="${on} de ${nWin} janelas acesas">${Array.from({ length: nWin }, (_, i) => `<div class="win ${i < on ? 'on' : ''}" style="--d:${i * .15}s"></div>`).join('')}</div>
     <div style="width:min(520px,100%)" class="lights"><div class="hud" style="margin:0"><span class="lbl">Luz de Lumiara</span><div class="bar"><i style="width:${p}%"></i></div><span class="pct">${p}%</span></div></div>
     <div class="row center" style="align-items:flex-start">${charCardHTML(M.char).replace('class="cardbig"', 'class="cardbig" style="--rc:' + r.color + ';width:260px"')}
       <div style="display:grid;gap:10px;max-width:420px;text-align:left">
-        <div class="fact" style="color:var(--ink)"><h4>Missão concluída</h4><p>Vocês conheceram <b>${esc(c.name)}</b> (${esc(c.job.toLowerCase())}) e descobriram por que esse trabalho é tão importante.</p></div>
+        <div class="fact" style="color:var(--ink)"><p>Sem <b>${esc(c.name)}</b>, a cidade não funciona!</p></div>
         <div class="medal-row">${medalsHTML()}</div></div></div>
-    <div class="row center"><button class="btn primary big" id="go">${regionDone && first ? 'Continuar a história' : progress() >= 1 ? 'Ir para o grande final' : 'Voltar ao mapa'} ${ICON.next}</button></div></div>`;
+    <div class="row center"><button class="btn primary big" id="go">${regionDone && first ? 'Continuar a história' : progress() >= 1 ? 'Ir para o grande final' : 'Próxima missão'} ${ICON.next}</button></div></div>`;
   $('#go').onclick = () => {
     if (regionDone && first) { const rs = planRegions(); go(screenInterlude, r.id, rs.filter(x => regionState(x.id) === 'done').length, rs.length); }
-    else if (progress() >= 1) { G.current = { mission: '_finale' }; saveGame(); go(screenFinale); } else go(screenMap);
+    else goNextMission();
   };
+  autoNext($('#go'), 4500, () => $('#go').click());
 }
 function medalsHTML() {
   return Object.entries(MEDALS).map(([k, m]) => {
@@ -536,3 +558,17 @@ function openGuide() {
     <h2 style="margin-top:18px">Perguntas para fechar a partida</h2>
     <ol style="font-weight:700"><li>O que você descobriu hoje?</li><li>Qual trabalho você não tinha reparado antes?</li><li>Por que esse trabalho importa?</li><li>Como essa pessoa ajuda a comunidade?</li><li>Como podemos mostrar que reconhecemos esse trabalho?</li></ol>`, { label: 'Como jogar' });
 }
+
+/* mapa: botão grande 'Próxima missão' com a mãozinha mostrando */
+(function () {
+  const m0 = screenMap;
+  screenMap = function () {
+    m0();
+    if (!G || !G.prologue || !$('.mapwrap')) return;
+    const next = planMissions().find(x => !G.done[x]);
+    if (!next && progress() < 1) return;
+    setFoot(`<span class="grow"></span><button class="btn primary big" id="nextm">${next ? 'Próxima missão' : 'Grande final'} ${ICON.next}</button>`);
+    $('#nextm').onclick = () => { Audio8.sfx('select'); goNextMission(); };
+    setTimeout(() => typeof demoTap === 'function' && demoTap($('#nextm'), 0), 1200);
+  };
+})();

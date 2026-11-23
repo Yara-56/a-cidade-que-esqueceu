@@ -1056,3 +1056,8 @@ body::before { will-change: transform; }
 .mess-it { touch-action: none; }
 .tbin.over { background: var(--glow); transform: scale(1.08); }
 .scene .layer .mess-it, .scene .layer .flame, .scene .layer .trashit { pointer-events: auto; }
+/* barrinha de 'segue sozinho' no botão */
+.btn.auto { position: relative; overflow: hidden; }
+.btn.auto::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: #2b223366; transform-origin: left; animation: autofill var(--t, 3s) linear forwards; }
+@keyframes autofill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.footbar .btn.auto::after { height: 100%; background: #ffffff40; }

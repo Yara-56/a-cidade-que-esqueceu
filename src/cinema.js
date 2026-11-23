@@ -24,7 +24,7 @@ function moveEl(img, x, y, ms, walk) {
 
 /* ---------- motor de cenas ---------- */
 function playCutscene(frames, { title = 'Lumiara', where = 'História', onDone }) {
-  let i = 0; const actors = {};
+  let i = 0, cancelT = null; const actors = {};
   app().innerHTML = `<div class="screen stage"><div class="mhead"><div><div class="where">${esc(where)}</div><h2>${esc(title)}</h2></div>
     <div class="dots">${frames.map(() => '<i></i>').join('')}</div></div>
     <div class="scene cap cut" id="cut"><img class="bg px" id="cbg" alt=""><div class="layer" id="lay"></div><div class="tint" id="dark"></div><div class="fogl" id="fog"></div></div>
@@ -60,6 +60,9 @@ function playCutscene(frames, { title = 'Lumiara', where = 'História', onDone }
     $('#say').onclick = () => { Audio8.init(); Voice.speak(f.text); };
     $('#skip').onclick = () => onDone();
     $('#nx').onclick = () => { Audio8.sfx('page'); if (i < frames.length - 1) { i++; show(); } else onDone(); };
+    /* minifilme: passa sozinho; tocar na cena adianta */
+    if (cancelT) cancelT(); cancelT = autoNext($('#nx'), Math.max(2600, f.text.length * 65), () => $('#nx').click());
+    $('#cut').onclick = () => $('#nx').click();
   };
   show();
 }
@@ -94,7 +97,7 @@ function screenInterlude(rid, k, n) {
   const frames = [{ scene, text: `${r.name} voltou a brilhar! Quem trabalha aqui foi lembrado.`, sparkle: true, actors }]
     .concat(lines.map(l => ({ scene, who: l.who, text: l.text, actors: { nevoa: { s: 'nevoa', x: 80 - nw / 2, y: 0, w: nw } } })));
   Audio8.music(r.music, prog);
-  playCutscene(frames, { title: 'Enquanto isso, no céu...', where: 'Interlúdio', onDone: () => go(screenMap) });
+  playCutscene(frames, { title: 'Enquanto isso, no céu...', where: 'Interlúdio', onDone: () => goNextMission() });
 }
 
 /* ---------- final animado ---------- */

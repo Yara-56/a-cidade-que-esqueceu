@@ -1064,6 +1064,11 @@ body::before { will-change: transform; }
 .mess-it { touch-action: none; }
 .tbin.over { background: var(--glow); transform: scale(1.08); }
 .scene .layer .mess-it, .scene .layer .flame, .scene .layer .trashit { pointer-events: auto; }
+/* barrinha de 'segue sozinho' no botão */
+.btn.auto { position: relative; overflow: hidden; }
+.btn.auto::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: #2b223366; transform-origin: left; animation: autofill var(--t, 3s) linear forwards; }
+@keyframes autofill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.footbar .btn.auto::after { height: 100%; background: #ffffff40; }
 </style>
 </head>
 <body>
@@ -2923,6 +2928,18 @@ function addMedal(key, n = 1, once) {
 const app = () => $('#app');
 let cleanupFns = [];
 function onCleanup(fn) { cleanupFns.push(fn); }
+/* modo minifilme: o jogo segue sozinho (menos toques). Na sala de aula, quem controla é o professor. */
+const flowOn = () => !G || G.mode !== 'sala';
+function autoNext(btn, ms, fn) {
+  if (!btn || !flowOn()) return () => {};
+  btn.classList.remove('auto'); void btn.offsetWidth; btn.style.setProperty('--t', ms + 'ms'); btn.classList.add('auto');
+  let t = setTimeout(() => { t = null; btn.classList.remove('auto'); fn(); }, ms);
+  const cancel = () => { if (t) { clearTimeout(t); t = null; btn.classList.remove('auto'); } };
+  const onTap = e => { if (e.isTrusted && !btn.contains(e.target) && !e.target.closest('.footbar') && !e.target.closest('#cut') && !e.target.closest('.bubble')) cancel(); };
+  document.addEventListener('pointerdown', onTap, true);
+  onCleanup(() => { cancel(); document.removeEventListener('pointerdown', onTap, true); });
+  return cancel;
+}
 function go(fn, ...args) {
   if (typeof NET !== 'undefined' && NET.on && NET.started) {
     if (NET.role === 'guest' && !NET.applying) return; /* quem decide a tela é o anfitrião */
@@ -3121,7 +3138,7 @@ function makeWalker(ctx, sceneKey, items, onExamine) {
 const STEPS = {
   /* ---------------- DIÁLOGO ---------------- */
   dialog(step, ctx) {
-    let i = 0;
+    let i = 0, cancelT = null;
     const lines = step.lines;
     ctx.stage.innerHTML = sceneHTML(step.scene, { items: step.items, faded: step.faded ?? !ctx.colored, alt: 'Cena da história', cap: true }) + `<div id="bub"></div>`;
     const sc = $('.scene', ctx.stage), lay = document.createElement('div'); lay.className = 'layer'; sc.appendChild(lay);
@@ -3139,8 +3156,10 @@ const STEPS = {
       $('#bub', ctx.stage).innerHTML = bubbleHTML(l.who, l.text);
       ctx.setPrimary(i < lines.length - 1 ? 'Continuar' : 'Vamos lá!');
       if (S.autoRead) Voice.speak(l.text);
+      if (cancelT) cancelT(); cancelT = autoNext($('#prim'), Math.max(2400, l.text.length * 70) + (i === 0 ? 900 : 0), () => $('#prim').click());
     };
     show(); ctx.complete();
+    ctx.stage.onclick = e => { if (e.isTrusted && !e.target.closest('button')) $('#prim').click(); };
     return {
       speak: () => lines[i].text,
       primary() { if (i < lines.length - 1) { i++; Audio8.sfx('page'); show(); return true; } return false; },
@@ -3152,11 +3171,12 @@ const STEPS = {
   investigate(step, ctx) {
     const items = step.items.filter(lvlOk);
     const clues = items.filter(i => i.clue);
+    const goal = Math.min(clues.length, G.diff === 'exp' ? 2 : G.diff === 'inv' ? 3 : clues.length);
     const found = new Set(), checked = new Set();
     const hots = items.map((it, k) => `<button class="hot" data-k="${k}" style="${hotStyle(it)}" aria-label="Examinar: ${esc(it.label)}"></button>`).join('');
     ctx.stage.innerHTML = promptHTML(step.prompt) +
-      `<div class="two"><div>${sceneHTML(step.scene, { items, cast: step.cast, faded: !ctx.colored, extra: hots, alt: 'Cena para investigar' })}<p class="nbmini">Pistas encontradas: <b id="cnt2">0</b> de ${clues.length}</p><p class="walk-help">Toque num objeto, use o controle ou as setas do teclado para andar. Perto de um objeto, toque em Examinar (ou Enter).</p><div id="fb" style="margin-top:12px"></div></div>
-      <aside class="notebook"><h3>Caderno de pistas</h3><p class="muted" style="margin:0 0 8px;font-weight:700">Pistas: <b id="cnt">0</b> de ${clues.length}</p><ul id="nb">${clues.map(() => '<li class="empty"><span></span></li>').join('')}</ul></aside></div>`;
+      `<div class="two"><div>${sceneHTML(step.scene, { items, cast: step.cast, faded: !ctx.colored, extra: hots, alt: 'Cena para investigar' })}<p class="nbmini">Pistas encontradas: <b id="cnt2">0</b> de ${goal}</p><p class="walk-help">Toque num objeto, use o controle ou as setas do teclado para andar. Perto de um objeto, toque em Examinar (ou Enter).</p><div id="fb" style="margin-top:12px"></div></div>
+      <aside class="notebook"><h3>Caderno de pistas</h3><p class="muted" style="margin:0 0 8px;font-weight:700">Pistas: <b id="cnt">0</b> de ${goal}</p><ul id="nb">${Array.from({ length: goal }, () => '<li class="empty"><span></span></li>').join('')}</ul></aside></div>`;
     wireSay(ctx.stage, () => step.prompt);
     const fb = $('#fb', ctx.stage), nb = $('#nb', ctx.stage);
     const examine = k => {
@@ -3165,14 +3185,15 @@ const STEPS = {
       if (it.clue) {
         if (found.has(it)) { feedback(fb, 'info', `<b>${esc(it.label)}</b> já está no caderno.`, it.prop); return; }
         found.add(it); b.classList.add('found'); b.classList.remove('hint-pulse');
+        if (typeof floatText === 'function') floatText($('.scene', ctx.stage), esc(it.label) + '!', ((it.x + (it.w || 18) / 2) / SW) * 100, Math.max(8, (it.y / SH) * 100 - 6));
         if (it.prop && !ctx.colored) b.insertAdjacentHTML('afterbegin', `<img class="px colorize" src="${SPR.url(it.prop)}" alt="">`);
         b.insertAdjacentHTML('beforeend', `<span class="badge">${found.size}</span>`);
         Audio8.sfx('found'); sparkle(b);
         feedback(fb, 'ok', `<b class="kind">Pista encontrada!</b>${esc(it.text)}`, it.prop);
-        const li = nb.children[found.size - 1]; li.className = ''; li.innerHTML = `${it.prop ? SPR.img(it.prop) : ''}<span>${esc(it.label)}</span>`;
+        const li = nb.children[found.size - 1]; if (li) li.className = ''; if (li) li.innerHTML = `${it.prop ? SPR.img(it.prop) : ''}<span>${esc(it.label)}</span>`;
         $('#cnt', ctx.stage).textContent = found.size; $('#cnt2', ctx.stage).textContent = found.size;
         if (S.autoRead) Voice.speak(it.text);
-        if (found.size === clues.length) { ctx.complete(); setTimeout(() => toast('Todas as pistas encontradas! Toque em <b>Continuar</b>.', 'faisca'), 600); }
+        if (found.size === goal) { ctx.complete(); Audio8.sfx('ok'); }
         else ctx.nextTurn();
       } else {
         b.classList.add('checked'); Audio8.sfx('select');
@@ -3869,7 +3890,7 @@ function screenPhoneClue(prefill) {
 /* ---------------- PRÓLOGO (animado, ver cinema.js) ---------------- */
 function screenPrologue() {
   Audio8.music({ root: 57, scale: 'min', tempo: 80, wave: 'sine' }, 0);
-  playCutscene(PROLOGUE_FRAMES, { title: 'Lumiara', where: 'Prólogo', onDone: () => { G.prologue = true; saveGame(); go(screenMap); } });
+  playCutscene(PROLOGUE_FRAMES, { title: 'Lumiara', where: 'Prólogo', onDone: () => { G.prologue = true; saveGame(); goNextMission(); } });
 }
 
 /* ---------------- MAPA ---------------- */
@@ -4046,7 +4067,7 @@ function renderMission(id, idx) {
   const M = MISSIONS[id], step = M.steps[idx], r = regionOf(id);
   if (!step) { finishMission(id); return; }
   /* menos cartas e leitura: no modo sozinho, o 'Quem sou eu?' fica só no Detetive; a associação some no Explorador */
-  if ((step.t === 'whoami' && G.mode === 'solo' && G.diff !== 'det') || (step.t === 'match' && G.diff === 'exp')) return renderMission(id, idx + 1);
+  if ((step.t === 'whoami' && G.mode === 'solo' && G.diff !== 'det') || (step.t === 'match' && G.diff === 'exp') || (step.t === 'reflect' && flowOn() && G.diff !== 'det')) return renderMission(id, idx + 1);
   const prev = G.current && G.current.mission === id ? G.current : {};
   G.current = { mission: id, step: idx, mistakes: prev.mistakes || 0, hints: prev.hints || 0 }; saveGame();
   Audio8.music(r.music, progress());
@@ -4067,7 +4088,10 @@ function renderMission(id, idx) {
   const prim = $('#prim'), hintBtn = $('#hint');
   const ctx = {
     stage: $('#stage'), id, idx, step, colored: idx > revealIdx,
-    complete() { RUN.done = true; prim.disabled = false; prim.classList.add('ready'); },
+    complete() { RUN.done = true; prim.disabled = false; prim.classList.add('ready');
+      if (['tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift'].includes(step.t)) addMedal('criatividade', 1, 'mg:' + id);
+      const ms = { dialog: 0, choice: 5200, reveal: 9000, thanks: 0, mirror: 0, reflect: 0, days: 3200 }[step.t] ?? 2600;
+      if (ms) autoNext(prim, ms, () => prim.click()); },
     setPrimary(t) { prim.innerHTML = `${esc(t)} ${ICON.next}`; },
     mistake() { RUN.mistakes++; G.current.mistakes++; saveGame(); refreshHint(); },
     usedHint() { if (!RUN.auto) { G.current.hints++; saveGame(); } },
@@ -4082,12 +4106,23 @@ function renderMission(id, idx) {
   };
   const resetIdle = () => {
     clearTimeout(RUN.idle);
-    if (G.diff === 'exp' && RUN.ctrl && RUN.ctrl.hint && !RUN.done) RUN.idle = setTimeout(() => { if (!RUN.done && !$('#modal')) { RUN.auto = true; RUN.ctrl.hint(); RUN.auto = false; toast('A Faísca deu uma dica!', 'faisca'); } }, 25000);
+    if (G.diff !== 'det' && RUN.ctrl && !RUN.done) RUN.idle = setTimeout(() => {
+      if (RUN.done || $('#modal')) return;
+      if (RUN.ctrl.hint) { RUN.auto = true; RUN.ctrl.hint(); RUN.auto = false; }
+      const t = $('#stage .glow, #stage .hint-pulse, #stage .hot:not(.found):not(.checked), #stage .opt:not(:disabled), #stage button:not(:disabled):not([data-say])');
+      if (t && typeof demoTap === 'function') demoTap(t, 100);
+      resetIdle();
+    }, G.diff === 'exp' ? 7000 : 11000);
     if (G.diff === 'det') RUN.idle = setTimeout(() => { RUN.hinted = true; refreshHint(); }, 45000);
   };
   onCleanup(() => clearTimeout(RUN && RUN.idle));
   RUN.ctrl = STEPS[step.t](step, ctx) || {};
   refreshHint(); resetIdle();
+  /* primeira vez num tipo de etapa: a mãozinha mostra onde tocar */
+  if (!G.seen['tut:' + step.t] && !['dialog', 'reveal', 'tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift'].includes(step.t)) {
+    G.seen['tut:' + step.t] = 1; saveGame();
+    setTimeout(() => { const t = $('#stage .hot:not(.found), #stage .opt, #stage .mcard, #stage .scard, #stage .sil, #stage .sort-item, #stage .cell.hint-pulse, #stage [data-g], #stage #pass, #stage .mem, #stage .chip'); if (t && typeof demoTap === 'function') demoTap(t, 0); }, 1300);
+  }
   if (S.autoRead && step.t !== 'dialog' && RUN.ctrl.speak) setTimeout(() => Voice.speak(RUN.ctrl.speak()), 300);
   const say = () => RUN.ctrl.speak && Voice.speak(RUN.ctrl.speak());
   if ($('#say')) $('#say').onclick = () => { Audio8.init(); if (!S.voice) toast('A leitura em voz alta está desligada nas configurações.'); say(); };
@@ -4107,6 +4142,13 @@ function renderMission(id, idx) {
     $('#trep').onclick = () => { Audio8.init(); Voice.enabled = true; say(); Voice.enabled = S.voice && !S.mute; };
     $('#tskip').onclick = () => { if (!RUN.done) { G.current.hints++; G.current.mistakes += 99; saveGame(); } advance(id, idx); };
   }
+}
+/* segue direto para a próxima missão do roteiro (sem passar pelo mapa) */
+function goNextMission() {
+  if (progress() >= 1) { G.current = { mission: '_finale' }; saveGame(); go(screenFinale); return; }
+  const m = planMissions().find(x => !G.done[x]);
+  if (!m) { go(screenMap); return; }
+  G.current = { mission: m, step: 0 }; saveGame(); go(renderMission, m, 0);
 }
 function advance(id, idx) {
   const M = MISSIONS[id], step = M.steps[idx];
@@ -4136,20 +4178,21 @@ function screenReward(id, first, stars = 1, info = {}) {
   const p = Math.round(progress() * 100);
   app().innerHTML = `<div class="screen reward">
     <h2>${regionDone ? `${esc(r.name)} restaurado!` : 'Lumiara ganhou mais luz!'}</h2>
-    <p style="font-weight:700;font-size:1.15rem;margin:0;max-width:640px">${regionDone ? 'As cores voltaram e as janelas se acenderam. Quem trabalha aqui foi lembrado!' : 'Uma janela de cada vez, a cidade volta a brilhar.'}</p>
+
     <div class="star-big">${starsHTML(stars)}</div>
     <p class="star-why">${starsHTML(1, 1)} Missão concluída &nbsp; ${starsHTML((info.mistakes || 0) <= DIFFS[G.diff].star ? 1 : 0, 1)} Poucos tropeços (${info.mistakes || 0}) &nbsp; ${starsHTML((info.hints || 0) === 0 ? 1 : 0, 1)} Sem pedir dica${stars < 3 ? '<br><span style="opacity:.85">Quer as 3 estrelas? Dá para jogar a missão de novo pela região.</span>' : ''}</p>
     <div class="windows" aria-label="${on} de ${nWin} janelas acesas">${Array.from({ length: nWin }, (_, i) => `<div class="win ${i < on ? 'on' : ''}" style="--d:${i * .15}s"></div>`).join('')}</div>
     <div style="width:min(520px,100%)" class="lights"><div class="hud" style="margin:0"><span class="lbl">Luz de Lumiara</span><div class="bar"><i style="width:${p}%"></i></div><span class="pct">${p}%</span></div></div>
     <div class="row center" style="align-items:flex-start">${charCardHTML(M.char).replace('class="cardbig"', 'class="cardbig" style="--rc:' + r.color + ';width:260px"')}
       <div style="display:grid;gap:10px;max-width:420px;text-align:left">
-        <div class="fact" style="color:var(--ink)"><h4>Missão concluída</h4><p>Vocês conheceram <b>${esc(c.name)}</b> (${esc(c.job.toLowerCase())}) e descobriram por que esse trabalho é tão importante.</p></div>
+        <div class="fact" style="color:var(--ink)"><p>Sem <b>${esc(c.name)}</b>, a cidade não funciona!</p></div>
         <div class="medal-row">${medalsHTML()}</div></div></div>
-    <div class="row center"><button class="btn primary big" id="go">${regionDone && first ? 'Continuar a história' : progress() >= 1 ? 'Ir para o grande final' : 'Voltar ao mapa'} ${ICON.next}</button></div></div>`;
+    <div class="row center"><button class="btn primary big" id="go">${regionDone && first ? 'Continuar a história' : progress() >= 1 ? 'Ir para o grande final' : 'Próxima missão'} ${ICON.next}</button></div></div>`;
   $('#go').onclick = () => {
     if (regionDone && first) { const rs = planRegions(); go(screenInterlude, r.id, rs.filter(x => regionState(x.id) === 'done').length, rs.length); }
-    else if (progress() >= 1) { G.current = { mission: '_finale' }; saveGame(); go(screenFinale); } else go(screenMap);
+    else goNextMission();
   };
+  autoNext($('#go'), 4500, () => $('#go').click());
 }
 function medalsHTML() {
   return Object.entries(MEDALS).map(([k, m]) => {
@@ -4241,6 +4284,20 @@ function openGuide() {
     <h2 style="margin-top:18px">Perguntas para fechar a partida</h2>
     <ol style="font-weight:700"><li>O que você descobriu hoje?</li><li>Qual trabalho você não tinha reparado antes?</li><li>Por que esse trabalho importa?</li><li>Como essa pessoa ajuda a comunidade?</li><li>Como podemos mostrar que reconhecemos esse trabalho?</li></ol>`, { label: 'Como jogar' });
 }
+
+/* mapa: botão grande 'Próxima missão' com a mãozinha mostrando */
+(function () {
+  const m0 = screenMap;
+  screenMap = function () {
+    m0();
+    if (!G || !G.prologue || !$('.mapwrap')) return;
+    const next = planMissions().find(x => !G.done[x]);
+    if (!next && progress() < 1) return;
+    setFoot(`<span class="grow"></span><button class="btn primary big" id="nextm">${next ? 'Próxima missão' : 'Grande final'} ${ICON.next}</button>`);
+    $('#nextm').onclick = () => { Audio8.sfx('select'); goNextMission(); };
+    setTimeout(() => typeof demoTap === 'function' && demoTap($('#nextm'), 0), 1200);
+  };
+})();
 
 /* ============================================================
    GRANDE FINAL — a Festa das Luzes
@@ -4391,7 +4448,7 @@ function moveEl(img, x, y, ms, walk) {
 
 /* ---------- motor de cenas ---------- */
 function playCutscene(frames, { title = 'Lumiara', where = 'História', onDone }) {
-  let i = 0; const actors = {};
+  let i = 0, cancelT = null; const actors = {};
   app().innerHTML = `<div class="screen stage"><div class="mhead"><div><div class="where">${esc(where)}</div><h2>${esc(title)}</h2></div>
     <div class="dots">${frames.map(() => '<i></i>').join('')}</div></div>
     <div class="scene cap cut" id="cut"><img class="bg px" id="cbg" alt=""><div class="layer" id="lay"></div><div class="tint" id="dark"></div><div class="fogl" id="fog"></div></div>
@@ -4427,6 +4484,9 @@ function playCutscene(frames, { title = 'Lumiara', where = 'História', onDone }
     $('#say').onclick = () => { Audio8.init(); Voice.speak(f.text); };
     $('#skip').onclick = () => onDone();
     $('#nx').onclick = () => { Audio8.sfx('page'); if (i < frames.length - 1) { i++; show(); } else onDone(); };
+    /* minifilme: passa sozinho; tocar na cena adianta */
+    if (cancelT) cancelT(); cancelT = autoNext($('#nx'), Math.max(2600, f.text.length * 65), () => $('#nx').click());
+    $('#cut').onclick = () => $('#nx').click();
   };
   show();
 }
@@ -4461,7 +4521,7 @@ function screenInterlude(rid, k, n) {
   const frames = [{ scene, text: `${r.name} voltou a brilhar! Quem trabalha aqui foi lembrado.`, sparkle: true, actors }]
     .concat(lines.map(l => ({ scene, who: l.who, text: l.text, actors: { nevoa: { s: 'nevoa', x: 80 - nw / 2, y: 0, w: nw } } })));
   Audio8.music(r.music, prog);
-  playCutscene(frames, { title: 'Enquanto isso, no céu...', where: 'Interlúdio', onDone: () => go(screenMap) });
+  playCutscene(frames, { title: 'Enquanto isso, no céu...', where: 'Interlúdio', onDone: () => goNextMission() });
 }
 
 /* ---------- final animado ---------- */

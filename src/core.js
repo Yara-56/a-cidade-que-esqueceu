@@ -132,6 +132,18 @@ function addMedal(key, n = 1, once) {
 const app = () => $('#app');
 let cleanupFns = [];
 function onCleanup(fn) { cleanupFns.push(fn); }
+/* modo minifilme: o jogo segue sozinho (menos toques). Na sala de aula, quem controla é o professor. */
+const flowOn = () => !G || G.mode !== 'sala';
+function autoNext(btn, ms, fn) {
+  if (!btn || !flowOn()) return () => {};
+  btn.classList.remove('auto'); void btn.offsetWidth; btn.style.setProperty('--t', ms + 'ms'); btn.classList.add('auto');
+  let t = setTimeout(() => { t = null; btn.classList.remove('auto'); fn(); }, ms);
+  const cancel = () => { if (t) { clearTimeout(t); t = null; btn.classList.remove('auto'); } };
+  const onTap = e => { if (e.isTrusted && !btn.contains(e.target) && !e.target.closest('.footbar') && !e.target.closest('#cut') && !e.target.closest('.bubble')) cancel(); };
+  document.addEventListener('pointerdown', onTap, true);
+  onCleanup(() => { cancel(); document.removeEventListener('pointerdown', onTap, true); });
+  return cancel;
+}
 function go(fn, ...args) {
   if (typeof NET !== 'undefined' && NET.on && NET.started) {
     if (NET.role === 'guest' && !NET.applying) return; /* quem decide a tela é o anfitrião */
