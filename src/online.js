@@ -136,7 +136,7 @@ function screenOnline() {
   $('#bk').onclick = () => go(screenTitle);
 }
 function screenOnlineHost() {
-  const cfg = { name: '', avatar: randomAvatar(), diff: 'inv', length: 'medium' };
+  const cfg = { name: S.myName || '', avatar: S.avatar ? JSON.parse(JSON.stringify(S.avatar)) : randomAvatar(), diff: 'inv', length: 'medium' };
   const draw = () => {
     app().innerHTML = `<div class="screen setup"><h2>Criar uma sala</h2>
       <div class="panel stage" style="max-width:720px;margin:0 auto">
@@ -178,7 +178,7 @@ function startHost(cfg, tries = 0) {
   });
 }
 function screenOnlineJoin(code0 = '') {
-  const cfg = { name: '', avatar: randomAvatar(), code: code0 };
+  const cfg = { name: S.myName || '', avatar: S.avatar ? JSON.parse(JSON.stringify(S.avatar)) : randomAvatar(), code: code0 };
   app().innerHTML = `<div class="screen setup"><h2>Entrar numa sala</h2>
     <div class="panel stage" style="max-width:720px;margin:0 auto">
       <label for="oc" style="font-weight:800">Código da sala</label><input class="txt code-in" id="oc" maxlength="4" autocomplete="off" autocapitalize="characters" placeholder="ABCD" value="${esc(cfg.code)}">

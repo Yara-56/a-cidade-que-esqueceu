@@ -26,40 +26,42 @@ function buildFinale() {
 }
 
 STEPS.thanks = function (step, ctx) {
-  const need = G.mode === 'sala' ? 5 : Math.max(3, G.players.length);
-  let sent = 0, who = null, msg = null;
-  const chars = G.album.slice();
-  ctx.stage.innerHTML = promptHTML(`Mural do Obrigado: escolham para quem agradecer e a mensagem. Cada obrigado deixa a Névoa menor. Faltam ${need}.`) + `
-    <div class="two"><div class="stage"><div class="scene faded" id="fs"><img class="bg px" src="${composeScene('festa').toDataURL()}" alt="A festa na praça de Lumiara"><div class="fogl"></div>
-      <img class="px map-nevoa nevoa-big" id="nv" src="${SPR.url('nevoa')}" alt="A Névoa" style="left:32%;top:2%;width:36%;animation:none"></div>
-      <div class="thanks-wall" id="wall" aria-live="polite"><span style="color:#fff;font-weight:700;opacity:.8">Os bilhetes de obrigado aparecem aqui.</span></div></div>
-    <div class="panel stage"><h3>1. Para quem?</h3><div class="chips" id="who">${chars.map(id => `<button class="chip" data-w="${id}" aria-pressed="false">${esc(CHARACTERS[id].name)}</button>`).join('')}</div>
-      <h3>2. Qual mensagem?</h3><div class="chips" id="msg">${FINALE.thanks.map((t, i) => `<button class="chip" data-m="${i}" aria-pressed="false">${esc(t)}</button>`).join('')}</div>
-      <label for="own" style="font-weight:800">Ou escreva a sua (opcional):</label><input class="txt" id="own" maxlength="80" autocomplete="off" placeholder="Ex.: Obrigada por cuidar do parque!">
-      <button class="btn primary big" id="send" disabled>Enviar obrigado</button><p id="left" style="font-weight:800;margin:0">Faltam ${need} agradecimentos.</p></div></div>`;
-  wireSay(ctx.stage, () => 'Mural do Obrigado. Escolham para quem agradecer e a mensagem.');
-  const upd = () => { $('#send', ctx.stage).disabled = !(who && (msg !== null || $('#own', ctx.stage).value.trim())); };
-  $$('[data-w]', ctx.stage).forEach(b => b.onclick = () => { $$('[data-w]', ctx.stage).forEach(x => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); who = b.dataset.w; Audio8.sfx('select'); upd(); });
-  $$('[data-m]', ctx.stage).forEach(b => b.onclick = () => { $$('[data-m]', ctx.stage).forEach(x => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); msg = +b.dataset.m; $('#own', ctx.stage).value = ''; Audio8.sfx('select'); upd(); });
-  $('#own', ctx.stage).oninput = () => { if ($('#own', ctx.stage).value.trim()) { msg = null; $$('[data-m]', ctx.stage).forEach(x => x.setAttribute('aria-pressed', 'false')); } upd(); };
-  $('#send', ctx.stage).onclick = () => {
-    const text = $('#own', ctx.stage).value.trim() || FINALE.thanks[msg];
-    const wall = $('#wall', ctx.stage); if (!sent) wall.innerHTML = '';
-    sent++; G.thanks.push({ to: who, text }); saveGame();
-    const by = isJuntos() ? player().name : G.mode === 'sala' ? 'Turma' : '';
-    wall.insertAdjacentHTML('beforeend', `<div class="note" style="--rot:${(Math.random() * 6 - 3).toFixed(1)}deg">${esc(text)}<small>Para ${esc(CHARACTERS[who].name)}${by ? ' · de ' + esc(by) : ''}</small></div>`);
-    Audio8.sfx('light'); sparkle($('#nv', ctx.stage), 14);
-    const f = Math.min(sent / need, 1), nv = $('#nv', ctx.stage);
-    nv.style.transform = `scale(${1 - f * .55})`; nv.style.filter = `grayscale(${1 - f}) brightness(${1 + f * .3})`;
-    $('#fs', ctx.stage).classList.toggle('faded', f < 1);
-    addMedal('gentileza', 1, 'thx:' + sent);
-    who = null; msg = null; $('#own', ctx.stage).value = ''; $$('.chip', ctx.stage).forEach(x => x.setAttribute('aria-pressed', 'false')); upd();
-    if (sent >= need) {
-      $('#left', ctx.stage).textContent = 'A Névoa está mudando…'; nv.src = SPR.url('nevoaFeliz'); Audio8.sfx('win'); confetti(70);
-      ctx.setPrimary('Ver o que aconteceu'); ctx.complete();
-    } else { $('#left', ctx.stage).textContent = `Faltam ${need - sent} agradecimentos.`; ctx.nextTurn(); }
+  /* "E se eles sumissem?": toque num trabalhador para ver a cidade sem ele. Depois, traga todo mundo de volta. */
+  const ids = (G.album.filter(id => CHARACTERS[id]).length >= 3 ? G.album.filter(id => CHARACTERS[id]) : ['denise', 'ze', 'cida', 'pedro', 'tania', 'joana']).slice(-6);
+  const need = Math.min(3, ids.length); let gone = [], back = false;
+  ctx.stage.innerHTML = `<div class="mg job wout">${mgHead('faisca', 'E se eles <b>sumissem</b>? Toque em alguém para ver a cidade <b>sem</b> essa pessoa.')}
+    <div class="scene jobscene" id="js"><img class="bg px" id="wbg" src="${composeScene('cidade').toDataURL()}" alt="Lumiara"><div class="wfog" id="wf"></div><div class="layer" id="lay"></div><div class="wmsg" id="wm"></div></div>
+    <div class="wrow" id="wr">${ids.map(id => `<button class="wcard" data-w="${id}"><img class="px" src="${SPR.url(id)}" alt=""><b>${esc(CHARACTERS[id].name)}</b><small>${esc(CHARACTERS[id].job)}</small></button>`).join('')}</div>
+    <div class="row center"><button class="btn big primary" id="wback" hidden>${SPR.img('coracao')} Trazer todo mundo de volta!</button></div></div>`;
+  wireSay(ctx.stage, () => 'E se eles sumissem? Toque em alguém para ver a cidade sem essa pessoa.');
+  const lay = $('#lay', ctx.stage), wm = $('#wm', ctx.stage), wf = $('#wf', ctx.stage), bg = $('#wbg', ctx.stage);
+  const look = () => { const k = gone.length / ids.length; bg.style.filter = `grayscale(${Math.min(1, k * 1.6)}) brightness(${1 - k * .35})`; wf.style.opacity = Math.min(.85, k * 1.4); };
+  $$('.wcard', ctx.stage).forEach(b => b.onclick = () => {
+    if (back || b.classList.contains('off')) return; ctx.activity(); const id = b.dataset.w;
+    b.classList.add('off'); gone.push(id); look(); Audio8.sfx('soft');
+    const f = spriteEl('fumacinha', 20 + RNG.next() * 110, 8 + RNG.next() * 30, { w: 14, cls: 'fumafly' }); lay.appendChild(f);
+    wm.innerHTML = `<b>Sem ${esc(CHARACTERS[id].name)}:</b> ${esc((FINALE.without || {})[id] || 'a cidade pararia.')}`; wm.classList.remove('on'); void wm.offsetWidth; wm.classList.add('on');
+    if (S.autoRead) Voice.speak(`Sem ${CHARACTERS[id].name}: ${(FINALE.without || {})[id] || ''}`);
+    ctx.nextTurn();
+    if (gone.length >= need) setTimeout(() => {
+      setHead(ctx, '<b>Viu?</b> Ninguém é invisível. Sem eles, nada funciona!'); Audio8.sfx('villain');
+      const bb = $('#wback', ctx.stage); bb.hidden = false; demoTap(bb, 300);
+    }, 1400);
+  });
+  $('#wback', ctx.stage).onclick = () => {
+    if (back) return; back = true; ctx.activity(); gone = []; look(); Audio8.sfx('reveal'); confetti(60);
+    $$('.fumafly', lay).forEach(e => { e.classList.add('poof'); setTimeout(() => e.remove(), 400); });
+    $$('.wcard', ctx.stage).forEach((b, i) => setTimeout(() => { b.classList.remove('off'); b.classList.add('back'); }, i * 120));
+    $('#wback', ctx.stage).hidden = true;
+    wm.innerHTML = '<b>Todo mundo de volta!</b> Quando a gente enxerga e agradece, a cidade brilha.'; wm.classList.remove('on'); void wm.offsetWidth; wm.classList.add('on');
+    setHead(ctx, '<b>Lumiara brilhou!</b> Agradeça quem cuida de você hoje.'); ctx.complete();
   };
-  return { speak: () => 'Mural do Obrigado. Escolham para quem agradecer e a mensagem. Cada obrigado deixa a Névoa menor.' };
+  setTimeout(() => demoTap($('.wcard', ctx.stage), 0), 900);
+  return {
+    speak: () => 'Toque em alguém para ver a cidade sem essa pessoa.',
+    hint() { ctx.usedHint(); const b = $('#wback:not([hidden])', ctx.stage) || $('.wcard:not(.off)', ctx.stage); if (b) { b.classList.add('glow'); setTimeout(() => b.classList.remove('glow'), 1500); } },
+    autoStep() { const bb = $('#wback:not([hidden])', ctx.stage); if (bb) return bb.click(); const c = $('.wcard:not(.off)', ctx.stage); if (c && gone.length < need) c.click(); }
+  };
 };
 
 STEPS.mirror = function (step, ctx) {

@@ -1175,3 +1175,67 @@ body::before { will-change: transform; }
 .title-btns .row { flex-wrap: nowrap; }
 @media (orientation: landscape) and (max-height: 520px) { .quick .qk { padding: 6px 4px !important; } .qk b { font-size: 1.15rem; } .title-btns { gap: 8px !important; } .title-btns .btn:not(.qk) { padding: 5px 8px; font-size: .85rem; } .title-btns .btn img.px { width: 22px; height: 22px; } }
 @media (max-width: 560px) { .title-btns .row { flex-wrap: wrap; } .title-art { width: 100%; } .title-btns { width: 100% !important; } .qk b { font-size: 1.1rem; } .title-btns .btn.grow { min-width: 0; } }
+/* moradores passeando no mapa */
+.map-npc { position: absolute; width: 2.3%; transform: translate(-50%, -85%); z-index: 5; pointer-events: none; filter: drop-shadow(1px 2px 0 #0005); }
+.map-npc.dog { width: 2.4%; transform: translate(-50%, -60%); }
+.map-npc.flip { transform: translate(-50%, -85%) scaleX(-1); }
+.map-npc.dog.flip { transform: translate(-50%, -60%) scaleX(-1); }
+.npc-bub { position: absolute; transform: translate(-50%, -100%) scale(.6); opacity: 0; background: var(--paper); color: var(--ink); border: 3px solid var(--ink); border-radius: 12px; padding: 3px 10px; font-weight: 900; font-size: .95rem; white-space: nowrap; box-shadow: 2px 2px 0 var(--ink); z-index: 8; pointer-events: none; transition: .25s cubic-bezier(.2,.9,.3,1.4); }
+.npc-bub.on { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+/* batalha final: aspirar a poluição */
+.smog { position: absolute; z-index: 4; border: 0; background: none; padding: 0; cursor: pointer; pointer-events: auto; transition: transform .15s; }
+.smog img { width: 100%; display: block; filter: grayscale(.6) brightness(.55) drop-shadow(0 0 6px #000a); animation: fumafly 1.4s ease-in-out infinite; }
+.smog.hit img { animation: smoghit .18s; } @keyframes smoghit { 50% { filter: brightness(1.6); transform: scale(.85); } }
+.smog.sucked { animation: sucked .38s forwards; } @keyframes sucked { to { transform: scale(.1) translateY(80%); opacity: 0; } }
+.vbeam { position: absolute; height: 10px; transform-origin: 0 50%; z-index: 6; pointer-events: none; border-radius: 99px; background: linear-gradient(90deg, #fff, #8fd6cf 40%, #fff1a8); box-shadow: 0 0 12px #8fd6cf; animation: beam .32s forwards; }
+.vbeam.help { background: linear-gradient(90deg, #fff, #f4c542 40%, #fff); box-shadow: 0 0 12px #f4c542; }
+@keyframes beam { from { opacity: 1; } to { opacity: 0; height: 2px; } }
+.folk { z-index: 3; transition: filter .4s; animation: bob 1.6s ease-in-out infinite; }
+.folk.sad { filter: grayscale(1) brightness(.6); animation: cough .5s ease-in-out infinite; } @keyframes cough { 50% { transform: translateY(3%) scaleY(.94); } }
+.folk.saved { animation: herojump .5s ease-out; filter: drop-shadow(0 0 8px #fff1a8); }
+.bosshero { z-index: 5; transition: left .22s ease-out; filter: drop-shadow(0 0 8px #fff1a8); animation: bob 1s ease-in-out infinite; }
+.bossvac { z-index: 5; transition: left .22s ease-out; }
+.arrive { animation: arrive .7s cubic-bezier(.2,.9,.3,1.4) both, bob 1.2s .7s ease-in-out infinite; } @keyframes arrive { from { transform: translateY(-120%) scale(.3); opacity: 0; } }
+.helpcard { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 20; display: flex; gap: 10px; align-items: center; background: var(--paper); color: var(--ink); border: var(--bw) solid var(--ink); border-radius: 18px; padding: 10px 16px; box-shadow: 6px 6px 0 var(--ink); max-width: 82%; animation: tipin .45s cubic-bezier(.2,.9,.3,1.3) both; }
+.helpcard > img.px { width: 64px; height: 96px; filter: drop-shadow(0 0 10px #f4c542); }
+.helpcard b { display: block; font-size: 1.15rem; } .helpcard small { background: var(--ink); color: var(--glow); border-radius: 99px; padding: 1px 8px; font-size: .75rem; }
+.helpcard span { font-weight: 800; font-size: 1.05rem; }
+.helpcard.out { animation: tipout .35s forwards; }
+.bosstip { display: flex; align-items: center; gap: 6px; color: #fff; font-weight: 900; margin: 0; } .bosstip img.px { width: 30px; }
+/* E se eles sumissem? */
+.wout .scene { position: relative; } .wout #wbg { transition: filter .6s; }
+.wfog { position: absolute; inset: 0; background: radial-gradient(circle at 50% 30%, #8a86a0aa, #3a3650dd); opacity: 0; transition: opacity .6s; pointer-events: none; z-index: 1; }
+.wmsg { position: absolute; left: 50%; bottom: 6%; transform: translateX(-50%); width: 86%; background: var(--paper); color: var(--ink); border: 3px solid var(--ink); border-radius: 14px; padding: 8px 14px; font-weight: 800; font-size: 1.1rem; box-shadow: 4px 4px 0 var(--ink); opacity: 0; z-index: 6; text-align: center; }
+.wmsg.on { animation: tipin .4s both; }
+.wrow { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.wcard { display: grid; justify-items: center; background: var(--paper); border: 3px solid var(--ink); border-radius: 14px; padding: 4px 10px; box-shadow: 3px 3px 0 var(--ink); cursor: pointer; transition: .3s; min-width: 92px; color: var(--ink); }
+.wcard img.px { width: 40px; height: 60px; } .wcard b { font-size: .95rem; } .wcard small { font-size: .7rem; font-weight: 700; opacity: .8; }
+.wcard.off { opacity: .35; filter: grayscale(1); transform: scale(.9) rotate(-3deg); }
+.wcard.back { animation: herojump .5s ease-out; box-shadow: 0 0 0 4px var(--glow), 3px 3px 0 var(--ink); }
+@media (orientation: landscape) and (max-height: 520px) { .wcard { min-width: 70px; padding: 2px 6px; } .wcard img.px { width: 28px; height: 42px; } .wmsg { font-size: .85rem; } .helpcard > img.px { width: 44px; height: 66px; } .helpcard span { font-size: .85rem; } }
+/* personagens mais vivos: respiram, pulam ao andar */
+.map-avatar.walking { animation: stepbob .24s ease-in-out infinite; }
+.map-npc { animation: stepbob .3s ease-in-out infinite; }
+@keyframes stepbob { 50% { margin-top: -0.35%; } }
+.scene .layer .sprite:not(.amb):not(.heartball):not(.fumafly) { animation-name: breathe; animation-duration: 2.4s; animation-iteration-count: infinite; animation-timing-function: ease-in-out; transform-origin: 50% 100%; }
+@keyframes breathe { 50% { transform: scaleY(1.03) scaleX(.985); } }
+.world .marker.quiet .pin { min-width: 0; padding: 2px 9px; font-size: .95rem; opacity: .85; }
+.world .marker.off { display: none; }
+.world .marker.done .pin { background: #a5d97f; }
+.mychar { display: flex; align-items: center; gap: 10px; background: var(--paper); color: var(--ink); border: 3px solid var(--ink); border-radius: 16px; padding: 4px 14px 4px 6px; box-shadow: 3px 3px 0 var(--ink); cursor: pointer; text-align: left; justify-self: center; }
+.mychar img.px { width: 34px; height: 51px; } .mychar span { display: grid; line-height: 1.1; } .mychar small { font-size: .72rem; font-weight: 800; opacity: .7; } .mychar b { font-size: 1.05rem; }
+.mychar i { font-style: normal; font-size: .75rem; font-weight: 800; background: var(--glow); border: 2px solid var(--ink); border-radius: 99px; padding: 0 8px; margin-left: 6px; }
+.mcmodal .modal { max-width: 560px; }
+@media (orientation: landscape) and (max-height: 520px) { .mychar { padding: 2px 10px 2px 4px; } .mychar img.px { width: 24px; height: 36px; } .mcmodal .modal { max-height: 92dvh; overflow: auto; } }
+.folk.home, .bosshero.home, .bossvac.home { opacity: 0; transform: translateY(20%); transition: opacity .5s, transform .5s; pointer-events: none; }
+.wmsg.on { opacity: 1; }
+.wout .scene { width: min(100%, calc(46vh * 16 / 9)); margin: 0 auto; }
+.mg.wout .scene.jobscene { width: min(100%, calc(44vh * 16 / 9)) !important; margin: 0 auto; }
+.helpcard { width: min(560px, 84%); } .helpcard > div { flex: 1; min-width: 0; }
+.helpcard small img.px { width: 14px; height: 14px; vertical-align: -2px; }
+@media (orientation: landscape) and (max-height: 520px) {
+  .mg.wout .scene.jobscene { width: 100% !important; }
+  .mg.wout .wrow { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; align-content: start; }
+  .mg.wout .wcard { min-width: 0; padding: 2px 4px; } .mg.wout .wcard small { display: none; } .mg.wout .wcard b { font-size: .72rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .mg.wout .wcard img.px { width: 22px; height: 33px; }
+}

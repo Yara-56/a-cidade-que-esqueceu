@@ -82,7 +82,7 @@ const PROLOGUE_FRAMES = [
     actors: { denise: { s: 'denise', mode: 'sil', x: 40, y: 60 }, rafa: { s: 'rafa', mode: 'sil', x: 92, y: 62, flip: true }, lucia: { s: 'lucia', mode: 'sil', x: 60, y: 62 }, ze: { s: 'ze', mode: 'sil', x: 132, y: 58, flip: true }, nevoa: { s: 'nevoa', x: 34, y: -2, w: 92, ms: 1800 } } },
   { scene: 'cidade', gray: 1, dark: .55, fog: .5, sparkle: true, text: 'Mas eu escapei! Eu sou a Faísca!',
     actors: { faisca: { s: 'faisca', from: [76, 80], x: 72, y: 34, w: 16, glow: true, ms: 1400 } } },
-  { scene: 'cidade', gray: .8, dark: .35, fog: .4, last: 'Bora!', text: 'Preciso de um herói. Você topa?',
+  { scene: 'cidade', gray: .8, dark: .35, fog: .4, last: 'Vamos juntos!', text: 'Ei... você consegue me ver? Então me ajuda a espantar a Névoa e devolver as cores de Lumiara!',
     actors: { you: { s: 'avatar', from: [-18, 62], x: 56, y: 62, walk: true, ms: 1600 }, faisca: { s: 'faisca', x: 74, y: 44, w: 14, glow: true } } }
 ];
 

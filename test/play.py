@@ -58,7 +58,7 @@ AUTO = r"""
     case 'reveal': { click(q('#curio')); return 'reveal'; }
     case 'choice': { click(q('[data-o="1"]')); click(q('[data-o="0"]')); return 'choice'; }
     case 'reflect': { click(q('#talk')); click(q('#acc')); return 'reflect'; }
-    case 'thanks': { click(q('[data-w]')); click(q('[data-m="' + (window.__tries[k] % 6) + '"]')); click(q('#send')); return 'thanks'; }
+    case 'thanks': { RUN.ctrl.autoStep(); return 'thanks'; }
     case 'mirror': { const i = q('#mn'); if (i) i.value = 'Vó Fátima'; click(q('[data-t="0"]')); click(q('#put')); return 'mirror'; }
     case 'dialog': return 'dialog-wait';
     case 'shift': { if (q('[data-ch]')) { q('[data-ch]').click(); return 'shift-choice'; } RUN.ctrl.autoStep(); window.__tries[k]--; return 'shift'; }

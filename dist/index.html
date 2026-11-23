@@ -1183,6 +1183,70 @@ body::before { will-change: transform; }
 .title-btns .row { flex-wrap: nowrap; }
 @media (orientation: landscape) and (max-height: 520px) { .quick .qk { padding: 6px 4px !important; } .qk b { font-size: 1.15rem; } .title-btns { gap: 8px !important; } .title-btns .btn:not(.qk) { padding: 5px 8px; font-size: .85rem; } .title-btns .btn img.px { width: 22px; height: 22px; } }
 @media (max-width: 560px) { .title-btns .row { flex-wrap: wrap; } .title-art { width: 100%; } .title-btns { width: 100% !important; } .qk b { font-size: 1.1rem; } .title-btns .btn.grow { min-width: 0; } }
+/* moradores passeando no mapa */
+.map-npc { position: absolute; width: 2.3%; transform: translate(-50%, -85%); z-index: 5; pointer-events: none; filter: drop-shadow(1px 2px 0 #0005); }
+.map-npc.dog { width: 2.4%; transform: translate(-50%, -60%); }
+.map-npc.flip { transform: translate(-50%, -85%) scaleX(-1); }
+.map-npc.dog.flip { transform: translate(-50%, -60%) scaleX(-1); }
+.npc-bub { position: absolute; transform: translate(-50%, -100%) scale(.6); opacity: 0; background: var(--paper); color: var(--ink); border: 3px solid var(--ink); border-radius: 12px; padding: 3px 10px; font-weight: 900; font-size: .95rem; white-space: nowrap; box-shadow: 2px 2px 0 var(--ink); z-index: 8; pointer-events: none; transition: .25s cubic-bezier(.2,.9,.3,1.4); }
+.npc-bub.on { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+/* batalha final: aspirar a poluição */
+.smog { position: absolute; z-index: 4; border: 0; background: none; padding: 0; cursor: pointer; pointer-events: auto; transition: transform .15s; }
+.smog img { width: 100%; display: block; filter: grayscale(.6) brightness(.55) drop-shadow(0 0 6px #000a); animation: fumafly 1.4s ease-in-out infinite; }
+.smog.hit img { animation: smoghit .18s; } @keyframes smoghit { 50% { filter: brightness(1.6); transform: scale(.85); } }
+.smog.sucked { animation: sucked .38s forwards; } @keyframes sucked { to { transform: scale(.1) translateY(80%); opacity: 0; } }
+.vbeam { position: absolute; height: 10px; transform-origin: 0 50%; z-index: 6; pointer-events: none; border-radius: 99px; background: linear-gradient(90deg, #fff, #8fd6cf 40%, #fff1a8); box-shadow: 0 0 12px #8fd6cf; animation: beam .32s forwards; }
+.vbeam.help { background: linear-gradient(90deg, #fff, #f4c542 40%, #fff); box-shadow: 0 0 12px #f4c542; }
+@keyframes beam { from { opacity: 1; } to { opacity: 0; height: 2px; } }
+.folk { z-index: 3; transition: filter .4s; animation: bob 1.6s ease-in-out infinite; }
+.folk.sad { filter: grayscale(1) brightness(.6); animation: cough .5s ease-in-out infinite; } @keyframes cough { 50% { transform: translateY(3%) scaleY(.94); } }
+.folk.saved { animation: herojump .5s ease-out; filter: drop-shadow(0 0 8px #fff1a8); }
+.bosshero { z-index: 5; transition: left .22s ease-out; filter: drop-shadow(0 0 8px #fff1a8); animation: bob 1s ease-in-out infinite; }
+.bossvac { z-index: 5; transition: left .22s ease-out; }
+.arrive { animation: arrive .7s cubic-bezier(.2,.9,.3,1.4) both, bob 1.2s .7s ease-in-out infinite; } @keyframes arrive { from { transform: translateY(-120%) scale(.3); opacity: 0; } }
+.helpcard { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 20; display: flex; gap: 10px; align-items: center; background: var(--paper); color: var(--ink); border: var(--bw) solid var(--ink); border-radius: 18px; padding: 10px 16px; box-shadow: 6px 6px 0 var(--ink); max-width: 82%; animation: tipin .45s cubic-bezier(.2,.9,.3,1.3) both; }
+.helpcard > img.px { width: 64px; height: 96px; filter: drop-shadow(0 0 10px #f4c542); }
+.helpcard b { display: block; font-size: 1.15rem; } .helpcard small { background: var(--ink); color: var(--glow); border-radius: 99px; padding: 1px 8px; font-size: .75rem; }
+.helpcard span { font-weight: 800; font-size: 1.05rem; }
+.helpcard.out { animation: tipout .35s forwards; }
+.bosstip { display: flex; align-items: center; gap: 6px; color: #fff; font-weight: 900; margin: 0; } .bosstip img.px { width: 30px; }
+/* E se eles sumissem? */
+.wout .scene { position: relative; } .wout #wbg { transition: filter .6s; }
+.wfog { position: absolute; inset: 0; background: radial-gradient(circle at 50% 30%, #8a86a0aa, #3a3650dd); opacity: 0; transition: opacity .6s; pointer-events: none; z-index: 1; }
+.wmsg { position: absolute; left: 50%; bottom: 6%; transform: translateX(-50%); width: 86%; background: var(--paper); color: var(--ink); border: 3px solid var(--ink); border-radius: 14px; padding: 8px 14px; font-weight: 800; font-size: 1.1rem; box-shadow: 4px 4px 0 var(--ink); opacity: 0; z-index: 6; text-align: center; }
+.wmsg.on { animation: tipin .4s both; }
+.wrow { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.wcard { display: grid; justify-items: center; background: var(--paper); border: 3px solid var(--ink); border-radius: 14px; padding: 4px 10px; box-shadow: 3px 3px 0 var(--ink); cursor: pointer; transition: .3s; min-width: 92px; color: var(--ink); }
+.wcard img.px { width: 40px; height: 60px; } .wcard b { font-size: .95rem; } .wcard small { font-size: .7rem; font-weight: 700; opacity: .8; }
+.wcard.off { opacity: .35; filter: grayscale(1); transform: scale(.9) rotate(-3deg); }
+.wcard.back { animation: herojump .5s ease-out; box-shadow: 0 0 0 4px var(--glow), 3px 3px 0 var(--ink); }
+@media (orientation: landscape) and (max-height: 520px) { .wcard { min-width: 70px; padding: 2px 6px; } .wcard img.px { width: 28px; height: 42px; } .wmsg { font-size: .85rem; } .helpcard > img.px { width: 44px; height: 66px; } .helpcard span { font-size: .85rem; } }
+/* personagens mais vivos: respiram, pulam ao andar */
+.map-avatar.walking { animation: stepbob .24s ease-in-out infinite; }
+.map-npc { animation: stepbob .3s ease-in-out infinite; }
+@keyframes stepbob { 50% { margin-top: -0.35%; } }
+.scene .layer .sprite:not(.amb):not(.heartball):not(.fumafly) { animation-name: breathe; animation-duration: 2.4s; animation-iteration-count: infinite; animation-timing-function: ease-in-out; transform-origin: 50% 100%; }
+@keyframes breathe { 50% { transform: scaleY(1.03) scaleX(.985); } }
+.world .marker.quiet .pin { min-width: 0; padding: 2px 9px; font-size: .95rem; opacity: .85; }
+.world .marker.off { display: none; }
+.world .marker.done .pin { background: #a5d97f; }
+.mychar { display: flex; align-items: center; gap: 10px; background: var(--paper); color: var(--ink); border: 3px solid var(--ink); border-radius: 16px; padding: 4px 14px 4px 6px; box-shadow: 3px 3px 0 var(--ink); cursor: pointer; text-align: left; justify-self: center; }
+.mychar img.px { width: 34px; height: 51px; } .mychar span { display: grid; line-height: 1.1; } .mychar small { font-size: .72rem; font-weight: 800; opacity: .7; } .mychar b { font-size: 1.05rem; }
+.mychar i { font-style: normal; font-size: .75rem; font-weight: 800; background: var(--glow); border: 2px solid var(--ink); border-radius: 99px; padding: 0 8px; margin-left: 6px; }
+.mcmodal .modal { max-width: 560px; }
+@media (orientation: landscape) and (max-height: 520px) { .mychar { padding: 2px 10px 2px 4px; } .mychar img.px { width: 24px; height: 36px; } .mcmodal .modal { max-height: 92dvh; overflow: auto; } }
+.folk.home, .bosshero.home, .bossvac.home { opacity: 0; transform: translateY(20%); transition: opacity .5s, transform .5s; pointer-events: none; }
+.wmsg.on { opacity: 1; }
+.wout .scene { width: min(100%, calc(46vh * 16 / 9)); margin: 0 auto; }
+.mg.wout .scene.jobscene { width: min(100%, calc(44vh * 16 / 9)) !important; margin: 0 auto; }
+.helpcard { width: min(560px, 84%); } .helpcard > div { flex: 1; min-width: 0; }
+.helpcard small img.px { width: 14px; height: 14px; vertical-align: -2px; }
+@media (orientation: landscape) and (max-height: 520px) {
+  .mg.wout .scene.jobscene { width: 100% !important; }
+  .mg.wout .wrow { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; align-content: start; }
+  .mg.wout .wcard { min-width: 0; padding: 2px 4px; } .mg.wout .wcard small { display: none; } .mg.wout .wcard b { font-size: .72rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .mg.wout .wcard img.px { width: 22px; height: 33px; }
+}
 </style>
 </head>
 <body>
@@ -1371,6 +1435,7 @@ const PROPS = {
   pato: { ops: [['white', 2, 8, 11, 6], ['white', 10, 3, 4, 6], ['orange', 14, 5, 2, 2], ['ink', 12, 4, 1, 1], ['greyL', 4, 9, 5, 2], ['blueL', 0, 14, 16, 2]] },
   grama: { ops: [['greenL', 0, 10, 16, 6], ['green', 0, 13, 16, 3], ['green', 2, 8, 1, 2], ['green', 6, 9, 1, 1], ['green', 10, 8, 1, 2], ['green', 14, 9, 1, 1]] },
   bancoparque: { ops: [['brownL', 0, 6, 16, 3], ['brownL', 0, 2, 16, 3], ['brown', 0, 9, 16, 2], ['greyD', 1, 11, 2, 5], ['greyD', 13, 11, 2, 5]] },
+  aspirador: { ops: [['ink', 1, 7, 9, 7], ['purple', 2, 8, 7, 5], ['white', 3, 9, 2, 1], ['ink', 2, 13, 2, 2], ['ink', 7, 13, 2, 2], ['greyD', 9, 9, 3, 1], ['greyD', 11, 4, 1, 6], ['greyD', 11, 3, 4, 1], ['ink', 13, 1, 3, 4], ['yellow', 14, 2, 1, 2]] },
   coracao: { ops: [['red', 2, 3, 5, 6], ['red', 9, 3, 5, 6], ['red', 1, 5, 14, 4], ['red', 3, 9, 10, 2], ['red', 5, 11, 6, 2], ['red', 7, 13, 2, 1], ['white', 3, 4, 2, 2]] },
   estrela: { ops: [['yellow', 7, 0, 2, 4], ['yellow', 0, 5, 16, 3], ['yellow', 3, 4, 10, 6], ['yellow', 4, 10, 3, 4], ['yellow', 9, 10, 3, 4], ['yellow', 2, 13, 3, 2], ['yellow', 11, 13, 3, 2], ['yellowL', 6, 5, 2, 2]] },
   casa: { ops: [['cream', 2, 7, 12, 9], ['red', 0, 6, 16, 2], ['red', 2, 4, 12, 2], ['red', 4, 2, 8, 2], ['red', 6, 0, 4, 2], ['brown', 7, 11, 3, 5], ['glass', 3, 9, 3, 3], ['glass', 11, 9, 3, 3]] },
@@ -3933,10 +3998,11 @@ function screenTitle() {
       <img class="px nevoa" src="${SPR.url('nevoa')}" alt=""><img class="px faisca" src="${SPR.url('faisca')}" alt=""></div>
     <div class="title-btns">
       ${has ? `<button class="btn primary big" id="cont">${ICON.next} Continuar a aventura</button>` : ''}
+      <button class="mychar" id="mych">${S.avatar ? `<img class="px" src="${SPR.url(avatarId(S.avatar))}" alt=""><span><small>Meu personagem</small><b>${esc(S.myName || 'Você')}</b></span><i>trocar</i>` : `${SPR.img('faisca')}<span><small>Primeiro passo</small><b>Criar meu personagem</b></span>`}</button>
       <div class="quick"><p>${has ? 'Ou comece de novo:' : 'Escolha e jogue!'}</p>
-        <button class="btn big qk" data-q="exp" style="--qc:#a5d97f"><b>Fácil</b><small>~5 min</small></button>
-        <button class="btn big qk" data-q="inv" style="--qc:#f4c542"><b>Médio</b><small>~12 min</small></button>
-        <button class="btn big qk" data-q="det" style="--qc:#e98bb0"><b>Difícil</b><small>~25 min</small></button></div>
+        <button class="btn big qk" data-q="exp" style="--qc:#a5d97f"><b>Fácil</b><small>~10 min</small></button>
+        <button class="btn big qk" data-q="inv" style="--qc:#f4c542"><b>Médio</b><small>~15 min</small></button>
+        <button class="btn big qk" data-q="det" style="--qc:#e98bb0"><b>Difícil</b><small>~30 min</small></button></div>
       <div class="row" style="justify-content:stretch"><button class="btn grow" id="online">${SPR.img('casa')} Jogar com amigos</button><button class="btn grow" id="new">${ICON.gear} Mais opções</button></div>
       <div class="row" style="justify-content:stretch"><button class="btn grow small" id="guide">${ICON.book} Como jogar</button><button class="btn grow small" id="phone">${SPR.img('caderno')} Código</button><button class="btn grow small" id="cfg">${ICON.gear} Som</button></div>
     </div>
@@ -3948,14 +4014,28 @@ function screenTitle() {
     else go(screenSetup);
   };
   /* início rápido: um toque e já começa (personagem sorteado, pode trocar depois) */
-  const QK = { exp: 'short', inv: 'medium', det: 'full' };
-  const quick = d => { newGame({ mode: 'solo', players: [{ name: 'Você', color: PLAYER_COLORS[0], avatar: randomAvatar() }], diff: d, length: QK[d] }); go(screenPrologue, 0); };
+  const QK = { exp: 'medium', inv: 'medium', det: 'full' };
+  const start = d => { newGame({ mode: 'solo', players: [{ name: S.myName || 'Você', color: PLAYER_COLORS[0], avatar: JSON.parse(JSON.stringify(S.avatar)) }], diff: d, length: QK[d] }); go(screenPrologue, 0); };
+  const quick = d => S.avatar ? start(d) : openMyChar(() => start(d));
+  $('#mych').onclick = () => { Audio8.init(); Audio8.sfx('select'); openMyChar(() => go(screenTitle)); };
   $$('.qk').forEach(b => b.onclick = () => { Audio8.init(); Audio8.sfx('select'); const d = b.dataset.q;
     if (has) confirmBox('Começar uma nova aventura? O progresso atual será apagado.', 'Sim, começar', () => quick(d)); else quick(d); });
   $('#guide').onclick = () => { Audio8.init(); openGuide(); };
   $('#phone').onclick = () => { Audio8.init(); go(screenPhoneClue); };
   $('#online').onclick = () => { Audio8.init(); go(screenOnline); };
   $('#cfg').onclick = () => { Audio8.init(); openSettings(); };
+}
+/* meu personagem: criado uma vez, salvo no aparelho e usado em todas as partidas */
+function openMyChar(after) {
+  const cfg = { avatar: S.avatar ? JSON.parse(JSON.stringify(S.avatar)) : randomAvatar() };
+  const m = modal(`<h2 style="margin:0 0 6px">Meu personagem</h2><div id="mcbox"></div>
+    <label for="mcn" style="font-weight:800">Como quer ser chamada(o)?</label><input class="txt" id="mcn" maxlength="16" placeholder="Seu nome ou apelido" value="${esc(S.myName || '')}">
+    <button class="btn primary big" id="mcok" style="margin-top:10px;width:100%">${ICON.next} Pronto!</button>`, { label: 'Meu personagem' });
+  m.classList.add('mcmodal');
+  const draw = () => { $('#mcbox').innerHTML = avatarPickerHTML(cfg.avatar); wireAvatarPicker(cfg); };
+  const _w = wireAvatarPicker; draw();
+  $('#mcbox').addEventListener('click', () => setTimeout(() => { if (!$('#avp')) draw(); }, 0));
+  $('#mcok').onclick = () => { S.avatar = cfg.avatar; S.myName = $('#mcn').value.trim().slice(0, 16); saveSettings(); Audio8.sfx('win'); closeModal(); if (G && !G.finished && G.mode === 'solo' && G.players[0]) { G.players[0].avatar = JSON.parse(JSON.stringify(S.avatar)); if (S.myName) G.players[0].name = S.myName; saveGame(); } after && after(); };
 }
 function resumeGame() {
   if (G.current && G.current.mission) { if (G.current.mission === '_finale') go(screenFinale); else go(renderMission, G.current.mission, G.current.step || 0); }
@@ -3974,7 +4054,7 @@ const COLOR_NAMES = { '#22161d': 'Preto', '#5a3520': 'Castanho', '#b5562c': 'Rui
 const EXTRA_NAMES = { none: 'Nada', glasses: 'Óculos', band: 'Faixa', freckles: 'Sardas' };
 
 function screenSetup() {
-  const cfg = { mode: 'solo', count: 2, names: PLAYER_DEFAULT.slice(), diff: 'inv', length: 'medium', clueMode: 'pass', avatars: PLAYER_DEFAULT.map(() => randomAvatar()), who: 0 };
+  const cfg = { mode: 'solo', count: 2, names: PLAYER_DEFAULT.slice(), diff: 'inv', length: 'medium', clueMode: 'pass', avatars: PLAYER_DEFAULT.map((_, i) => i === 0 && S.avatar ? JSON.parse(JSON.stringify(S.avatar)) : randomAvatar()), who: 0 };
   let st = 0;
   const modeArt = { solo: ['theo'], juntos: ['bia', 'theo', 'iara'], sala: ['davi', 'bia', 'iara', 'theo', 'sono'] };
   const views = () => cfg.mode === 'juntos' ? ['mode', 'players', 'avatar', 'diff', 'length'] : cfg.mode === 'solo' ? ['mode', 'avatar', 'diff', 'length'] : ['mode', 'diff', 'length'];
@@ -4025,6 +4105,7 @@ function screenSetup() {
       if (st < steps - 1) { st++; draw(); return; }
       const players = cfg.mode === 'juntos' ? Array.from({ length: cfg.count }, (_, i) => ({ name: (cfg.names[i] || '').trim() || PLAYER_DEFAULT[i], color: PLAYER_COLORS[i], avatar: cfg.avatars[i] }))
         : cfg.mode === 'sala' ? [{ name: 'Turma', color: PLAYER_COLORS[0], avatar: cfg.avatars[0] }] : [{ name: 'Você', color: PLAYER_COLORS[0], avatar: cfg.avatars[0] }];
+      if (cfg.mode !== 'sala') { S.avatar = JSON.parse(JSON.stringify(cfg.avatars[0])); saveSettings(); }
       if (cfg.mode === 'sala' && !S._salaSet) { S.contrast = true; S._salaSet = true; saveSettings(); }
       newGame({ mode: cfg.mode, players, diff: cfg.diff, length: cfg.length, clueMode: cfg.mode === 'juntos' ? cfg.clueMode : 'pass' });
       go(screenPrologue, 0);
@@ -4150,7 +4231,8 @@ function screenMap() {
   const markers = REGIONS.map(r => {
     const D = DISTRICTS[r.id], st = planOf(G)[r.id] ? regionState(r.id) : 'off';
     const lab = st === 'done' ? ' ✓' : '';
-    return `<button class="marker ${st} ${target && target.id === r.id ? 'next' : ''}" data-r="${r.id}" style="left:${D.mx}%;top:${D.my}%" aria-label="${esc(r.name)}"><span class="pin">${esc(r.name)}${lab}</span></button>`;
+    const isT = target && target.id === r.id;
+    return `<button class="marker ${st} ${isT ? 'next' : 'quiet'}" data-r="${r.id}" style="left:${D.mx}%;top:${D.my}%" aria-label="${esc(r.name)}"><span class="pin">${isT ? esc(r.name) : st === 'done' ? '✓' : st === 'off' ? '' : '•'}</span></button>`;
   }).join('');
   const start = G.lastRegion ? DISTRICTS[G.lastRegion] : null;
   app().innerHTML = `<div class="screen citymap">
@@ -4161,7 +4243,7 @@ function screenMap() {
       ${allDone ? `<button class="marker open next plaza" id="finale" style="left:50%;top:50%"><span class="pin">${SPR.img('estrela')} Grande final</span></button>` : ''}
       ${prog < 1 ? `<img class="px map-nevoa" src="${SPR.url('nevoa')}" alt="" style="left:${60 - prog * 30}%;top:${36 + prog * 10}%;opacity:${.95 - prog * .5}">` : ''}
       ${regs.filter(r => regionState(r.id) === 'locked').map((r, i) => `<img class="px map-fuma fumafly" src="${SPR.url('fumacinha')}" alt="" style="left:${DISTRICTS[r.id].mx - 4 + i}%;top:${DISTRICTS[r.id].my + 10}%;animation-delay:${i * .3}s">`).join('')}
-      <img class="px map-avatar" id="mav" src="${SPR.url(avatarOf())}" alt="Seu personagem">
+      <div id="npcs"></div><img class="px map-avatar" id="mav" src="${SPR.url(avatarOf())}" alt="Seu personagem">
       <div class="compass" id="cmp" aria-hidden="true">▲</div></div>
       <div class="map-banner" id="mbn"></div></div></div>`;
   wireHud();
@@ -4181,6 +4263,23 @@ function screenMap() {
     entering = true; Audio8.sfx('select'); banner.innerHTML = `Entrando em <b>${esc(r.name)}</b>...`; banner.classList.add('on');
     setTimeout(() => { G.lastRegion = rid; G.current = { mission: m, step: 0 }; saveGame(); go(renderMission, m, 0); }, 700);
   };
+  /* a cidade movimentada: quem você já conheceu passeia pelas calçadas */
+  const LANES = [{ y: 46.5 }, { y: 53.5 }, { x: 32.6 }, { x: 36.4 }, { x: 63.6 }, { x: 67.4 }];
+  const NPCS = [...G.album.slice(-3), 'dog'].filter(id => id === 'dog' || CHARACTERS[id] || LOOKS[id]).map((id, i) => {
+    const ln = LANES[i % LANES.length], el = document.createElement('img'); el.className = 'px map-npc' + (id === 'dog' ? ' dog' : ''); el.alt = ''; $('#npcs').appendChild(el);
+    const bub = document.createElement('div'); bub.className = 'npc-bub'; $('#npcs').appendChild(bub);
+    return { id, ln, el, bub, p: 3 + ((i * 37) % 90), d: i % 2 ? -1 : 1, v: .09 + (i % 3) * .03, f: 0, said: 0 };
+  });
+  const HI = ['Oi! Valeu pela ajuda!', 'Bom te ver por aqui!', 'Obrigado, viu?', 'A cidade tá mais bonita!', 'Vai lá, herói!'];
+  const npcTick = () => NPCS.forEach((n, i) => {
+    n.p += n.d * n.v; if (n.p > 97 || n.p < 3) n.d *= -1;
+    const x = n.ln.x !== undefined ? n.ln.x : n.p, y = n.ln.y !== undefined ? n.ln.y : n.p;
+    n.f = (n.f + 1) % 16; n.el.src = n.id === 'dog' ? SPR.url(n.f < 8 ? 'dog' : 'dog2') : SPR.url(n.id, n.f < 8 ? 'walk' : null);
+    n.el.style.left = x + '%'; n.el.style.top = y + '%'; n.el.classList.toggle('flip', n.ln.y !== undefined && n.d < 0);
+    const near = Math.hypot(x - P.x, (y - P.y) * .6) < 4;
+    if (near && !n.said) { n.said = Date.now(); n.bub.textContent = n.id === 'dog' ? 'Au au! ♥' : (CHARACTERS[n.id] ? CHARACTERS[n.id].name + ': ' : '') + HI[i % HI.length]; n.bub.classList.add('on'); Audio8.sfx('page'); setTimeout(() => n.bub.classList.remove('on'), 2200); }
+    n.bub.style.left = x + '%'; n.bub.style.top = (y - 6) + '%';
+  });
   const toWorld = e => { const r = wm.getBoundingClientRect(); return { x: clamp((e.clientX - r.left) / r.width * 100, 3, 97), y: clamp((e.clientY - r.top) / r.height * 100, 10, 98) }; };
   /* tocar ou arrastar o dedo: o personagem vai até lá */
   let dragging = false;
@@ -4201,14 +4300,15 @@ function screenMap() {
     if (!dx && !dy && tgt) { const ex = tgt.x - P.x, ey = (tgt.y - P.y) * .6, d = Math.hypot(ex, ey); if (d < .6) { if (tgt.rid) enter(tgt.rid); tgt = null; } else { dx = ex / d; dy = ey / d / .6; } }
     const moving = !!(dx || dy);
     if (moving) { const n = Math.hypot(dx, dy * .6) || 1; P.x = clamp(P.x + dx / n * .55, 3, 97); P.y = clamp(P.y + dy / n * .55 / .6 * .6, 10, 98); if (dx) av.classList.toggle('flip', dx < 0); }
+    av.classList.toggle('walking', moving);
     if (moving && Date.now() - lastT > 120) { lastT = Date.now(); f ^= 1; av.src = SPR.url(avatarOf(), f ? 'walk' : null); } else if (!moving && f) { f = 0; av.src = SPR.url(avatarOf()); }
-    av.style.left = P.x + '%'; av.style.top = P.y + '%';
+    av.style.left = P.x + '%'; av.style.top = P.y + '%'; npcTick();
     /* câmera segue o personagem */
     const cx = clamp(Z.vw / 2 - P.x / 100 * Z.W, Z.vw - Z.W, 0), cy = clamp(Z.vh / 2 - P.y / 100 * Z.H, Z.vh - Z.H, 0);
     cam = cam ? { x: cam.x + (cx - cam.x) * .18, y: cam.y + (cy - cam.y) * .18 } : { x: cx, y: cy };
     wm.style.width = Z.W + 'px'; wm.style.height = Z.H + 'px'; wm.style.transform = `translate(${cam.x}px, ${cam.y}px)`;
     /* chegou na porta de um bairro: entra sozinho */
-    for (const r of REGIONS) { const D = doorOf(r.id); if (Math.hypot(D.x - P.x, (D.y - P.y) * .6) < 2.4 && planOf(G)[r.id]) { enter(r.id); break; } }
+    for (const r of REGIONS) { const D = DISTRICTS[r.id]; if (planOf(G)[r.id] && Math.abs(D.mx - P.x) < 8 && P.y > D.my - 3 && P.y < D.my + 24) { enter(r.id); break; } else if (warned[r.id] && (Math.abs(D.mx - P.x) > 14 || P.y > D.my + 32)) delete warned[r.id]; }
     if (allDone && Math.hypot(50 - P.x, (50 - P.y) * .6) < 3) { entering = true; $('#finale').click(); }
     /* bússola apontando para o objetivo */
     if (goal) { const ang = Math.atan2((goal.y - P.y) * .6, goal.x - P.x), far = Math.hypot(goal.x - P.x, (goal.y - P.y) * .6) > 7; cmp.style.left = P.x + '%'; cmp.style.top = (P.y - 7) + '%'; cmp.style.transform = `translate(-50%, -50%) rotate(${ang + Math.PI / 2}rad)`; cmp.style.opacity = far ? 1 : 0; }
@@ -4270,7 +4370,7 @@ function renderMission(id, idx) {
     stage: $('#stage'), id, idx, step, colored: idx > revealIdx,
     complete() { RUN.done = true; prim.disabled = false; prim.classList.add('ready');
       if (['tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift', 'catch'].includes(step.t)) { addMedal('criatividade', 1, 'mg:' + id); if (!G.seen['eg:' + id]) { G.seen['eg:' + id] = 1; G.energy = (G.energy || 0) + 1; saveGame(); updEnergy(); } }
-      const ms = { dialog: 0, choice: 5200, reveal: 9000, thanks: 0, mirror: 0, reflect: 0, days: 3200 }[step.t] ?? 2600;
+      const ms = { dialog: 0, choice: 5200, reveal: 9000, thanks: 5000, mirror: 0, reflect: 0, days: 3200 }[step.t] ?? 2600;
       if (ms) autoNext(prim, ms, () => prim.click()); },
     setPrimary(t) { prim.innerHTML = `${esc(t)} ${ICON.next}`; },
     mistake() { RUN.mistakes++; G.current.mistakes++; saveGame(); refreshHint(); heroTip(id, step, true); },
@@ -4501,40 +4601,42 @@ function buildFinale() {
 }
 
 STEPS.thanks = function (step, ctx) {
-  const need = G.mode === 'sala' ? 5 : Math.max(3, G.players.length);
-  let sent = 0, who = null, msg = null;
-  const chars = G.album.slice();
-  ctx.stage.innerHTML = promptHTML(`Mural do Obrigado: escolham para quem agradecer e a mensagem. Cada obrigado deixa a Névoa menor. Faltam ${need}.`) + `
-    <div class="two"><div class="stage"><div class="scene faded" id="fs"><img class="bg px" src="${composeScene('festa').toDataURL()}" alt="A festa na praça de Lumiara"><div class="fogl"></div>
-      <img class="px map-nevoa nevoa-big" id="nv" src="${SPR.url('nevoa')}" alt="A Névoa" style="left:32%;top:2%;width:36%;animation:none"></div>
-      <div class="thanks-wall" id="wall" aria-live="polite"><span style="color:#fff;font-weight:700;opacity:.8">Os bilhetes de obrigado aparecem aqui.</span></div></div>
-    <div class="panel stage"><h3>1. Para quem?</h3><div class="chips" id="who">${chars.map(id => `<button class="chip" data-w="${id}" aria-pressed="false">${esc(CHARACTERS[id].name)}</button>`).join('')}</div>
-      <h3>2. Qual mensagem?</h3><div class="chips" id="msg">${FINALE.thanks.map((t, i) => `<button class="chip" data-m="${i}" aria-pressed="false">${esc(t)}</button>`).join('')}</div>
-      <label for="own" style="font-weight:800">Ou escreva a sua (opcional):</label><input class="txt" id="own" maxlength="80" autocomplete="off" placeholder="Ex.: Obrigada por cuidar do parque!">
-      <button class="btn primary big" id="send" disabled>Enviar obrigado</button><p id="left" style="font-weight:800;margin:0">Faltam ${need} agradecimentos.</p></div></div>`;
-  wireSay(ctx.stage, () => 'Mural do Obrigado. Escolham para quem agradecer e a mensagem.');
-  const upd = () => { $('#send', ctx.stage).disabled = !(who && (msg !== null || $('#own', ctx.stage).value.trim())); };
-  $$('[data-w]', ctx.stage).forEach(b => b.onclick = () => { $$('[data-w]', ctx.stage).forEach(x => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); who = b.dataset.w; Audio8.sfx('select'); upd(); });
-  $$('[data-m]', ctx.stage).forEach(b => b.onclick = () => { $$('[data-m]', ctx.stage).forEach(x => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); msg = +b.dataset.m; $('#own', ctx.stage).value = ''; Audio8.sfx('select'); upd(); });
-  $('#own', ctx.stage).oninput = () => { if ($('#own', ctx.stage).value.trim()) { msg = null; $$('[data-m]', ctx.stage).forEach(x => x.setAttribute('aria-pressed', 'false')); } upd(); };
-  $('#send', ctx.stage).onclick = () => {
-    const text = $('#own', ctx.stage).value.trim() || FINALE.thanks[msg];
-    const wall = $('#wall', ctx.stage); if (!sent) wall.innerHTML = '';
-    sent++; G.thanks.push({ to: who, text }); saveGame();
-    const by = isJuntos() ? player().name : G.mode === 'sala' ? 'Turma' : '';
-    wall.insertAdjacentHTML('beforeend', `<div class="note" style="--rot:${(Math.random() * 6 - 3).toFixed(1)}deg">${esc(text)}<small>Para ${esc(CHARACTERS[who].name)}${by ? ' · de ' + esc(by) : ''}</small></div>`);
-    Audio8.sfx('light'); sparkle($('#nv', ctx.stage), 14);
-    const f = Math.min(sent / need, 1), nv = $('#nv', ctx.stage);
-    nv.style.transform = `scale(${1 - f * .55})`; nv.style.filter = `grayscale(${1 - f}) brightness(${1 + f * .3})`;
-    $('#fs', ctx.stage).classList.toggle('faded', f < 1);
-    addMedal('gentileza', 1, 'thx:' + sent);
-    who = null; msg = null; $('#own', ctx.stage).value = ''; $$('.chip', ctx.stage).forEach(x => x.setAttribute('aria-pressed', 'false')); upd();
-    if (sent >= need) {
-      $('#left', ctx.stage).textContent = 'A Névoa está mudando…'; nv.src = SPR.url('nevoaFeliz'); Audio8.sfx('win'); confetti(70);
-      ctx.setPrimary('Ver o que aconteceu'); ctx.complete();
-    } else { $('#left', ctx.stage).textContent = `Faltam ${need - sent} agradecimentos.`; ctx.nextTurn(); }
+  /* "E se eles sumissem?": toque num trabalhador para ver a cidade sem ele. Depois, traga todo mundo de volta. */
+  const ids = (G.album.filter(id => CHARACTERS[id]).length >= 3 ? G.album.filter(id => CHARACTERS[id]) : ['denise', 'ze', 'cida', 'pedro', 'tania', 'joana']).slice(-6);
+  const need = Math.min(3, ids.length); let gone = [], back = false;
+  ctx.stage.innerHTML = `<div class="mg job wout">${mgHead('faisca', 'E se eles <b>sumissem</b>? Toque em alguém para ver a cidade <b>sem</b> essa pessoa.')}
+    <div class="scene jobscene" id="js"><img class="bg px" id="wbg" src="${composeScene('cidade').toDataURL()}" alt="Lumiara"><div class="wfog" id="wf"></div><div class="layer" id="lay"></div><div class="wmsg" id="wm"></div></div>
+    <div class="wrow" id="wr">${ids.map(id => `<button class="wcard" data-w="${id}"><img class="px" src="${SPR.url(id)}" alt=""><b>${esc(CHARACTERS[id].name)}</b><small>${esc(CHARACTERS[id].job)}</small></button>`).join('')}</div>
+    <div class="row center"><button class="btn big primary" id="wback" hidden>${SPR.img('coracao')} Trazer todo mundo de volta!</button></div></div>`;
+  wireSay(ctx.stage, () => 'E se eles sumissem? Toque em alguém para ver a cidade sem essa pessoa.');
+  const lay = $('#lay', ctx.stage), wm = $('#wm', ctx.stage), wf = $('#wf', ctx.stage), bg = $('#wbg', ctx.stage);
+  const look = () => { const k = gone.length / ids.length; bg.style.filter = `grayscale(${Math.min(1, k * 1.6)}) brightness(${1 - k * .35})`; wf.style.opacity = Math.min(.85, k * 1.4); };
+  $$('.wcard', ctx.stage).forEach(b => b.onclick = () => {
+    if (back || b.classList.contains('off')) return; ctx.activity(); const id = b.dataset.w;
+    b.classList.add('off'); gone.push(id); look(); Audio8.sfx('soft');
+    const f = spriteEl('fumacinha', 20 + RNG.next() * 110, 8 + RNG.next() * 30, { w: 14, cls: 'fumafly' }); lay.appendChild(f);
+    wm.innerHTML = `<b>Sem ${esc(CHARACTERS[id].name)}:</b> ${esc((FINALE.without || {})[id] || 'a cidade pararia.')}`; wm.classList.remove('on'); void wm.offsetWidth; wm.classList.add('on');
+    if (S.autoRead) Voice.speak(`Sem ${CHARACTERS[id].name}: ${(FINALE.without || {})[id] || ''}`);
+    ctx.nextTurn();
+    if (gone.length >= need) setTimeout(() => {
+      setHead(ctx, '<b>Viu?</b> Ninguém é invisível. Sem eles, nada funciona!'); Audio8.sfx('villain');
+      const bb = $('#wback', ctx.stage); bb.hidden = false; demoTap(bb, 300);
+    }, 1400);
+  });
+  $('#wback', ctx.stage).onclick = () => {
+    if (back) return; back = true; ctx.activity(); gone = []; look(); Audio8.sfx('reveal'); confetti(60);
+    $$('.fumafly', lay).forEach(e => { e.classList.add('poof'); setTimeout(() => e.remove(), 400); });
+    $$('.wcard', ctx.stage).forEach((b, i) => setTimeout(() => { b.classList.remove('off'); b.classList.add('back'); }, i * 120));
+    $('#wback', ctx.stage).hidden = true;
+    wm.innerHTML = '<b>Todo mundo de volta!</b> Quando a gente enxerga e agradece, a cidade brilha.'; wm.classList.remove('on'); void wm.offsetWidth; wm.classList.add('on');
+    setHead(ctx, '<b>Lumiara brilhou!</b> Agradeça quem cuida de você hoje.'); ctx.complete();
   };
-  return { speak: () => 'Mural do Obrigado. Escolham para quem agradecer e a mensagem. Cada obrigado deixa a Névoa menor.' };
+  setTimeout(() => demoTap($('.wcard', ctx.stage), 0), 900);
+  return {
+    speak: () => 'Toque em alguém para ver a cidade sem essa pessoa.',
+    hint() { ctx.usedHint(); const b = $('#wback:not([hidden])', ctx.stage) || $('.wcard:not(.off)', ctx.stage); if (b) { b.classList.add('glow'); setTimeout(() => b.classList.remove('glow'), 1500); } },
+    autoStep() { const bb = $('#wback:not([hidden])', ctx.stage); if (bb) return bb.click(); const c = $('.wcard:not(.off)', ctx.stage); if (c && gone.length < need) c.click(); }
+  };
 };
 
 STEPS.mirror = function (step, ctx) {
@@ -4682,7 +4784,7 @@ const PROLOGUE_FRAMES = [
     actors: { denise: { s: 'denise', mode: 'sil', x: 40, y: 60 }, rafa: { s: 'rafa', mode: 'sil', x: 92, y: 62, flip: true }, lucia: { s: 'lucia', mode: 'sil', x: 60, y: 62 }, ze: { s: 'ze', mode: 'sil', x: 132, y: 58, flip: true }, nevoa: { s: 'nevoa', x: 34, y: -2, w: 92, ms: 1800 } } },
   { scene: 'cidade', gray: 1, dark: .55, fog: .5, sparkle: true, text: 'Mas eu escapei! Eu sou a Faísca!',
     actors: { faisca: { s: 'faisca', from: [76, 80], x: 72, y: 34, w: 16, glow: true, ms: 1400 } } },
-  { scene: 'cidade', gray: .8, dark: .35, fog: .4, last: 'Bora!', text: 'Preciso de um herói. Você topa?',
+  { scene: 'cidade', gray: .8, dark: .35, fog: .4, last: 'Vamos juntos!', text: 'Ei... você consegue me ver? Então me ajuda a espantar a Névoa e devolver as cores de Lumiara!',
     actors: { you: { s: 'avatar', from: [-18, 62], x: 56, y: 62, walk: true, ms: 1600 }, faisca: { s: 'faisca', x: 74, y: 44, w: 14, glow: true } } }
 ];
 
@@ -5747,65 +5849,113 @@ STEPS.catch = function (step, ctx) {
    Os heróis que você conheceu aparecem para ajudar, cada um com seu superpoder.
    ============================================================ */
 STEPS.boss = function (step, ctx) {
+  /* Batalha final em 3 atos: 1) aspirar a poluição da Névoa e salvar os moradores; 2) um trabalhador que você ajudou chega para ajudar;
+     3) todo mundo junto grita OBRIGADO até a Névoa virar nuvem boa. */
   Audio8.energy = 1; onCleanup(() => { Audio8.energy = 0; });
-  const maxHp = G.diff === 'exp' ? 8 : 10;
-  let hp = maxHp, charge = Math.max(3, Math.min(12, G.energy || 0)), fumas = [], tick = 0, done = false, k = 0;
-  const heroes = (G.album.length ? G.album : ['denise', 'pedro', 'cida']).slice(0, 10);
-  ctx.stage.innerHTML = `<div class="mg job bossg">${mgHead('faisca', 'Estoure os <b>Fumacinhas</b> e lance <b>OBRIGADO</b> na Névoa!')}
+  const D = G.diff, goal = D === 'exp' ? 9 : D === 'inv' ? 13 : 17, hits = D === 'exp' ? 1 : D === 'inv' ? 2 : 3;
+  const met = G.album.filter(id => CHARACTERS[id]), helperId = met.length ? met[met.length - 1] : 'denise', heroes = (met.length ? met : ['denise', 'pedro', 'cida']).slice(-8);
+  const folks = ['theo', 'bia', 'iara', 'davi', 'theo', 'bia'].map((id, i) => ({ id, x: 14 + i * 24, smog: null }));
+  let phase = 1, cleared = 0, smogs = [], tick = 0, done = false, hp = 100, helper = null, helperT = 0, me = { x: 74 };
+  ctx.stage.innerHTML = `<div class="mg job bossg">${mgHead('faisca', 'A Névoa está soltando <b>poluição</b>! Toque na fumaça para <b>aspirar</b> e salvar os moradores!')}
     <div class="scene jobscene bossscene" id="js"><img class="bg px" src="${composeScene('festa').toDataURL()}" alt="Praça à noite com a Névoa"><div class="bossdark" id="bd"></div><div class="layer" id="lay"></div>
-      <div class="bosshp"><span>Névoa</span><div class="bar"><i id="hp" style="width:100%"></i></div></div><div class="mgsay" id="say"></div></div>
-    <div class="bossbar"><button class="btn big primary throw" id="throw">${SPR.img('coracao')} OBRIGADO! <b id="ch">${charge}</b></button></div></div>`;
-  wireSay(ctx.stage, () => 'Estoure os Fumacinhas e lance obrigado na Névoa!');
-  const lay = $('#lay', ctx.stage), sc = $('#js', ctx.stage), say = $('#say', ctx.stage);
-  const nev = spriteEl('nevoa', 52, 0, { w: 56, cls: 'bossnev' }); lay.appendChild(nev);
-  const row = heroes.map((id, i) => { const e = spriteEl(id, 6 + i * (140 / Math.max(1, heroes.length - 1)) * (heroes.length > 1 ? 1 : 0) + (heroes.length === 1 ? 70 : 0), 64); e.classList.add('herorow'); e.style.animationDelay = (i * .12) + 's'; lay.appendChild(e); return { id, e, x: 6 + i * (140 / Math.max(1, heroes.length - 1)) }; });
-  const upd = () => { $('#hp', ctx.stage).style.width = (hp / maxHp * 100) + '%'; $('#ch', ctx.stage).textContent = charge; $('#throw', ctx.stage).classList.toggle('ready', charge > 0); $('#bd', ctx.stage).style.opacity = .15 + .45 * hp / maxHp; nev.style.width = pct(30 + 26 * hp / maxHp, SW); };
-  const spawnFuma = () => {
-    const x = 50 + RNG.next() * 50, el = document.createElement('button'); el.className = 'fumab'; el.innerHTML = SPR.img('fumacinha'); el.style.left = pct(x, SW); el.style.top = pct(14, SH); el.style.width = pct(13, SW); lay.appendChild(el);
-    const f = { x, y: 14, vx: (RNG.next() - .5) * 1.4, el }; fumas.push(f);
-    el.onclick = () => { if (f.gone || done) return; ctx.activity(); f.gone = true; el.classList.add('poof'); setTimeout(() => el.remove(), 350); charge++; Audio8.sfx('found'); floatText(sc, '+1', f.x / SW * 100, f.y / SH * 100); upd(); };
+      <div class="bosshp"><span id="bl">Poluição</span><div class="bar"><i id="hp" style="width:0%"></i></div><b id="bc">0/${goal}</b></div><div class="mgsay" id="say"></div></div>
+    <div class="bossbar"><button class="btn big primary throw" id="throw" hidden>${SPR.img('coracao')} OBRIGADO!</button><p class="bosstip" id="btip">${SPR.img('faisca')} Toque na fumaça!</p></div></div>`;
+  wireSay(ctx.stage, () => phase < 3 ? 'Toque na fumaça para aspirar a poluição e salvar os moradores!' : 'Todos juntos! Toque em obrigado sem parar!');
+  const lay = $('#lay', ctx.stage), sc = $('#js', ctx.stage), say = $('#say', ctx.stage), thr = $('#throw', ctx.stage);
+  const nev = spriteEl('nevoa', 52, 0, { w: 50, cls: 'bossnev' }); lay.appendChild(nev);
+  folks.forEach(f => { f.e = spriteEl(f.id, f.x - 6, 63, { w: 12 }); f.e.classList.add('folk'); lay.appendChild(f.e); });
+  const hero = spriteEl(avatarOf(), me.x - 7, 60, { w: 14 }); hero.classList.add('bosshero'); lay.appendChild(hero);
+  const vac = spriteEl('aspirador', me.x + 3, 74, { w: 9 }); vac.classList.add('bossvac'); lay.appendChild(vac);
+  const placeMe = () => { hero.style.left = pct(me.x - 7, SW); vac.style.left = pct(me.x + 3, SW); };
+  const beam = (x0, y0, x1, y1, cls = '') => {
+    const r = sc.getBoundingClientRect(), ax = x0 / SW * r.width, ay = y0 / SH * r.height, bx = x1 / SW * r.width, by = y1 / SH * r.height;
+    const el = document.createElement('div'); el.className = 'vbeam ' + cls; el.style.left = ax + 'px'; el.style.top = ay + 'px'; el.style.width = Math.hypot(bx - ax, by - ay) + 'px';
+    el.style.transform = `rotate(${Math.atan2(by - ay, bx - ax)}rad)`; sc.appendChild(el); setTimeout(() => el.remove(), 320);
   };
-  $('#throw', ctx.stage).onclick = () => {
-    if (done) return; ctx.activity();
-    if (charge <= 0) { mgSay(say, 'Sem energia! Estoure Fumacinhas!', 'info'); Audio8.sfx('soft'); return; }
-    charge--; const h = row[k++ % row.length];
-    h.e.classList.remove('jump'); void h.e.offsetWidth; h.e.classList.add('jump');
-    const ball = spriteEl('coracao', h.x + 2, 60, { w: 10, cls: 'heartball' }); lay.appendChild(ball);
-    setTimeout(() => moveEl(ball, 74, 12, 520), 20);
-    floatText(sc, (POWERS[h.id] || 'Obrigado') + '!', h.x / SW * 100 + 4, 70);
-    Audio8.sfx('select');
-    setTimeout(() => {
-      ball.remove(); hp--; Audio8.sfx('ok'); nev.classList.remove('hit'); void nev.offsetWidth; nev.classList.add('hit'); sparkle(nev, 8);
-      floatText(sc, pick(['OBRIGADO!', 'VALEU!', 'GRATIDÃO!', 'VOCÊ IMPORTA!']), 70, 18); ctx.nextTurn(); upd();
-      if (hp <= 0) win();
-    }, 560);
+  const upd = () => {
+    if (phase < 3) { $('#hp', ctx.stage).style.width = Math.min(100, cleared / goal * 100) + '%'; $('#bc', ctx.stage).textContent = `${Math.min(cleared, goal)}/${goal}`; }
+    else { $('#hp', ctx.stage).style.width = hp + '%'; $('#bc', ctx.stage).textContent = ''; }
+    $('#bd', ctx.stage).style.opacity = phase < 3 ? .55 - .3 * cleared / goal : .1 + .3 * hp / 100;
+  };
+  const spawn = () => {
+    const free = folks.filter(f => !f.smog && !smogs.some(s => s.to === f && !s.gone)); if (!free.length) return;
+    const to = free[Math.floor(RNG.next() * free.length)], x0 = 60 + RNG.next() * 40;
+    const el = document.createElement('button'); el.className = 'smog'; el.setAttribute('aria-label', 'Poluição'); el.innerHTML = SPR.img('fumacinha');
+    el.style.left = pct(x0 - 10, SW); el.style.top = pct(12, SH); el.style.width = pct(21, SW); lay.appendChild(el);
+    const sm = { x: x0, y: 12, to, el, hp: hits, landed: false }; smogs.push(sm);
+    el.onclick = () => zap(sm, false);
+  };
+  const zap = (sm, byHelper) => {
+    if (sm.gone || done || phase === 3) return; if (!byHelper) ctx.activity();
+    if (!byHelper) { me.x = clamp(sm.x, 8, 150); placeMe(); hero.classList.toggle('flip', sm.x < me.x); }
+    const src = byHelper ? helper : { x: me.x + 6, y: 70 };
+    beam(src.x, src.y, sm.x, sm.y + 6, byHelper ? 'help' : ''); Audio8.sfx('select');
+    sm.hp -= byHelper ? hits : 1; sm.el.classList.remove('hit'); void sm.el.offsetWidth; sm.el.classList.add('hit');
+    if (sm.hp > 0) { sm.el.style.transform = `scale(${.55 + .45 * sm.hp / hits})`; return; }
+    sm.gone = true; sm.el.classList.add('sucked'); setTimeout(() => sm.el.remove(), 380); cleared++; ctx.nextTurn();
+    if (sm.landed) { const f = sm.to; f.smog = null; f.e.classList.remove('sad'); f.e.classList.add('saved'); setTimeout(() => f.e.classList.remove('saved'), 700); sparkle(f.e, 6); floatText(sc, pick(['Valeu!', 'Ufa!', 'Obrigado!', 'Respirei!']), f.x / SW * 100, 54); Audio8.sfx('found'); }
+    else floatText(sc, '+1', sm.x / SW * 100, (sm.y + 4) / SH * 100);
     upd();
+    if (cleared >= Math.ceil(goal / 2) && !helper && phase === 1) callHelper();
+    if (cleared >= goal && phase === 2) finale();
+  };
+  /* ato 2: quem você ajudou volta para te ajudar */
+  const callHelper = () => {
+    phase = 2; const C = CHARACTERS[helperId], name = C ? C.name : 'Amiga';
+    const card = document.createElement('div'); card.className = 'helpcard';
+    card.innerHTML = `<img class="px" src="${SPR.url(helperId)}" alt=""><div><b>${esc(name)}${POWERS[helperId] ? ` <small>${SPR.img('raio')} ${esc(POWERS[helperId])}</small>` : ''}</b><span>Você fez a cidade lembrar de mim. Agora é a minha vez de te ajudar!</span></div>`;
+    sc.appendChild(card); Audio8.sfx('reveal'); confetti(20);
+    if (S.autoRead) Voice.speak(`${name}: você fez a cidade lembrar de mim. Agora é a minha vez de te ajudar!`);
+    setTimeout(() => { card.classList.add('out'); setTimeout(() => card.remove(), 400); }, 3200);
+    const he = spriteEl(helperId, 140, 60, { w: 14 }); he.classList.add('bosshero', 'arrive'); lay.appendChild(he); helper = { x: 146, y: 64, e: he };
+    $('#btip', ctx.stage).innerHTML = `${SPR.img(helperId)} ${esc(name)} está ajudando!`;
+  };
+  /* ato 3: todo mundo junto */
+  const finale = () => {
+    phase = 3; smogs.forEach(s => { if (!s.gone) { s.gone = true; s.el.classList.add('sucked'); setTimeout(() => s.el.remove(), 380); } }); folks.forEach(f => { f.smog = null; f.e.classList.remove('sad'); f.e.classList.add('home'); }); hero.classList.add('home'); vac.classList.add('home'); if (helper) helper.e.classList.add('home');
+    heroes.forEach((id, i) => { const e = spriteEl(id, 8 + i * (128 / Math.max(1, heroes.length - 1)), 60, { w: 13 }); e.classList.add('herorow', 'arrive'); e.style.animationDelay = (i * .1) + 's'; lay.appendChild(e); });
+    $('#bl', ctx.stage).textContent = 'Névoa'; thr.hidden = false; $('#btip', ctx.stage).hidden = true; Audio8.sfx('villain');
+    setHead(ctx, '<b>TODOS JUNTOS!</b> Toque em <b>OBRIGADO</b> sem parar!'); upd(); demoTap(thr, 200);
+  };
+  thr.onclick = () => {
+    if (done || phase !== 3) return; ctx.activity();
+    hp = Math.max(0, hp - (D === 'exp' ? 8 : D === 'inv' ? 6 : 4.5));
+    const hs = $$('.herorow', lay), h = hs[Math.floor(RNG.next() * hs.length)];
+    if (h) { h.classList.remove('jump'); void h.offsetWidth; h.classList.add('jump'); const x = parseFloat(h.style.left) / 100 * SW; const ball = spriteEl('coracao', x + 3, 56, { w: 8, cls: 'heartball' }); lay.appendChild(ball); setTimeout(() => moveEl(ball, 76, 8, 380), 20); setTimeout(() => ball.remove(), 420); }
+    nev.classList.remove('hit'); void nev.offsetWidth; nev.classList.add('hit'); Audio8.sfx('ok');
+    if (RNG.next() < .35) floatText(sc, pick(['OBRIGADO!', 'VALEU!', 'GRATIDÃO!', 'VOCÊ IMPORTA!']), 50 + RNG.next() * 30, 20);
+    upd(); if (hp <= 0) win();
   };
   const loop = setInterval(() => {
     if (done) return; tick++;
-    if (tick % 22 === 0 && fumas.filter(f => !f.gone).length < 5) spawnFuma();
-    for (const f of fumas) {
-      if (f.gone) continue;
-      f.y += .32; f.x = clamp(f.x + f.vx + Math.sin((tick + f.y) / 9) * .4, 2, 146);
-      f.el.style.left = pct(f.x, SW); f.el.style.top = pct(f.y, SH);
-      if (f.y > 58) { f.gone = true; f.el.classList.add('poof'); setTimeout(() => f.el.remove(), 350); floatText(sc, 'Hehehe!', f.x / SW * 100, 62); }
-    }
-    fumas = fumas.filter(f => !f.gone || document.body.contains(f.el));
+    nev.style.left = pct(46 + Math.sin(tick / 40) * 30, SW);
+    if (phase < 3) {
+      const every = Math.max(D === 'det' ? 16 : 20, (D === 'exp' ? 46 : 38) - cleared * 2);
+      if (tick % every === 0) spawn();
+      for (const sm of smogs) {
+        if (sm.gone || sm.landed) continue;
+        const tx = sm.to.x, ty = 54; sm.x += (tx - sm.x) * .03; sm.y += (ty - sm.y) * .028;
+        sm.el.style.left = pct(sm.x - 10, SW); sm.el.style.top = pct(sm.y, SH);
+        if (Math.abs(sm.y - ty) < 1.2) { sm.landed = true; sm.to.smog = sm; sm.to.e.classList.add('sad'); floatText(sc, 'Cof cof!', sm.to.x / SW * 100, 52); Audio8.sfx('soft'); if (smogs.filter(x => x.landed && !x.gone).length >= 4) mgSay(say, 'Rápido! Os moradores não conseguem respirar!', 'info'); }
+      }
+      if (helper && tick - helperT > (D === 'det' ? 55 : 42)) { const t = smogs.filter(x => !x.gone).sort((a, b) => b.y - a.y)[0]; if (t) { helperT = tick; zap(t, true); helper.e.classList.remove('jump'); void helper.e.offsetWidth; helper.e.classList.add('jump'); } }
+      smogs = smogs.filter(x => !x.gone || document.body.contains(x.el));
+    } else { hp = Math.min(100, hp + (D === 'det' ? .22 : .15)); if (tick % 5 === 0) upd(); }
   }, 40);
   onCleanup(() => clearInterval(loop));
   const win = () => {
-    done = true; clearInterval(loop); fumas.forEach(f => f.el.remove());
-    nev.src = SPR.url('nevoaFeliz'); nev.classList.add('saved'); $('#bd', ctx.stage).style.opacity = 0;
-    Audio8.sfx('win'); confetti(80); row.forEach((h, i) => setTimeout(() => { h.e.classList.remove('jump'); void h.e.offsetWidth; h.e.classList.add('jump'); }, i * 90));
-    setHead(ctx, '<b>VOCÊS VENCERAM!</b> A Névoa ficou... diferente?'); mgSay(say, 'Heróis de verdade não usam capa!');
-    if (S.autoRead) Voice.speak('Vocês venceram! Heróis de verdade não usam capa!');
+    done = true; clearInterval(loop);
+    nev.src = SPR.url('nevoaFeliz'); nev.classList.add('saved'); $('#bd', ctx.stage).style.opacity = 0; thr.hidden = true;
+    Audio8.sfx('win'); confetti(90); $$('.herorow, .folk, .bosshero', lay).forEach((e, i) => setTimeout(() => { e.classList.remove('jump'); void e.offsetWidth; e.classList.add('jump'); }, i * 70));
+    setHead(ctx, '<b>VOCÊS VENCERAM JUNTOS!</b> Heróis de verdade não usam capa!');
+    if (S.autoRead) Voice.speak('Vocês venceram juntos! Heróis de verdade não usam capa!');
     ctx.complete();
   };
-  upd(); Audio8.sfx('villain'); setTimeout(() => demoTap($('#throw', ctx.stage), 0), 700);
+  placeMe(); upd(); Audio8.sfx('villain'); setTimeout(spawn, 500); setTimeout(() => { const s = smogs.find(x => !x.gone); if (s) demoTap(s.el, 0); }, 1500);
   return {
-    speak: () => 'Estoure os Fumacinhas e lance obrigado na Névoa!',
-    hint() { ctx.usedHint(); $('#throw', ctx.stage).classList.add('glow'); setTimeout(() => $('#throw', ctx.stage).classList.remove('glow'), 1500); },
-    autoStep() { if (done) return; if (charge > 0) $('#throw', ctx.stage).click(); else { const f = fumas.find(x => !x.gone); if (f) f.el.click(); } }
+    speak: () => phase < 3 ? 'Toque na fumaça para aspirar a poluição e salvar os moradores!' : 'Todos juntos! Toque em obrigado sem parar!',
+    hint() { ctx.usedHint(); const s = phase < 3 ? (smogs.find(x => !x.gone) || {}).el : thr; if (s) { s.classList.add('glow'); setTimeout(() => s.classList.remove('glow'), 1500); } },
+    autoStep() { if (done) return; if (phase === 3) thr.click(); else { const s = smogs.filter(x => !x.gone).sort((a, b) => b.y - a.y)[0]; if (s) s.el.click(); } }
   };
 };
 
@@ -5824,7 +5974,7 @@ const HERO_TIPS = {
   catch: ['Arraste para os lados e pegue com a cesta!', 'Cuidado com os Fumacinhas!'],
   shift: ['Chegue perto do lixo para varrer!', 'Carrinho cheio? Esvazie na lixeira grande!'],
   route: ['Remédio é urgente: entregue primeiro!', 'Desvie da obra e da rua alagada!'],
-  boss: ['Estoure os Fumacinhas para ganhar energia!', 'Toque em OBRIGADO para atacar!']
+
 };
 function heroTip(id, step, err) {
   const tips = HERO_TIPS[step.t]; if (!tips || !document.body.contains($('#stage'))) return;
@@ -5978,7 +6128,7 @@ function screenOnline() {
   $('#bk').onclick = () => go(screenTitle);
 }
 function screenOnlineHost() {
-  const cfg = { name: '', avatar: randomAvatar(), diff: 'inv', length: 'medium' };
+  const cfg = { name: S.myName || '', avatar: S.avatar ? JSON.parse(JSON.stringify(S.avatar)) : randomAvatar(), diff: 'inv', length: 'medium' };
   const draw = () => {
     app().innerHTML = `<div class="screen setup"><h2>Criar uma sala</h2>
       <div class="panel stage" style="max-width:720px;margin:0 auto">
@@ -6020,7 +6170,7 @@ function startHost(cfg, tries = 0) {
   });
 }
 function screenOnlineJoin(code0 = '') {
-  const cfg = { name: '', avatar: randomAvatar(), code: code0 };
+  const cfg = { name: S.myName || '', avatar: S.avatar ? JSON.parse(JSON.stringify(S.avatar)) : randomAvatar(), code: code0 };
   app().innerHTML = `<div class="screen setup"><h2>Entrar numa sala</h2>
     <div class="panel stage" style="max-width:720px;margin:0 auto">
       <label for="oc" style="font-weight:800">Código da sala</label><input class="txt code-in" id="oc" maxlength="4" autocomplete="off" autocapitalize="characters" placeholder="ABCD" value="${esc(cfg.code)}">

@@ -86,65 +86,113 @@ STEPS.catch = function (step, ctx) {
    Os heróis que você conheceu aparecem para ajudar, cada um com seu superpoder.
    ============================================================ */
 STEPS.boss = function (step, ctx) {
+  /* Batalha final em 3 atos: 1) aspirar a poluição da Névoa e salvar os moradores; 2) um trabalhador que você ajudou chega para ajudar;
+     3) todo mundo junto grita OBRIGADO até a Névoa virar nuvem boa. */
   Audio8.energy = 1; onCleanup(() => { Audio8.energy = 0; });
-  const maxHp = G.diff === 'exp' ? 8 : 10;
-  let hp = maxHp, charge = Math.max(3, Math.min(12, G.energy || 0)), fumas = [], tick = 0, done = false, k = 0;
-  const heroes = (G.album.length ? G.album : ['denise', 'pedro', 'cida']).slice(0, 10);
-  ctx.stage.innerHTML = `<div class="mg job bossg">${mgHead('faisca', 'Estoure os <b>Fumacinhas</b> e lance <b>OBRIGADO</b> na Névoa!')}
+  const D = G.diff, goal = D === 'exp' ? 9 : D === 'inv' ? 13 : 17, hits = D === 'exp' ? 1 : D === 'inv' ? 2 : 3;
+  const met = G.album.filter(id => CHARACTERS[id]), helperId = met.length ? met[met.length - 1] : 'denise', heroes = (met.length ? met : ['denise', 'pedro', 'cida']).slice(-8);
+  const folks = ['theo', 'bia', 'iara', 'davi', 'theo', 'bia'].map((id, i) => ({ id, x: 14 + i * 24, smog: null }));
+  let phase = 1, cleared = 0, smogs = [], tick = 0, done = false, hp = 100, helper = null, helperT = 0, me = { x: 74 };
+  ctx.stage.innerHTML = `<div class="mg job bossg">${mgHead('faisca', 'A Névoa está soltando <b>poluição</b>! Toque na fumaça para <b>aspirar</b> e salvar os moradores!')}
     <div class="scene jobscene bossscene" id="js"><img class="bg px" src="${composeScene('festa').toDataURL()}" alt="Praça à noite com a Névoa"><div class="bossdark" id="bd"></div><div class="layer" id="lay"></div>
-      <div class="bosshp"><span>Névoa</span><div class="bar"><i id="hp" style="width:100%"></i></div></div><div class="mgsay" id="say"></div></div>
-    <div class="bossbar"><button class="btn big primary throw" id="throw">${SPR.img('coracao')} OBRIGADO! <b id="ch">${charge}</b></button></div></div>`;
-  wireSay(ctx.stage, () => 'Estoure os Fumacinhas e lance obrigado na Névoa!');
-  const lay = $('#lay', ctx.stage), sc = $('#js', ctx.stage), say = $('#say', ctx.stage);
-  const nev = spriteEl('nevoa', 52, 0, { w: 56, cls: 'bossnev' }); lay.appendChild(nev);
-  const row = heroes.map((id, i) => { const e = spriteEl(id, 6 + i * (140 / Math.max(1, heroes.length - 1)) * (heroes.length > 1 ? 1 : 0) + (heroes.length === 1 ? 70 : 0), 64); e.classList.add('herorow'); e.style.animationDelay = (i * .12) + 's'; lay.appendChild(e); return { id, e, x: 6 + i * (140 / Math.max(1, heroes.length - 1)) }; });
-  const upd = () => { $('#hp', ctx.stage).style.width = (hp / maxHp * 100) + '%'; $('#ch', ctx.stage).textContent = charge; $('#throw', ctx.stage).classList.toggle('ready', charge > 0); $('#bd', ctx.stage).style.opacity = .15 + .45 * hp / maxHp; nev.style.width = pct(30 + 26 * hp / maxHp, SW); };
-  const spawnFuma = () => {
-    const x = 50 + RNG.next() * 50, el = document.createElement('button'); el.className = 'fumab'; el.innerHTML = SPR.img('fumacinha'); el.style.left = pct(x, SW); el.style.top = pct(14, SH); el.style.width = pct(13, SW); lay.appendChild(el);
-    const f = { x, y: 14, vx: (RNG.next() - .5) * 1.4, el }; fumas.push(f);
-    el.onclick = () => { if (f.gone || done) return; ctx.activity(); f.gone = true; el.classList.add('poof'); setTimeout(() => el.remove(), 350); charge++; Audio8.sfx('found'); floatText(sc, '+1', f.x / SW * 100, f.y / SH * 100); upd(); };
+      <div class="bosshp"><span id="bl">Poluição</span><div class="bar"><i id="hp" style="width:0%"></i></div><b id="bc">0/${goal}</b></div><div class="mgsay" id="say"></div></div>
+    <div class="bossbar"><button class="btn big primary throw" id="throw" hidden>${SPR.img('coracao')} OBRIGADO!</button><p class="bosstip" id="btip">${SPR.img('faisca')} Toque na fumaça!</p></div></div>`;
+  wireSay(ctx.stage, () => phase < 3 ? 'Toque na fumaça para aspirar a poluição e salvar os moradores!' : 'Todos juntos! Toque em obrigado sem parar!');
+  const lay = $('#lay', ctx.stage), sc = $('#js', ctx.stage), say = $('#say', ctx.stage), thr = $('#throw', ctx.stage);
+  const nev = spriteEl('nevoa', 52, 0, { w: 50, cls: 'bossnev' }); lay.appendChild(nev);
+  folks.forEach(f => { f.e = spriteEl(f.id, f.x - 6, 63, { w: 12 }); f.e.classList.add('folk'); lay.appendChild(f.e); });
+  const hero = spriteEl(avatarOf(), me.x - 7, 60, { w: 14 }); hero.classList.add('bosshero'); lay.appendChild(hero);
+  const vac = spriteEl('aspirador', me.x + 3, 74, { w: 9 }); vac.classList.add('bossvac'); lay.appendChild(vac);
+  const placeMe = () => { hero.style.left = pct(me.x - 7, SW); vac.style.left = pct(me.x + 3, SW); };
+  const beam = (x0, y0, x1, y1, cls = '') => {
+    const r = sc.getBoundingClientRect(), ax = x0 / SW * r.width, ay = y0 / SH * r.height, bx = x1 / SW * r.width, by = y1 / SH * r.height;
+    const el = document.createElement('div'); el.className = 'vbeam ' + cls; el.style.left = ax + 'px'; el.style.top = ay + 'px'; el.style.width = Math.hypot(bx - ax, by - ay) + 'px';
+    el.style.transform = `rotate(${Math.atan2(by - ay, bx - ax)}rad)`; sc.appendChild(el); setTimeout(() => el.remove(), 320);
   };
-  $('#throw', ctx.stage).onclick = () => {
-    if (done) return; ctx.activity();
-    if (charge <= 0) { mgSay(say, 'Sem energia! Estoure Fumacinhas!', 'info'); Audio8.sfx('soft'); return; }
-    charge--; const h = row[k++ % row.length];
-    h.e.classList.remove('jump'); void h.e.offsetWidth; h.e.classList.add('jump');
-    const ball = spriteEl('coracao', h.x + 2, 60, { w: 10, cls: 'heartball' }); lay.appendChild(ball);
-    setTimeout(() => moveEl(ball, 74, 12, 520), 20);
-    floatText(sc, (POWERS[h.id] || 'Obrigado') + '!', h.x / SW * 100 + 4, 70);
-    Audio8.sfx('select');
-    setTimeout(() => {
-      ball.remove(); hp--; Audio8.sfx('ok'); nev.classList.remove('hit'); void nev.offsetWidth; nev.classList.add('hit'); sparkle(nev, 8);
-      floatText(sc, pick(['OBRIGADO!', 'VALEU!', 'GRATIDÃO!', 'VOCÊ IMPORTA!']), 70, 18); ctx.nextTurn(); upd();
-      if (hp <= 0) win();
-    }, 560);
+  const upd = () => {
+    if (phase < 3) { $('#hp', ctx.stage).style.width = Math.min(100, cleared / goal * 100) + '%'; $('#bc', ctx.stage).textContent = `${Math.min(cleared, goal)}/${goal}`; }
+    else { $('#hp', ctx.stage).style.width = hp + '%'; $('#bc', ctx.stage).textContent = ''; }
+    $('#bd', ctx.stage).style.opacity = phase < 3 ? .55 - .3 * cleared / goal : .1 + .3 * hp / 100;
+  };
+  const spawn = () => {
+    const free = folks.filter(f => !f.smog && !smogs.some(s => s.to === f && !s.gone)); if (!free.length) return;
+    const to = free[Math.floor(RNG.next() * free.length)], x0 = 60 + RNG.next() * 40;
+    const el = document.createElement('button'); el.className = 'smog'; el.setAttribute('aria-label', 'Poluição'); el.innerHTML = SPR.img('fumacinha');
+    el.style.left = pct(x0 - 10, SW); el.style.top = pct(12, SH); el.style.width = pct(21, SW); lay.appendChild(el);
+    const sm = { x: x0, y: 12, to, el, hp: hits, landed: false }; smogs.push(sm);
+    el.onclick = () => zap(sm, false);
+  };
+  const zap = (sm, byHelper) => {
+    if (sm.gone || done || phase === 3) return; if (!byHelper) ctx.activity();
+    if (!byHelper) { me.x = clamp(sm.x, 8, 150); placeMe(); hero.classList.toggle('flip', sm.x < me.x); }
+    const src = byHelper ? helper : { x: me.x + 6, y: 70 };
+    beam(src.x, src.y, sm.x, sm.y + 6, byHelper ? 'help' : ''); Audio8.sfx('select');
+    sm.hp -= byHelper ? hits : 1; sm.el.classList.remove('hit'); void sm.el.offsetWidth; sm.el.classList.add('hit');
+    if (sm.hp > 0) { sm.el.style.transform = `scale(${.55 + .45 * sm.hp / hits})`; return; }
+    sm.gone = true; sm.el.classList.add('sucked'); setTimeout(() => sm.el.remove(), 380); cleared++; ctx.nextTurn();
+    if (sm.landed) { const f = sm.to; f.smog = null; f.e.classList.remove('sad'); f.e.classList.add('saved'); setTimeout(() => f.e.classList.remove('saved'), 700); sparkle(f.e, 6); floatText(sc, pick(['Valeu!', 'Ufa!', 'Obrigado!', 'Respirei!']), f.x / SW * 100, 54); Audio8.sfx('found'); }
+    else floatText(sc, '+1', sm.x / SW * 100, (sm.y + 4) / SH * 100);
     upd();
+    if (cleared >= Math.ceil(goal / 2) && !helper && phase === 1) callHelper();
+    if (cleared >= goal && phase === 2) finale();
+  };
+  /* ato 2: quem você ajudou volta para te ajudar */
+  const callHelper = () => {
+    phase = 2; const C = CHARACTERS[helperId], name = C ? C.name : 'Amiga';
+    const card = document.createElement('div'); card.className = 'helpcard';
+    card.innerHTML = `<img class="px" src="${SPR.url(helperId)}" alt=""><div><b>${esc(name)}${POWERS[helperId] ? ` <small>${SPR.img('raio')} ${esc(POWERS[helperId])}</small>` : ''}</b><span>Você fez a cidade lembrar de mim. Agora é a minha vez de te ajudar!</span></div>`;
+    sc.appendChild(card); Audio8.sfx('reveal'); confetti(20);
+    if (S.autoRead) Voice.speak(`${name}: você fez a cidade lembrar de mim. Agora é a minha vez de te ajudar!`);
+    setTimeout(() => { card.classList.add('out'); setTimeout(() => card.remove(), 400); }, 3200);
+    const he = spriteEl(helperId, 140, 60, { w: 14 }); he.classList.add('bosshero', 'arrive'); lay.appendChild(he); helper = { x: 146, y: 64, e: he };
+    $('#btip', ctx.stage).innerHTML = `${SPR.img(helperId)} ${esc(name)} está ajudando!`;
+  };
+  /* ato 3: todo mundo junto */
+  const finale = () => {
+    phase = 3; smogs.forEach(s => { if (!s.gone) { s.gone = true; s.el.classList.add('sucked'); setTimeout(() => s.el.remove(), 380); } }); folks.forEach(f => { f.smog = null; f.e.classList.remove('sad'); f.e.classList.add('home'); }); hero.classList.add('home'); vac.classList.add('home'); if (helper) helper.e.classList.add('home');
+    heroes.forEach((id, i) => { const e = spriteEl(id, 8 + i * (128 / Math.max(1, heroes.length - 1)), 60, { w: 13 }); e.classList.add('herorow', 'arrive'); e.style.animationDelay = (i * .1) + 's'; lay.appendChild(e); });
+    $('#bl', ctx.stage).textContent = 'Névoa'; thr.hidden = false; $('#btip', ctx.stage).hidden = true; Audio8.sfx('villain');
+    setHead(ctx, '<b>TODOS JUNTOS!</b> Toque em <b>OBRIGADO</b> sem parar!'); upd(); demoTap(thr, 200);
+  };
+  thr.onclick = () => {
+    if (done || phase !== 3) return; ctx.activity();
+    hp = Math.max(0, hp - (D === 'exp' ? 8 : D === 'inv' ? 6 : 4.5));
+    const hs = $$('.herorow', lay), h = hs[Math.floor(RNG.next() * hs.length)];
+    if (h) { h.classList.remove('jump'); void h.offsetWidth; h.classList.add('jump'); const x = parseFloat(h.style.left) / 100 * SW; const ball = spriteEl('coracao', x + 3, 56, { w: 8, cls: 'heartball' }); lay.appendChild(ball); setTimeout(() => moveEl(ball, 76, 8, 380), 20); setTimeout(() => ball.remove(), 420); }
+    nev.classList.remove('hit'); void nev.offsetWidth; nev.classList.add('hit'); Audio8.sfx('ok');
+    if (RNG.next() < .35) floatText(sc, pick(['OBRIGADO!', 'VALEU!', 'GRATIDÃO!', 'VOCÊ IMPORTA!']), 50 + RNG.next() * 30, 20);
+    upd(); if (hp <= 0) win();
   };
   const loop = setInterval(() => {
     if (done) return; tick++;
-    if (tick % 22 === 0 && fumas.filter(f => !f.gone).length < 5) spawnFuma();
-    for (const f of fumas) {
-      if (f.gone) continue;
-      f.y += .32; f.x = clamp(f.x + f.vx + Math.sin((tick + f.y) / 9) * .4, 2, 146);
-      f.el.style.left = pct(f.x, SW); f.el.style.top = pct(f.y, SH);
-      if (f.y > 58) { f.gone = true; f.el.classList.add('poof'); setTimeout(() => f.el.remove(), 350); floatText(sc, 'Hehehe!', f.x / SW * 100, 62); }
-    }
-    fumas = fumas.filter(f => !f.gone || document.body.contains(f.el));
+    nev.style.left = pct(46 + Math.sin(tick / 40) * 30, SW);
+    if (phase < 3) {
+      const every = Math.max(D === 'det' ? 16 : 20, (D === 'exp' ? 46 : 38) - cleared * 2);
+      if (tick % every === 0) spawn();
+      for (const sm of smogs) {
+        if (sm.gone || sm.landed) continue;
+        const tx = sm.to.x, ty = 54; sm.x += (tx - sm.x) * .03; sm.y += (ty - sm.y) * .028;
+        sm.el.style.left = pct(sm.x - 10, SW); sm.el.style.top = pct(sm.y, SH);
+        if (Math.abs(sm.y - ty) < 1.2) { sm.landed = true; sm.to.smog = sm; sm.to.e.classList.add('sad'); floatText(sc, 'Cof cof!', sm.to.x / SW * 100, 52); Audio8.sfx('soft'); if (smogs.filter(x => x.landed && !x.gone).length >= 4) mgSay(say, 'Rápido! Os moradores não conseguem respirar!', 'info'); }
+      }
+      if (helper && tick - helperT > (D === 'det' ? 55 : 42)) { const t = smogs.filter(x => !x.gone).sort((a, b) => b.y - a.y)[0]; if (t) { helperT = tick; zap(t, true); helper.e.classList.remove('jump'); void helper.e.offsetWidth; helper.e.classList.add('jump'); } }
+      smogs = smogs.filter(x => !x.gone || document.body.contains(x.el));
+    } else { hp = Math.min(100, hp + (D === 'det' ? .22 : .15)); if (tick % 5 === 0) upd(); }
   }, 40);
   onCleanup(() => clearInterval(loop));
   const win = () => {
-    done = true; clearInterval(loop); fumas.forEach(f => f.el.remove());
-    nev.src = SPR.url('nevoaFeliz'); nev.classList.add('saved'); $('#bd', ctx.stage).style.opacity = 0;
-    Audio8.sfx('win'); confetti(80); row.forEach((h, i) => setTimeout(() => { h.e.classList.remove('jump'); void h.e.offsetWidth; h.e.classList.add('jump'); }, i * 90));
-    setHead(ctx, '<b>VOCÊS VENCERAM!</b> A Névoa ficou... diferente?'); mgSay(say, 'Heróis de verdade não usam capa!');
-    if (S.autoRead) Voice.speak('Vocês venceram! Heróis de verdade não usam capa!');
+    done = true; clearInterval(loop);
+    nev.src = SPR.url('nevoaFeliz'); nev.classList.add('saved'); $('#bd', ctx.stage).style.opacity = 0; thr.hidden = true;
+    Audio8.sfx('win'); confetti(90); $$('.herorow, .folk, .bosshero', lay).forEach((e, i) => setTimeout(() => { e.classList.remove('jump'); void e.offsetWidth; e.classList.add('jump'); }, i * 70));
+    setHead(ctx, '<b>VOCÊS VENCERAM JUNTOS!</b> Heróis de verdade não usam capa!');
+    if (S.autoRead) Voice.speak('Vocês venceram juntos! Heróis de verdade não usam capa!');
     ctx.complete();
   };
-  upd(); Audio8.sfx('villain'); setTimeout(() => demoTap($('#throw', ctx.stage), 0), 700);
+  placeMe(); upd(); Audio8.sfx('villain'); setTimeout(spawn, 500); setTimeout(() => { const s = smogs.find(x => !x.gone); if (s) demoTap(s.el, 0); }, 1500);
   return {
-    speak: () => 'Estoure os Fumacinhas e lance obrigado na Névoa!',
-    hint() { ctx.usedHint(); $('#throw', ctx.stage).classList.add('glow'); setTimeout(() => $('#throw', ctx.stage).classList.remove('glow'), 1500); },
-    autoStep() { if (done) return; if (charge > 0) $('#throw', ctx.stage).click(); else { const f = fumas.find(x => !x.gone); if (f) f.el.click(); } }
+    speak: () => phase < 3 ? 'Toque na fumaça para aspirar a poluição e salvar os moradores!' : 'Todos juntos! Toque em obrigado sem parar!',
+    hint() { ctx.usedHint(); const s = phase < 3 ? (smogs.find(x => !x.gone) || {}).el : thr; if (s) { s.classList.add('glow'); setTimeout(() => s.classList.remove('glow'), 1500); } },
+    autoStep() { if (done) return; if (phase === 3) thr.click(); else { const s = smogs.filter(x => !x.gone).sort((a, b) => b.y - a.y)[0]; if (s) s.el.click(); } }
   };
 };
 
@@ -163,7 +211,7 @@ const HERO_TIPS = {
   catch: ['Arraste para os lados e pegue com a cesta!', 'Cuidado com os Fumacinhas!'],
   shift: ['Chegue perto do lixo para varrer!', 'Carrinho cheio? Esvazie na lixeira grande!'],
   route: ['Remédio é urgente: entregue primeiro!', 'Desvie da obra e da rua alagada!'],
-  boss: ['Estoure os Fumacinhas para ganhar energia!', 'Toque em OBRIGADO para atacar!']
+
 };
 function heroTip(id, step, err) {
   const tips = HERO_TIPS[step.t]; if (!tips || !document.body.contains($('#stage'))) return;

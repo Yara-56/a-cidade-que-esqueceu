@@ -64,10 +64,11 @@ function screenTitle() {
       <img class="px nevoa" src="${SPR.url('nevoa')}" alt=""><img class="px faisca" src="${SPR.url('faisca')}" alt=""></div>
     <div class="title-btns">
       ${has ? `<button class="btn primary big" id="cont">${ICON.next} Continuar a aventura</button>` : ''}
+      <button class="mychar" id="mych">${S.avatar ? `<img class="px" src="${SPR.url(avatarId(S.avatar))}" alt=""><span><small>Meu personagem</small><b>${esc(S.myName || 'Você')}</b></span><i>trocar</i>` : `${SPR.img('faisca')}<span><small>Primeiro passo</small><b>Criar meu personagem</b></span>`}</button>
       <div class="quick"><p>${has ? 'Ou comece de novo:' : 'Escolha e jogue!'}</p>
-        <button class="btn big qk" data-q="exp" style="--qc:#a5d97f"><b>Fácil</b><small>~5 min</small></button>
-        <button class="btn big qk" data-q="inv" style="--qc:#f4c542"><b>Médio</b><small>~12 min</small></button>
-        <button class="btn big qk" data-q="det" style="--qc:#e98bb0"><b>Difícil</b><small>~25 min</small></button></div>
+        <button class="btn big qk" data-q="exp" style="--qc:#a5d97f"><b>Fácil</b><small>~10 min</small></button>
+        <button class="btn big qk" data-q="inv" style="--qc:#f4c542"><b>Médio</b><small>~15 min</small></button>
+        <button class="btn big qk" data-q="det" style="--qc:#e98bb0"><b>Difícil</b><small>~30 min</small></button></div>
       <div class="row" style="justify-content:stretch"><button class="btn grow" id="online">${SPR.img('casa')} Jogar com amigos</button><button class="btn grow" id="new">${ICON.gear} Mais opções</button></div>
       <div class="row" style="justify-content:stretch"><button class="btn grow small" id="guide">${ICON.book} Como jogar</button><button class="btn grow small" id="phone">${SPR.img('caderno')} Código</button><button class="btn grow small" id="cfg">${ICON.gear} Som</button></div>
     </div>
@@ -79,14 +80,28 @@ function screenTitle() {
     else go(screenSetup);
   };
   /* início rápido: um toque e já começa (personagem sorteado, pode trocar depois) */
-  const QK = { exp: 'short', inv: 'medium', det: 'full' };
-  const quick = d => { newGame({ mode: 'solo', players: [{ name: 'Você', color: PLAYER_COLORS[0], avatar: randomAvatar() }], diff: d, length: QK[d] }); go(screenPrologue, 0); };
+  const QK = { exp: 'medium', inv: 'medium', det: 'full' };
+  const start = d => { newGame({ mode: 'solo', players: [{ name: S.myName || 'Você', color: PLAYER_COLORS[0], avatar: JSON.parse(JSON.stringify(S.avatar)) }], diff: d, length: QK[d] }); go(screenPrologue, 0); };
+  const quick = d => S.avatar ? start(d) : openMyChar(() => start(d));
+  $('#mych').onclick = () => { Audio8.init(); Audio8.sfx('select'); openMyChar(() => go(screenTitle)); };
   $$('.qk').forEach(b => b.onclick = () => { Audio8.init(); Audio8.sfx('select'); const d = b.dataset.q;
     if (has) confirmBox('Começar uma nova aventura? O progresso atual será apagado.', 'Sim, começar', () => quick(d)); else quick(d); });
   $('#guide').onclick = () => { Audio8.init(); openGuide(); };
   $('#phone').onclick = () => { Audio8.init(); go(screenPhoneClue); };
   $('#online').onclick = () => { Audio8.init(); go(screenOnline); };
   $('#cfg').onclick = () => { Audio8.init(); openSettings(); };
+}
+/* meu personagem: criado uma vez, salvo no aparelho e usado em todas as partidas */
+function openMyChar(after) {
+  const cfg = { avatar: S.avatar ? JSON.parse(JSON.stringify(S.avatar)) : randomAvatar() };
+  const m = modal(`<h2 style="margin:0 0 6px">Meu personagem</h2><div id="mcbox"></div>
+    <label for="mcn" style="font-weight:800">Como quer ser chamada(o)?</label><input class="txt" id="mcn" maxlength="16" placeholder="Seu nome ou apelido" value="${esc(S.myName || '')}">
+    <button class="btn primary big" id="mcok" style="margin-top:10px;width:100%">${ICON.next} Pronto!</button>`, { label: 'Meu personagem' });
+  m.classList.add('mcmodal');
+  const draw = () => { $('#mcbox').innerHTML = avatarPickerHTML(cfg.avatar); wireAvatarPicker(cfg); };
+  const _w = wireAvatarPicker; draw();
+  $('#mcbox').addEventListener('click', () => setTimeout(() => { if (!$('#avp')) draw(); }, 0));
+  $('#mcok').onclick = () => { S.avatar = cfg.avatar; S.myName = $('#mcn').value.trim().slice(0, 16); saveSettings(); Audio8.sfx('win'); closeModal(); if (G && !G.finished && G.mode === 'solo' && G.players[0]) { G.players[0].avatar = JSON.parse(JSON.stringify(S.avatar)); if (S.myName) G.players[0].name = S.myName; saveGame(); } after && after(); };
 }
 function resumeGame() {
   if (G.current && G.current.mission) { if (G.current.mission === '_finale') go(screenFinale); else go(renderMission, G.current.mission, G.current.step || 0); }
@@ -105,7 +120,7 @@ const COLOR_NAMES = { '#22161d': 'Preto', '#5a3520': 'Castanho', '#b5562c': 'Rui
 const EXTRA_NAMES = { none: 'Nada', glasses: 'Óculos', band: 'Faixa', freckles: 'Sardas' };
 
 function screenSetup() {
-  const cfg = { mode: 'solo', count: 2, names: PLAYER_DEFAULT.slice(), diff: 'inv', length: 'medium', clueMode: 'pass', avatars: PLAYER_DEFAULT.map(() => randomAvatar()), who: 0 };
+  const cfg = { mode: 'solo', count: 2, names: PLAYER_DEFAULT.slice(), diff: 'inv', length: 'medium', clueMode: 'pass', avatars: PLAYER_DEFAULT.map((_, i) => i === 0 && S.avatar ? JSON.parse(JSON.stringify(S.avatar)) : randomAvatar()), who: 0 };
   let st = 0;
   const modeArt = { solo: ['theo'], juntos: ['bia', 'theo', 'iara'], sala: ['davi', 'bia', 'iara', 'theo', 'sono'] };
   const views = () => cfg.mode === 'juntos' ? ['mode', 'players', 'avatar', 'diff', 'length'] : cfg.mode === 'solo' ? ['mode', 'avatar', 'diff', 'length'] : ['mode', 'diff', 'length'];
@@ -156,6 +171,7 @@ function screenSetup() {
       if (st < steps - 1) { st++; draw(); return; }
       const players = cfg.mode === 'juntos' ? Array.from({ length: cfg.count }, (_, i) => ({ name: (cfg.names[i] || '').trim() || PLAYER_DEFAULT[i], color: PLAYER_COLORS[i], avatar: cfg.avatars[i] }))
         : cfg.mode === 'sala' ? [{ name: 'Turma', color: PLAYER_COLORS[0], avatar: cfg.avatars[0] }] : [{ name: 'Você', color: PLAYER_COLORS[0], avatar: cfg.avatars[0] }];
+      if (cfg.mode !== 'sala') { S.avatar = JSON.parse(JSON.stringify(cfg.avatars[0])); saveSettings(); }
       if (cfg.mode === 'sala' && !S._salaSet) { S.contrast = true; S._salaSet = true; saveSettings(); }
       newGame({ mode: cfg.mode, players, diff: cfg.diff, length: cfg.length, clueMode: cfg.mode === 'juntos' ? cfg.clueMode : 'pass' });
       go(screenPrologue, 0);
@@ -281,7 +297,8 @@ function screenMap() {
   const markers = REGIONS.map(r => {
     const D = DISTRICTS[r.id], st = planOf(G)[r.id] ? regionState(r.id) : 'off';
     const lab = st === 'done' ? ' ✓' : '';
-    return `<button class="marker ${st} ${target && target.id === r.id ? 'next' : ''}" data-r="${r.id}" style="left:${D.mx}%;top:${D.my}%" aria-label="${esc(r.name)}"><span class="pin">${esc(r.name)}${lab}</span></button>`;
+    const isT = target && target.id === r.id;
+    return `<button class="marker ${st} ${isT ? 'next' : 'quiet'}" data-r="${r.id}" style="left:${D.mx}%;top:${D.my}%" aria-label="${esc(r.name)}"><span class="pin">${isT ? esc(r.name) : st === 'done' ? '✓' : st === 'off' ? '' : '•'}</span></button>`;
   }).join('');
   const start = G.lastRegion ? DISTRICTS[G.lastRegion] : null;
   app().innerHTML = `<div class="screen citymap">
@@ -292,7 +309,7 @@ function screenMap() {
       ${allDone ? `<button class="marker open next plaza" id="finale" style="left:50%;top:50%"><span class="pin">${SPR.img('estrela')} Grande final</span></button>` : ''}
       ${prog < 1 ? `<img class="px map-nevoa" src="${SPR.url('nevoa')}" alt="" style="left:${60 - prog * 30}%;top:${36 + prog * 10}%;opacity:${.95 - prog * .5}">` : ''}
       ${regs.filter(r => regionState(r.id) === 'locked').map((r, i) => `<img class="px map-fuma fumafly" src="${SPR.url('fumacinha')}" alt="" style="left:${DISTRICTS[r.id].mx - 4 + i}%;top:${DISTRICTS[r.id].my + 10}%;animation-delay:${i * .3}s">`).join('')}
-      <img class="px map-avatar" id="mav" src="${SPR.url(avatarOf())}" alt="Seu personagem">
+      <div id="npcs"></div><img class="px map-avatar" id="mav" src="${SPR.url(avatarOf())}" alt="Seu personagem">
       <div class="compass" id="cmp" aria-hidden="true">▲</div></div>
       <div class="map-banner" id="mbn"></div></div></div>`;
   wireHud();
@@ -312,6 +329,23 @@ function screenMap() {
     entering = true; Audio8.sfx('select'); banner.innerHTML = `Entrando em <b>${esc(r.name)}</b>...`; banner.classList.add('on');
     setTimeout(() => { G.lastRegion = rid; G.current = { mission: m, step: 0 }; saveGame(); go(renderMission, m, 0); }, 700);
   };
+  /* a cidade movimentada: quem você já conheceu passeia pelas calçadas */
+  const LANES = [{ y: 46.5 }, { y: 53.5 }, { x: 32.6 }, { x: 36.4 }, { x: 63.6 }, { x: 67.4 }];
+  const NPCS = [...G.album.slice(-3), 'dog'].filter(id => id === 'dog' || CHARACTERS[id] || LOOKS[id]).map((id, i) => {
+    const ln = LANES[i % LANES.length], el = document.createElement('img'); el.className = 'px map-npc' + (id === 'dog' ? ' dog' : ''); el.alt = ''; $('#npcs').appendChild(el);
+    const bub = document.createElement('div'); bub.className = 'npc-bub'; $('#npcs').appendChild(bub);
+    return { id, ln, el, bub, p: 3 + ((i * 37) % 90), d: i % 2 ? -1 : 1, v: .09 + (i % 3) * .03, f: 0, said: 0 };
+  });
+  const HI = ['Oi! Valeu pela ajuda!', 'Bom te ver por aqui!', 'Obrigado, viu?', 'A cidade tá mais bonita!', 'Vai lá, herói!'];
+  const npcTick = () => NPCS.forEach((n, i) => {
+    n.p += n.d * n.v; if (n.p > 97 || n.p < 3) n.d *= -1;
+    const x = n.ln.x !== undefined ? n.ln.x : n.p, y = n.ln.y !== undefined ? n.ln.y : n.p;
+    n.f = (n.f + 1) % 16; n.el.src = n.id === 'dog' ? SPR.url(n.f < 8 ? 'dog' : 'dog2') : SPR.url(n.id, n.f < 8 ? 'walk' : null);
+    n.el.style.left = x + '%'; n.el.style.top = y + '%'; n.el.classList.toggle('flip', n.ln.y !== undefined && n.d < 0);
+    const near = Math.hypot(x - P.x, (y - P.y) * .6) < 4;
+    if (near && !n.said) { n.said = Date.now(); n.bub.textContent = n.id === 'dog' ? 'Au au! ♥' : (CHARACTERS[n.id] ? CHARACTERS[n.id].name + ': ' : '') + HI[i % HI.length]; n.bub.classList.add('on'); Audio8.sfx('page'); setTimeout(() => n.bub.classList.remove('on'), 2200); }
+    n.bub.style.left = x + '%'; n.bub.style.top = (y - 6) + '%';
+  });
   const toWorld = e => { const r = wm.getBoundingClientRect(); return { x: clamp((e.clientX - r.left) / r.width * 100, 3, 97), y: clamp((e.clientY - r.top) / r.height * 100, 10, 98) }; };
   /* tocar ou arrastar o dedo: o personagem vai até lá */
   let dragging = false;
@@ -332,14 +366,15 @@ function screenMap() {
     if (!dx && !dy && tgt) { const ex = tgt.x - P.x, ey = (tgt.y - P.y) * .6, d = Math.hypot(ex, ey); if (d < .6) { if (tgt.rid) enter(tgt.rid); tgt = null; } else { dx = ex / d; dy = ey / d / .6; } }
     const moving = !!(dx || dy);
     if (moving) { const n = Math.hypot(dx, dy * .6) || 1; P.x = clamp(P.x + dx / n * .55, 3, 97); P.y = clamp(P.y + dy / n * .55 / .6 * .6, 10, 98); if (dx) av.classList.toggle('flip', dx < 0); }
+    av.classList.toggle('walking', moving);
     if (moving && Date.now() - lastT > 120) { lastT = Date.now(); f ^= 1; av.src = SPR.url(avatarOf(), f ? 'walk' : null); } else if (!moving && f) { f = 0; av.src = SPR.url(avatarOf()); }
-    av.style.left = P.x + '%'; av.style.top = P.y + '%';
+    av.style.left = P.x + '%'; av.style.top = P.y + '%'; npcTick();
     /* câmera segue o personagem */
     const cx = clamp(Z.vw / 2 - P.x / 100 * Z.W, Z.vw - Z.W, 0), cy = clamp(Z.vh / 2 - P.y / 100 * Z.H, Z.vh - Z.H, 0);
     cam = cam ? { x: cam.x + (cx - cam.x) * .18, y: cam.y + (cy - cam.y) * .18 } : { x: cx, y: cy };
     wm.style.width = Z.W + 'px'; wm.style.height = Z.H + 'px'; wm.style.transform = `translate(${cam.x}px, ${cam.y}px)`;
     /* chegou na porta de um bairro: entra sozinho */
-    for (const r of REGIONS) { const D = doorOf(r.id); if (Math.hypot(D.x - P.x, (D.y - P.y) * .6) < 2.4 && planOf(G)[r.id]) { enter(r.id); break; } }
+    for (const r of REGIONS) { const D = DISTRICTS[r.id]; if (planOf(G)[r.id] && Math.abs(D.mx - P.x) < 8 && P.y > D.my - 3 && P.y < D.my + 24) { enter(r.id); break; } else if (warned[r.id] && (Math.abs(D.mx - P.x) > 14 || P.y > D.my + 32)) delete warned[r.id]; }
     if (allDone && Math.hypot(50 - P.x, (50 - P.y) * .6) < 3) { entering = true; $('#finale').click(); }
     /* bússola apontando para o objetivo */
     if (goal) { const ang = Math.atan2((goal.y - P.y) * .6, goal.x - P.x), far = Math.hypot(goal.x - P.x, (goal.y - P.y) * .6) > 7; cmp.style.left = P.x + '%'; cmp.style.top = (P.y - 7) + '%'; cmp.style.transform = `translate(-50%, -50%) rotate(${ang + Math.PI / 2}rad)`; cmp.style.opacity = far ? 1 : 0; }
@@ -401,7 +436,7 @@ function renderMission(id, idx) {
     stage: $('#stage'), id, idx, step, colored: idx > revealIdx,
     complete() { RUN.done = true; prim.disabled = false; prim.classList.add('ready');
       if (['tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift', 'catch'].includes(step.t)) { addMedal('criatividade', 1, 'mg:' + id); if (!G.seen['eg:' + id]) { G.seen['eg:' + id] = 1; G.energy = (G.energy || 0) + 1; saveGame(); updEnergy(); } }
-      const ms = { dialog: 0, choice: 5200, reveal: 9000, thanks: 0, mirror: 0, reflect: 0, days: 3200 }[step.t] ?? 2600;
+      const ms = { dialog: 0, choice: 5200, reveal: 9000, thanks: 5000, mirror: 0, reflect: 0, days: 3200 }[step.t] ?? 2600;
       if (ms) autoNext(prim, ms, () => prim.click()); },
     setPrimary(t) { prim.innerHTML = `${esc(t)} ${ICON.next}`; },
     mistake() { RUN.mistakes++; G.current.mistakes++; saveGame(); refreshHint(); heroTip(id, step, true); },
