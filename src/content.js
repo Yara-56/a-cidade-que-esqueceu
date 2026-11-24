@@ -472,7 +472,7 @@ const MISSIONS = {
       { who: 'faisca', text: 'A chuva embaralhou as ruas... e tem gente esperando entrega!' },
       { who: 'rafa', text: 'Oi! Sou o Rafa, entregador. Tem remédio, comida e encomenda pra chegar hoje!' },
       { who: 'rafa', text: 'Faça chuva ou faça sol, eu tô na rua. Me ajuda a planejar o caminho? Remédio primeiro!' }] },
-    { t: 'route', prompt: 'Toque nas ruas e entregue tudo! Remédio primeiro.',
+    { t: 'route', prompt: 'Toque onde quer ir e a bike pedala até lá! Siga a rua que brilha: remédio primeiro.',
       grids: {
         exp: { w: 6, h: 5, start: [0, 2], drops: [{ x: 5, y: 0, prop: 'casa', label: 'Casa da Dona Neide' }, { x: 4, y: 4, prop: 'farmacia', label: 'Remédio para o Seu Osvaldo' }],
           blocks: [{ x: 2, y: 1, prop: 'obra' }, { x: 2, y: 2, prop: 'obra' }, { x: 3, y: 3, prop: 'agua' }] },

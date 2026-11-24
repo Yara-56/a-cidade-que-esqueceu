@@ -200,6 +200,8 @@ const STEPS = {
     const fb = $('#fb', ctx.stage);
     const A = i => $(`[data-a="${i}"]`, ctx.stage), B = i => $(`[data-b="${i}"]`, ctx.stage);
     const one = window.innerWidth < 700; if (one) ctx.stage.classList.add('one');
+    /* depois de escolher à esquerda, a coluna da direita pisca chamando o toque */
+    const mt = $('.match', ctx.stage); mt.addEventListener('click', () => setTimeout(() => { const a = $('[data-a][aria-pressed="true"]', mt), b = $('[data-b][aria-pressed="true"]', mt); mt.classList.toggle('waitb', !!a && !b); mt.classList.toggle('waita', !a && !!b); }, 0));
     const clearSel = () => { $$('.mcard', ctx.stage).forEach(c => { if (!c.classList.contains('done')) c.setAttribute('aria-pressed', 'false'); }); if (one) autoA(); };
     const autoA = () => { const a = $$('[data-a]', ctx.stage).find(c => !c.classList.contains('done')); if (a) { selA = +a.dataset.a; a.setAttribute('aria-pressed', 'true'); } };
     const tryPair = () => {
@@ -341,7 +343,13 @@ const STEPS = {
         <div id="fb"></div></div></div>`;
     wireSay(ctx.stage, () => step.prompt);
     const fb = $('#fb', ctx.stage);
+    /* caminho mais curto (desviando de obra e alagamento) */
+    const bfs = (from, to) => { const q = [from], prev = { [key(...from)]: null }; while (q.length) { const c = q.shift(); if (c[0] === to[0] && c[1] === to[1]) break; for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const n = [c[0] + dx, c[1] + dy], k = key(...n); if (n[0] < 0 || n[1] < 0 || n[0] >= g.w || n[1] >= g.h || k in prev || blockAt(...n)) continue; prev[k] = c; q.push(n); } } if (!(key(...to) in prev)) return null; const path = []; let c = to; while (c && !(c[0] === from[0] && c[1] === from[1])) { path.unshift(c); c = prev[key(...c)]; } return path; };
+    let hint = null;
+    const calcHint = () => { const left = g.drops.map((d, i) => i).filter(i => !delivered.has(i)); if (!left.length) return hint = null; const tgt = urgentIdx >= 0 && !delivered.has(urgentIdx) ? urgentIdx : left.map(i => [i, (bfs(pos, [g.drops[i].x, g.drops[i].y]) || []).length || 99]).sort((a, b) => a[1] - b[1])[0][0]; const p = bfs(pos, [g.drops[tgt].x, g.drops[tgt].y]); hint = p && p.length ? { next: p[0], goal: [g.drops[tgt].x, g.drops[tgt].y] } : null; };
+    let riding = false;
     const draw = () => {
+      calcHint();
       const tr = new Set(trail.map(p => key(p[0], p[1])));
       let html = '';
       for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) {
@@ -355,6 +363,8 @@ const STEPS = {
         if (tr.has(key(x, y)) && !b && d < 0 && !st) cls += ' trail';
         if (here) { cls += ' here'; inner += `<img class="px bikeimg" src="${SPR.url('bike')}" alt="">`; label += ' (a bicicleta está aqui)'; }
         if (near && !b) cls += ' near';
+        if (hint && hint.next && hint.next[0] === x && hint.next[1] === y) cls += ' hintstep';
+        if (hint && hint.goal && hint.goal[0] === x && hint.goal[1] === y) cls += ' goal';
         html += `<button class="${cls}" data-x="${x}" data-y="${y}" aria-label="${esc(label)}">${inner}</button>`;
       }
       $('#grid', ctx.stage).innerHTML = html;
@@ -365,7 +375,10 @@ const STEPS = {
       ctx.activity();
       if (x < 0 || y < 0 || x >= g.w || y >= g.h) return;
       if (Math.abs(pos[0] - x) + Math.abs(pos[1] - y) !== 1) {
-        if (!(pos[0] === x && pos[1] === y)) feedback(fb, 'info', 'A bicicleta anda uma rua de cada vez. Toque num quadrado vizinho (com borda branca).');
+        if (pos[0] === x && pos[1] === y || riding || blockAt(x, y)) return;
+        /* tocou longe: a bicicleta vai pedalando até lá sozinha */
+        const p = bfs(pos, [x, y]); if (!p) return;
+        riding = true; let i = 0; const ride = () => { if (i >= p.length || !document.body.contains(fb)) { riding = false; return; } const [nx, ny] = p[i++]; const before = delivered.size; move(nx, ny); if (delivered.size !== before || RUN.done) { riding = false; return; } setTimeout(ride, 170); }; ride();
         return;
       }
       const b = blockAt(x, y);

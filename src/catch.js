@@ -147,36 +147,55 @@ STEPS.boss = function (step, ctx) {
     const he = spriteEl(helperId, 140, 60, { w: 14 }); he.classList.add('bosshero', 'arrive'); lay.appendChild(he); helper = { x: 146, y: 64, e: he };
     $('#btip', ctx.stage).innerHTML = `${SPR.img(helperId)} ${esc(name)} está ajudando!`;
   };
-  /* ato 3: a Névoa diz que ninguém lembra de alguém; você mostra que lembra, e essa pessoa manda o golpe de luz */
-  const DOES = { cida: 'cuida da casa e das roupas', jorge: 'guarda o prédio e as encomendas', ze: 'faz a merenda da escola', katia: 'deixa a escola limpinha', lucia: 'visita as casas cuidando da saúde',
-    benedito: 'cuida de quem precisa de ajuda', zefa: 'planta a comida da feira', rafa: 'entrega tudo na sua porta', marina: 'separa o lixo para reciclar', joaquim: 'cuida das plantas da praça',
-    denise: 'deixa a rua limpa', pedro: 'leva luz para as casas', tania: 'faz a água chegar limpa', joana: 'apaga incêndios e salva vidas', carlos: 'protege a travessia das crianças' };
-  let order = [], ask = null, rounds = 3;
+  /* ato 3: a Névoa ataca com o que cada trabalhador ensinou; um por um, eles chegam e você mostra que aprendeu */
+  const ATK = {
+    cida: { taunt: 'Joguei roupa pra todo lado! Duvido lembrar como a Dona Cida deixa tudo em ordem!', help: 'Eu te ensinei! Dobra comigo!', kind: 'tap', prop: 'camiseta', n: 3, act: 'Toque nas roupas para dobrar!' },
+    ze: { taunt: 'Embaralhei a receita! Quantos copos de água pra 1 de arroz soltinho?', help: 'Lembra da regra de ouro?', kind: 'ask', opts: ['1 copo', '2 copos', '5 copos'], ok: 1 },
+    joana: { taunt: 'Faíscas pra todo lado! Hehehe!', help: 'Mangueira na mão, parceria!', kind: 'tap', prop: 'fogo', n: 4, act: 'Apague as chamas!' },
+    tania: { taunt: 'Sujei a água da cidade de novo!', help: 'Primeiro a gente tira o lixo da água!', kind: 'tap', prop: 'garrafa', n: 3, act: 'Tire o lixo da água!' },
+    rafa: { taunt: 'Embaralhei as entregas! O que vai primeiro?', help: 'Você sabe o que é urgente!', kind: 'ask', opts: ['Pizza', 'Remédio', 'Brinquedo'], ok: 1 },
+    pedro: { taunt: 'Apaguei as luzes! Agora ninguém enxerga nada!', help: 'Bora religar, com segurança!', kind: 'tap', prop: 'lampada', n: 3, act: 'Acenda as lâmpadas!' },
+    carlos: { taunt: 'Os carros vêm correndo... e tem criança na faixa!', help: 'Qual é o sinal certo?', kind: 'ask', opts: ['SIGA', 'PARE'], ok: 1 },
+    marina: { taunt: 'Espalhei lixo reciclável na praça!', help: 'Cada coisa no seu lugar!', kind: 'tap', prop: 'lata', n: 3, act: 'Recolha as latinhas!' },
+    jorge: { taunt: 'Escondi as encomendas do prédio!', help: 'Eu sei onde fica cada uma!', kind: 'tap', prop: 'caixa', n: 3, act: 'Pegue as encomendas!' },
+    denise: { taunt: 'Sujei a rua inteirinha!', help: 'Vassoura na mão!', kind: 'tap', prop: 'papel', n: 4, act: 'Varra o lixo!' }
+  };
+  const DOES = { cida: 'cuida da casa', ze: 'faz a merenda', joana: 'apaga incêndios', tania: 'traz a água limpa', rafa: 'faz as entregas', pedro: 'leva a luz', carlos: 'protege a travessia', marina: 'recicla', jorge: 'cuida do prédio', denise: 'limpa a rua' };
+  let order = [], rounds = 3, rk = 0, ask = null, need = 0, team = [];
   const taunt = $('#bt', ctx.stage);
   const nextAsk = () => {
     if (done) return; if (!order.length) return win();
-    ask = order.shift(); taunt.dataset.ask = ask;
-    taunt.innerHTML = `<b>Névoa:</b> Ninguém lembra de quem <b>${esc(DOES[ask])}</b>!`; taunt.classList.remove('on'); void taunt.offsetWidth; taunt.classList.add('on');
-    if (S.autoRead) Voice.speak(`Ninguém lembra de quem ${DOES[ask]}!`);
+    const id = order.shift(), A = ATK[id], C = CHARACTERS[id]; ask = id;
+    taunt.innerHTML = `<b>Névoa:</b> ${esc(A.taunt)}`; taunt.classList.remove('on'); void taunt.offsetWidth; taunt.classList.add('on'); taunt.dataset.ask = id; Audio8.sfx('villain');
+    nev.classList.remove('hit'); void nev.offsetWidth; nev.classList.add('hit');
+    setTimeout(() => {
+      /* o trabalhador chega para ajudar */
+      const x = 6 + rk * 26, e = spriteEl(id, x, 58, { w: 14, cls: 'herorow arrive' }); e.dataset.h = id; lay.appendChild(e); team.push({ id, x, e }); rk++;
+      { const hf = $('.mghead .hface img', ctx.stage); if (hf) hf.src = SPR.url(id); }
+      setHead(ctx, `<b>${esc(C.name)}:</b> ${esc(A.help)}`); Audio8.sfx('reveal');
+      if (A.kind === 'tap') {
+        need = A.n; setTimeout(() => { if (done) return; taunt.classList.remove('on'); setHead(ctx, `<b>${esc(C.name)}:</b> ${esc(A.act)}`);
+          for (let i = 0; i < A.n; i++) { const it = spriteEl(A.prop, 16 + RNG.next() * 120, 18 + RNG.next() * 28, { w: 13, cls: 'pick qte' }); it.style.animationDelay = (i * .1) + 's'; lay.appendChild(it);
+            it.onclick = () => { if (done || it.classList.contains('gone')) return; ctx.activity(); it.classList.add('gone'); sparkle(it, 5); Audio8.sfx('found'); setTimeout(() => it.remove(), 300); if (--need <= 0) strike(id); }; } }, 1200);
+      } else {
+        setTimeout(() => { if (done) return; const box = document.createElement('div'); box.className = 'bq'; box.innerHTML = A.opts.map((o, i) => `<button class="btn big" data-o="${i}">${esc(o)}</button>`).join(''); sc.appendChild(box);
+          $$('[data-o]', box).forEach(bt => bt.onclick = () => { ctx.activity(); if (+bt.dataset.o === A.ok) { Audio8.sfx('ok'); box.remove(); strike(id); } else { ctx.mistake(); Audio8.sfx('soft'); bt.classList.add('shake'); setTimeout(() => bt.classList.remove('shake'), 400); setHead(ctx, `<b>${esc(C.name)}:</b> Hmm... pensa no que a gente fez juntos!`); } }); }, 1000);
+      }
+    }, 1600);
+  };
+  const strike = id => {
+    const h = team.find(t => t.id === id), C = CHARACTERS[id]; ask = null; taunt.classList.remove('on');
+    if (h) { h.e.classList.remove('jump'); void h.e.offsetWidth; h.e.classList.add('jump'); beam(h.x + 7, 60, parseFloat(nev.style.left) / 100 * SW + 25, 14, 'help'); }
+    floatText(sc, `Obrigado, ${C.name}!`, ((h ? h.x : 70) + 6) / SW * 100, 44); hp = Math.max(0, hp - 100 / rounds); sparkle(nev, 10); Audio8.sfx('reveal');
+    setHead(ctx, `Você lembrou: <b>${esc(C.name)}</b> ${esc(DOES[id] || 'cuida da cidade')}!`); ctx.nextTurn(); upd(); setTimeout(nextAsk, 1500);
   };
   const finale = () => {
     phase = 3; smogs.forEach(s => { if (!s.gone) { s.gone = true; s.el.classList.add('sucked'); setTimeout(() => s.el.remove(), 380); } }); folks.forEach(f => { f.smog = null; f.e.classList.remove('sad'); f.e.classList.add('home'); }); hero.classList.add('home'); vac.classList.add('home'); if (helper) helper.e.classList.add('home');
-    const team = heroes.filter(id => DOES[id]);
-    team.forEach((id, i) => {
-      const x = 8 + i * (128 / Math.max(1, team.length - 1)), e = spriteEl(id, x, 58, { w: 14, cls: 'herorow arrive pick' }); e.style.animationDelay = (i * .1) + 's'; e.dataset.h = id; lay.appendChild(e);
-      e.onclick = () => {
-        if (done || phase !== 3 || !ask) return; ctx.activity();
-        if (id !== ask) { ctx.mistake(); Audio8.sfx('soft'); e.classList.remove('nope'); void e.offsetWidth; e.classList.add('nope'); floatText(sc, 'Hmm, não é...', (x + 6) / SW * 100, 50); return; }
-        const C = CHARACTERS[id]; e.classList.remove('jump'); void e.offsetWidth; e.classList.add('jump');
-        beam(x + 7, 60, parseFloat(nev.style.left) / 100 * SW + 25, 14, 'help'); Audio8.sfx('reveal');
-        floatText(sc, `Obrigado, ${C.name}!`, (x + 6) / SW * 100, 46); hp = Math.max(0, hp - 100 / rounds); nev.classList.remove('hit'); void nev.offsetWidth; nev.classList.add('hit'); sparkle(nev, 10);
-        ask = null; taunt.classList.remove('on'); ctx.nextTurn(); upd(); setTimeout(nextAsk, 1100);
-      };
-    });
-    rounds = Math.min(team.length, D === 'exp' ? 3 : D === 'inv' ? 4 : 5); order = shuffle(team).slice(0, rounds);
-    $('#bl', ctx.stage).textContent = 'Névoa'; $('#btip', ctx.stage).hidden = true; Audio8.sfx('villain'); hp = 100;
-    setHead(ctx, 'A Névoa diz que ninguém lembra deles. <b>Mostre que você lembra!</b>'); upd();
-    setTimeout(nextAsk, 900);
+    const pool = (G.album.filter(id => ATK[id]).length ? G.album.filter(id => ATK[id]) : ['cida', 'ze', 'joana', 'tania']);
+    rounds = Math.min(pool.length, D === 'exp' ? 3 : D === 'inv' ? 4 : 5); order = shuffle(pool).slice(0, rounds);
+    $('#bl', ctx.stage).textContent = 'Névoa'; $('#btip', ctx.stage).hidden = true; hp = 100;
+    setHead(ctx, 'A Névoa vai atacar com o <b>esquecimento</b>... mostre tudo o que você aprendeu!'); upd();
+    setTimeout(nextAsk, 1400);
   };
   const loop = setInterval(() => {
     if (done) return; tick++;
@@ -205,9 +224,9 @@ STEPS.boss = function (step, ctx) {
   };
   placeMe(); upd(); Audio8.sfx('villain'); setTimeout(spawn, 500); setTimeout(() => { const s = smogs.find(x => !x.gone); if (s) demoTap(s.el, 0); }, 1500);
   return {
-    speak: () => phase < 3 ? 'Toque na fumaça para aspirar a poluição e salvar os moradores!' : (ask ? `Quem ${DOES[ask]}? Toque nessa pessoa!` : 'Mostre que você lembra!'),
-    hint() { ctx.usedHint(); const s = phase < 3 ? (smogs.find(x => !x.gone) || {}).el : $(`.pick[data-h="${ask}"]`, ctx.stage); if (s) { s.classList.add('glow'); setTimeout(() => s.classList.remove('glow'), 1500); } },
-    autoStep() { if (done) return; if (phase === 3) { const e = ask && $(`.pick[data-h="${ask}"]`, ctx.stage); if (e) e.click(); } else { const s = smogs.filter(x => !x.gone).sort((a, b) => b.y - a.y)[0]; if (s) s.el.click(); } }
+    speak: () => phase < 3 ? 'Toque na fumaça para aspirar a poluição e salvar os moradores!' : 'Mostre tudo o que você aprendeu com cada trabalhador!',
+    hint() { ctx.usedHint(); const s = phase < 3 ? (smogs.find(x => !x.gone) || {}).el : ($('.qte:not(.gone)', ctx.stage) || $('.bq [data-o]', ctx.stage)); if (s) { s.classList.add('glow'); setTimeout(() => s.classList.remove('glow'), 1500); } },
+    autoStep() { if (done) return; if (phase === 3) { const q = $('.qte:not(.gone)', ctx.stage); if (q) q.click(); else if (ask && ATK[ask].kind === 'ask') { const bt = $(`.bq [data-o="${ATK[ask].ok}"]`, ctx.stage); if (bt) bt.click(); } } else { const s = smogs.filter(x => !x.gone).sort((a, b) => b.y - a.y)[0]; if (s) s.el.click(); } }
   };
 };
 

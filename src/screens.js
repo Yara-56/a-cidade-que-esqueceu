@@ -469,7 +469,7 @@ function renderMission(id, idx) {
   const prim = $('#prim'), hintBtn = $('#hint');
   const ctx = {
     stage: $('#stage'), id, idx, step, colored: idx > revealIdx,
-    complete() { RUN.done = true; prim.disabled = false; prim.classList.add('ready'); if (flowOn()) prim.innerHTML = `Continuar ${ICON.next}`;
+    complete() { RUN.done = true; prim.disabled = false; prim.classList.add('ready'); if (flowOn()) { prim.innerHTML = `Continuar ${ICON.next}`; setTimeout(() => { if (prim.isConnected && RUN.done && typeof demoTap === 'function') demoTap(prim, 0); }, 1600); }
       if (['tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift', 'catch'].includes(step.t)) { addMedal('criatividade', 1, 'mg:' + id); if (!G.seen['eg:' + id]) { G.seen['eg:' + id] = 1; G.energy = (G.energy || 0) + 1; saveGame(); updEnergy(); } }
       const ms = 0; /* nada avança sozinho: o botão ▶ pulsa e a criança segue no tempo dela */
       if (ms) autoNext(prim, ms, () => prim.click()); },
@@ -506,7 +506,7 @@ function renderMission(id, idx) {
     const thinkT = setInterval(() => {
       const h = $('#stage .mghead.talky'); if (!h || RUN.done || Date.now() - lastAct < 3500 || h._rt && Date.now() - lastAct < 6000) return;
       const who = h.dataset.who, list = THOUGHTS[who] || THOUGHTS.faisca; if (h._main === undefined) h._main = h.querySelector('#mgt').innerHTML;
-      headSay(h, list[k++ % list.length], 'think'); clearTimeout(h._rt); h._rt = setTimeout(() => headSay(h, h._main), 3200);
+      headSay(h, list[k++ % list.length], 'think'); clearTimeout(h._rt); h._rt = setTimeout(() => { h._rt = null; headSay(h, h._main); }, 3200);
     }, 9000);
     onCleanup(() => clearInterval(thinkT));
   }

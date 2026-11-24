@@ -1441,6 +1441,25 @@ html { font-size: clamp(16px, calc(.55vmin + 10px), 21px); }
 }
 @media (pointer: fine), (min-width: 900px) and (min-height: 600px) { .reflect p, .reflect li { font-size: 1.2rem !important; line-height: 1.4; } .reflect h3 { font-size: 1.35rem; } }
 .map-banner.hook { font-size: 1.3rem; max-width: 80%; display: flex; gap: 10px; align-items: center; } .map-banner.hook img.px { width: 34px; flex: none; }
+.cook .reclab { width: 100%; font-size: .9rem; }
+.cook .chipi.need { opacity: .55; border-style: dashed; } .cook .chipi.have { background: #d6f0b8; }
+.ing.next { animation: pulse 1s infinite; box-shadow: 0 0 0 4px var(--glow), 3px 3px 0 var(--ink) !important; position: relative; }
+.ing.next::after { content: '👆'; position: absolute; top: -18px; right: -6px; font-size: 22px; animation: bob 1s ease-in-out infinite; }
+.cell.hintstep { box-shadow: inset 0 0 0 4px var(--glow) !important; animation: pulse 1.1s infinite; }
+.cell.hintstep::after { content: '▸'; position: absolute; inset: 0; display: grid; place-items: center; color: #c79400; font-size: 1.4rem; font-weight: 900; }
+.cell.goal { box-shadow: inset 0 0 0 4px #e98bb0 !important; }
+.cell { position: relative; }
+/* instruções mais enxutas, jogo maior */
+.prompt { padding: 6px 12px !important; gap: 8px !important; } .prompt p { font-size: 1rem !important; margin: 0; } .prompt img.px { width: 26px !important; height: auto !important; }
+.mghead.talky .hbub { padding: 6px 14px; } .mghead.talky .hbub b { font-size: 1rem; } .mghead.talky .hface { width: 48px; height: 48px; } .mghead.talky .hface img.px { width: 24px !important; height: 36px !important; }
+.match.waitb .col:last-child .mcard:not(.done), .match.waita .col:first-child .mcard:not(.done) { animation: pulse 1s infinite; box-shadow: 0 0 0 3px var(--glow), 3px 3px 0 var(--ink); }
+.match.waitb .col:last-child > b::after { content: ' ← toque no par'; color: #c79400; }
+.match.waita .col:first-child > b::after { content: ' ← toque no par'; color: #c79400; }
+.scene .layer .qte { pointer-events: auto; cursor: pointer; animation: arrive .45s cubic-bezier(.2,.9,.3,1.4) both, bob 1.2s .45s ease-in-out infinite; filter: drop-shadow(0 0 6px #fff1a8); z-index: 7; }
+.scene .layer .qte.gone { animation: sucked .3s forwards; }
+.bq { position: absolute; left: 50%; top: 48%; transform: translate(-50%, -50%); z-index: 12; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; animation: tipin .4s both; }
+.bq .btn { font-size: 1.3rem; min-width: 130px; box-shadow: 0 0 0 4px #fff1a8, 4px 4px 0 var(--ink); }
+@media (orientation: landscape) and (max-height: 520px) { .bq .btn { font-size: 1rem; min-width: 96px; padding: 8px 12px; } }
 </style>
 </head>
 <body>
@@ -2728,7 +2747,7 @@ const MISSIONS = {
       { who: 'faisca', text: 'A chuva embaralhou as ruas... e tem gente esperando entrega!' },
       { who: 'rafa', text: 'Oi! Sou o Rafa, entregador. Tem remédio, comida e encomenda pra chegar hoje!' },
       { who: 'rafa', text: 'Faça chuva ou faça sol, eu tô na rua. Me ajuda a planejar o caminho? Remédio primeiro!' }] },
-    { t: 'route', prompt: 'Toque nas ruas e entregue tudo! Remédio primeiro.',
+    { t: 'route', prompt: 'Toque onde quer ir e a bike pedala até lá! Siga a rua que brilha: remédio primeiro.',
       grids: {
         exp: { w: 6, h: 5, start: [0, 2], drops: [{ x: 5, y: 0, prop: 'casa', label: 'Casa da Dona Neide' }, { x: 4, y: 4, prop: 'farmacia', label: 'Remédio para o Seu Osvaldo' }],
           blocks: [{ x: 2, y: 1, prop: 'obra' }, { x: 2, y: 2, prop: 'obra' }, { x: 3, y: 3, prop: 'agua' }] },
@@ -3748,6 +3767,8 @@ const STEPS = {
     const fb = $('#fb', ctx.stage);
     const A = i => $(`[data-a="${i}"]`, ctx.stage), B = i => $(`[data-b="${i}"]`, ctx.stage);
     const one = window.innerWidth < 700; if (one) ctx.stage.classList.add('one');
+    /* depois de escolher à esquerda, a coluna da direita pisca chamando o toque */
+    const mt = $('.match', ctx.stage); mt.addEventListener('click', () => setTimeout(() => { const a = $('[data-a][aria-pressed="true"]', mt), b = $('[data-b][aria-pressed="true"]', mt); mt.classList.toggle('waitb', !!a && !b); mt.classList.toggle('waita', !a && !!b); }, 0));
     const clearSel = () => { $$('.mcard', ctx.stage).forEach(c => { if (!c.classList.contains('done')) c.setAttribute('aria-pressed', 'false'); }); if (one) autoA(); };
     const autoA = () => { const a = $$('[data-a]', ctx.stage).find(c => !c.classList.contains('done')); if (a) { selA = +a.dataset.a; a.setAttribute('aria-pressed', 'true'); } };
     const tryPair = () => {
@@ -3889,7 +3910,13 @@ const STEPS = {
         <div id="fb"></div></div></div>`;
     wireSay(ctx.stage, () => step.prompt);
     const fb = $('#fb', ctx.stage);
+    /* caminho mais curto (desviando de obra e alagamento) */
+    const bfs = (from, to) => { const q = [from], prev = { [key(...from)]: null }; while (q.length) { const c = q.shift(); if (c[0] === to[0] && c[1] === to[1]) break; for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const n = [c[0] + dx, c[1] + dy], k = key(...n); if (n[0] < 0 || n[1] < 0 || n[0] >= g.w || n[1] >= g.h || k in prev || blockAt(...n)) continue; prev[k] = c; q.push(n); } } if (!(key(...to) in prev)) return null; const path = []; let c = to; while (c && !(c[0] === from[0] && c[1] === from[1])) { path.unshift(c); c = prev[key(...c)]; } return path; };
+    let hint = null;
+    const calcHint = () => { const left = g.drops.map((d, i) => i).filter(i => !delivered.has(i)); if (!left.length) return hint = null; const tgt = urgentIdx >= 0 && !delivered.has(urgentIdx) ? urgentIdx : left.map(i => [i, (bfs(pos, [g.drops[i].x, g.drops[i].y]) || []).length || 99]).sort((a, b) => a[1] - b[1])[0][0]; const p = bfs(pos, [g.drops[tgt].x, g.drops[tgt].y]); hint = p && p.length ? { next: p[0], goal: [g.drops[tgt].x, g.drops[tgt].y] } : null; };
+    let riding = false;
     const draw = () => {
+      calcHint();
       const tr = new Set(trail.map(p => key(p[0], p[1])));
       let html = '';
       for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) {
@@ -3903,6 +3930,8 @@ const STEPS = {
         if (tr.has(key(x, y)) && !b && d < 0 && !st) cls += ' trail';
         if (here) { cls += ' here'; inner += `<img class="px bikeimg" src="${SPR.url('bike')}" alt="">`; label += ' (a bicicleta está aqui)'; }
         if (near && !b) cls += ' near';
+        if (hint && hint.next && hint.next[0] === x && hint.next[1] === y) cls += ' hintstep';
+        if (hint && hint.goal && hint.goal[0] === x && hint.goal[1] === y) cls += ' goal';
         html += `<button class="${cls}" data-x="${x}" data-y="${y}" aria-label="${esc(label)}">${inner}</button>`;
       }
       $('#grid', ctx.stage).innerHTML = html;
@@ -3913,7 +3942,10 @@ const STEPS = {
       ctx.activity();
       if (x < 0 || y < 0 || x >= g.w || y >= g.h) return;
       if (Math.abs(pos[0] - x) + Math.abs(pos[1] - y) !== 1) {
-        if (!(pos[0] === x && pos[1] === y)) feedback(fb, 'info', 'A bicicleta anda uma rua de cada vez. Toque num quadrado vizinho (com borda branca).');
+        if (pos[0] === x && pos[1] === y || riding || blockAt(x, y)) return;
+        /* tocou longe: a bicicleta vai pedalando até lá sozinha */
+        const p = bfs(pos, [x, y]); if (!p) return;
+        riding = true; let i = 0; const ride = () => { if (i >= p.length || !document.body.contains(fb)) { riding = false; return; } const [nx, ny] = p[i++]; const before = delivered.size; move(nx, ny); if (delivered.size !== before || RUN.done) { riding = false; return; } setTimeout(ride, 170); }; ride();
         return;
       }
       const b = blockAt(x, y);
@@ -4685,7 +4717,7 @@ function renderMission(id, idx) {
   const prim = $('#prim'), hintBtn = $('#hint');
   const ctx = {
     stage: $('#stage'), id, idx, step, colored: idx > revealIdx,
-    complete() { RUN.done = true; prim.disabled = false; prim.classList.add('ready'); if (flowOn()) prim.innerHTML = `Continuar ${ICON.next}`;
+    complete() { RUN.done = true; prim.disabled = false; prim.classList.add('ready'); if (flowOn()) { prim.innerHTML = `Continuar ${ICON.next}`; setTimeout(() => { if (prim.isConnected && RUN.done && typeof demoTap === 'function') demoTap(prim, 0); }, 1600); }
       if (['tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift', 'catch'].includes(step.t)) { addMedal('criatividade', 1, 'mg:' + id); if (!G.seen['eg:' + id]) { G.seen['eg:' + id] = 1; G.energy = (G.energy || 0) + 1; saveGame(); updEnergy(); } }
       const ms = 0; /* nada avança sozinho: o botão ▶ pulsa e a criança segue no tempo dela */
       if (ms) autoNext(prim, ms, () => prim.click()); },
@@ -4722,7 +4754,7 @@ function renderMission(id, idx) {
     const thinkT = setInterval(() => {
       const h = $('#stage .mghead.talky'); if (!h || RUN.done || Date.now() - lastAct < 3500 || h._rt && Date.now() - lastAct < 6000) return;
       const who = h.dataset.who, list = THOUGHTS[who] || THOUGHTS.faisca; if (h._main === undefined) h._main = h.querySelector('#mgt').innerHTML;
-      headSay(h, list[k++ % list.length], 'think'); clearTimeout(h._rt); h._rt = setTimeout(() => headSay(h, h._main), 3200);
+      headSay(h, list[k++ % list.length], 'think'); clearTimeout(h._rt); h._rt = setTimeout(() => { h._rt = null; headSay(h, h._main); }, 3200);
     }, 9000);
     onCleanup(() => clearInterval(thinkT));
   }
@@ -5385,8 +5417,8 @@ function mgSay(box, html, kind = 'ok') {
   /* no modo fluido, a reação sai do balão do personagem (não cobre o jogo) */
   const head = box.closest('.mg') && box.closest('.mg').querySelector('.mghead.talky');
   if (head && typeof flowOn === 'function' && flowOn()) {
-    if (head._main === undefined) head._main = head.querySelector('#mgt').innerHTML;
-    headSay(head, html, kind); clearTimeout(head._rt); head._rt = setTimeout(() => headSay(head, head._main), 2600); return;
+    if (head._main === undefined || !head._rt) head._main = head._main !== undefined && head._set ? head._main : head.querySelector('#mgt').innerHTML;
+    headSay(head, html, kind); clearTimeout(head._rt); head._rt = setTimeout(() => { head._rt = null; headSay(head, head._main); }, 2600); return;
   }
   box.innerHTML = html; box.className = 'mgsay on ' + kind;
   clearTimeout(box._t); box._t = setTimeout(() => box.className = 'mgsay', 2400);
@@ -5505,7 +5537,7 @@ STEPS.tidy = function (step, ctx) {
   { const f = items[0]; setTimeout(() => demoDrag(f.el, $(`.tbin[data-bin="${f.bin}"]`, ctx.stage), SPR.url(f.prop)), 400); }
   const foldPhase = () => {
     phase = 'fold'; Audio8.sfx('ok'); confetti(20);
-    $('#mgt', ctx.stage).textContent = 'Sala arrumada! Agora dobre as camisetas: toque 3 vezes em cada uma.';
+    setHead(ctx, 'Sala arrumada! Agora dobre as camisetas: toque 3 vezes em cada uma.');
     setTimeout(() => demoTap($('.shirt', ctx.stage)), 300);
     $('#bins', ctx.stage).hidden = true; $('.mgbar', ctx.stage).hidden = true;
     const f = $('#folds', ctx.stage); room.appendChild(f); f.hidden = false;
@@ -5521,7 +5553,7 @@ STEPS.tidy = function (step, ctx) {
     phase = 'done'; Audio8.sfx('win'); confetti(40);
     const c = spriteEl('cida', 170, 40); lay.appendChild(c); c.classList.add('flip'); setTimeout(() => moveEl(c, 110, 40, 1400, true), 60);
     room.classList.add('shine');
-    $('#mgt', ctx.stage).innerHTML = '<b>Casa brilhando!</b> A Dona Cida faz isso <b>todo dia</b>, e ainda cozinha, lava e passa.';
+    setHead(ctx, '<b>Casa brilhando!</b> A Dona Cida faz isso <b>todo dia</b>, e ainda cozinha, lava e passa.');
     if (S.autoRead) Voice.speak('Casa brilhando! A Dona Cida faz isso todo dia, e ainda cozinha, lava e passa.');
     ctx.complete();
   };
@@ -5600,7 +5632,7 @@ STEPS.cook = function (step, ctx) {
   const btn = (id, label, cls = '') => `<button class="ing ${cls}" data-ing="${id}">${SPR.img(id)}<span>${label}</span></button>`;
   const renderShop = () => {
     tray.innerHTML = `<p class="traylab">Despensa</p>` + shelf.map(id => btn(id, LABEL[id], got.has(id) ? 'used' : '')).join('');
-    $('#ctr', ctx.stage).innerHTML = [...got].map(id => `<span class="chipi">${SPR.img(id)}${ING[id]}</span>`).join('') || '<span class="muted">Ingredientes aparecem aqui</span>';
+    $('#ctr', ctx.stage).innerHTML = `<b class="reclab">Receita do Seu Zé:</b>` + Object.keys(ING).map(id => `<span class="chipi ${got.has(id) ? 'have' : 'need'}">${got.has(id) ? '✓' : SPR.img(id)} ${ING[id]}</span>`).join('');
     $$('.ing', tray).forEach(b => b.onclick = () => shopPick(b.dataset.ing, b));
   };
   const shopPick = (id, b) => {
@@ -5616,9 +5648,10 @@ STEPS.cook = function (step, ctx) {
     showStep(); setTimeout(() => demoTap($('[data-ing="escorredor"]', tray)), 300);
   };
   const showStep = () => {
-    const s = PLAN[k]; $('#mgt', ctx.stage).textContent = s.say; stirs = 0; wrongInRow = 0;
+    const s = PLAN[k]; setHead(ctx, `<b>Passo ${k + 1}:</b> ${s.say}`); stirs = 0; wrongInRow = 0;
     $$('#dots i', ctx.stage).forEach((d, i) => d.className = i < k ? 'ok' : i === k ? 'now' : '');
-    $$('.ing', tray).forEach(b => b.classList.remove('glow'));
+    $$('.ing', tray).forEach(b => b.classList.remove('glow', 'next'));
+    const nb = $(`[data-ing="${s.stir ? 'colher' : s.need}"]`, tray); if (nb) nb.classList.add('next');
     if (s.need === 'fogo') $('[data-ing="fogo"] span', tray).textContent = pot.fire ? 'Desligar' : 'Fogo';
     if (S.autoRead) Voice.speak(s.say);
   };
@@ -5645,10 +5678,12 @@ STEPS.cook = function (step, ctx) {
     ok();
   };
   const ok = () => {
-    const s = PLAN[k]; if (s.tip) mgSay(say, s.tip, 'info'); else mgSay(say, pick(['Isso!', 'Perfeito!', 'Muito bem!', 'Cheirinho bom!']));
-    k++; ctx.nextTurn();
+    const s = PLAN[k]; k++; ctx.nextTurn();
+    $$('.ing', tray).forEach(b => b.classList.remove('next'));
     if (k >= PLAN.length) return finish();
-    showStep();
+    /* o Seu Zé comenta o que você acabou de fazer, e só depois diz o próximo passo */
+    setHead(ctx, s.tip ? `👍 ${s.tip}` : pick(['Isso!', 'Perfeito!', 'Muito bem!', 'Cheirinho bom!']));
+    busy = true; setTimeout(() => { busy = false; showStep(); }, s.tip ? 2300 : 900);
   };
   const wrong = (b, msg) => {
     ctx.mistake(); wrongInRow++; Audio8.sfx('soft'); mgSay(say, msg, 'soft');
@@ -5658,7 +5693,7 @@ STEPS.cook = function (step, ctx) {
   const finish = () => {
     phase = 'done'; Audio8.sfx('win'); confetti(50);
     $$('#dots i', ctx.stage).forEach(d => d.className = 'ok');
-    $('#mgt', ctx.stage).innerHTML = '<b>Arroz soltinho!</b> Na escola, o Seu Zé faz <b>30 quilos</b> disso todo dia.';
+    setHead(ctx, '<b>Arroz soltinho!</b> Na escola, o Seu Zé faz <b>30 quilos</b> disso todo dia.');
     tray.innerHTML = `<div class="recipe"><b>Sua receita</b>${Object.keys(ING).map(id => `<span class="chipi">${SPR.img(id)}${ING[id]}</span>`).join('')}<p>Lavar · refogar o alho · refogar o arroz · água e sal · tampar até secar. <b>Sempre com um adulto no fogão!</b></p></div>`;
     $('#ctr', ctx.stage).innerHTML = '';
     if (S.autoRead) Voice.speak('Arroz soltinho! Na escola, o Seu Zé faz trinta quilos disso todo dia.');
@@ -5705,7 +5740,7 @@ function headSay(head, html, kind) {
   bub.classList.remove('pop'); void bub.offsetWidth; bub.classList.add('pop');
   const f = head.querySelector('.hface'); if (f) { f.classList.remove('react'); void f.offsetWidth; f.classList.add('react'); }
 }
-function setHead(ctx, html) { const h = $('.mghead', ctx.stage); if (h) { h._main = html; headSay(h, html); } else { const t = $('#mgt', ctx.stage); if (t) t.innerHTML = html; } }
+function setHead(ctx, html) { const h = $('.mghead', ctx.stage); if (h) { h._main = html; h._set = true; clearTimeout(h._rt); h._rt = null; headSay(h, html); } else { const t = $('#mgt', ctx.stage); if (t) t.innerHTML = html; } }
 function hotBtn(x, y, w, h, attrs = '') { return `<button class="jhot" style="left:${pct(x, SW)};top:${pct(y, SH)};width:${pct(w, SW)};height:${pct(h, SH)}" ${attrs}></button>`; }
 function energize() { Audio8.energy = 1; onCleanup(() => { Audio8.energy = 0; }); }
 const money = v => 'R$ ' + v.toFixed(2).replace('.', ',');
@@ -6268,36 +6303,55 @@ STEPS.boss = function (step, ctx) {
     const he = spriteEl(helperId, 140, 60, { w: 14 }); he.classList.add('bosshero', 'arrive'); lay.appendChild(he); helper = { x: 146, y: 64, e: he };
     $('#btip', ctx.stage).innerHTML = `${SPR.img(helperId)} ${esc(name)} está ajudando!`;
   };
-  /* ato 3: a Névoa diz que ninguém lembra de alguém; você mostra que lembra, e essa pessoa manda o golpe de luz */
-  const DOES = { cida: 'cuida da casa e das roupas', jorge: 'guarda o prédio e as encomendas', ze: 'faz a merenda da escola', katia: 'deixa a escola limpinha', lucia: 'visita as casas cuidando da saúde',
-    benedito: 'cuida de quem precisa de ajuda', zefa: 'planta a comida da feira', rafa: 'entrega tudo na sua porta', marina: 'separa o lixo para reciclar', joaquim: 'cuida das plantas da praça',
-    denise: 'deixa a rua limpa', pedro: 'leva luz para as casas', tania: 'faz a água chegar limpa', joana: 'apaga incêndios e salva vidas', carlos: 'protege a travessia das crianças' };
-  let order = [], ask = null, rounds = 3;
+  /* ato 3: a Névoa ataca com o que cada trabalhador ensinou; um por um, eles chegam e você mostra que aprendeu */
+  const ATK = {
+    cida: { taunt: 'Joguei roupa pra todo lado! Duvido lembrar como a Dona Cida deixa tudo em ordem!', help: 'Eu te ensinei! Dobra comigo!', kind: 'tap', prop: 'camiseta', n: 3, act: 'Toque nas roupas para dobrar!' },
+    ze: { taunt: 'Embaralhei a receita! Quantos copos de água pra 1 de arroz soltinho?', help: 'Lembra da regra de ouro?', kind: 'ask', opts: ['1 copo', '2 copos', '5 copos'], ok: 1 },
+    joana: { taunt: 'Faíscas pra todo lado! Hehehe!', help: 'Mangueira na mão, parceria!', kind: 'tap', prop: 'fogo', n: 4, act: 'Apague as chamas!' },
+    tania: { taunt: 'Sujei a água da cidade de novo!', help: 'Primeiro a gente tira o lixo da água!', kind: 'tap', prop: 'garrafa', n: 3, act: 'Tire o lixo da água!' },
+    rafa: { taunt: 'Embaralhei as entregas! O que vai primeiro?', help: 'Você sabe o que é urgente!', kind: 'ask', opts: ['Pizza', 'Remédio', 'Brinquedo'], ok: 1 },
+    pedro: { taunt: 'Apaguei as luzes! Agora ninguém enxerga nada!', help: 'Bora religar, com segurança!', kind: 'tap', prop: 'lampada', n: 3, act: 'Acenda as lâmpadas!' },
+    carlos: { taunt: 'Os carros vêm correndo... e tem criança na faixa!', help: 'Qual é o sinal certo?', kind: 'ask', opts: ['SIGA', 'PARE'], ok: 1 },
+    marina: { taunt: 'Espalhei lixo reciclável na praça!', help: 'Cada coisa no seu lugar!', kind: 'tap', prop: 'lata', n: 3, act: 'Recolha as latinhas!' },
+    jorge: { taunt: 'Escondi as encomendas do prédio!', help: 'Eu sei onde fica cada uma!', kind: 'tap', prop: 'caixa', n: 3, act: 'Pegue as encomendas!' },
+    denise: { taunt: 'Sujei a rua inteirinha!', help: 'Vassoura na mão!', kind: 'tap', prop: 'papel', n: 4, act: 'Varra o lixo!' }
+  };
+  const DOES = { cida: 'cuida da casa', ze: 'faz a merenda', joana: 'apaga incêndios', tania: 'traz a água limpa', rafa: 'faz as entregas', pedro: 'leva a luz', carlos: 'protege a travessia', marina: 'recicla', jorge: 'cuida do prédio', denise: 'limpa a rua' };
+  let order = [], rounds = 3, rk = 0, ask = null, need = 0, team = [];
   const taunt = $('#bt', ctx.stage);
   const nextAsk = () => {
     if (done) return; if (!order.length) return win();
-    ask = order.shift(); taunt.dataset.ask = ask;
-    taunt.innerHTML = `<b>Névoa:</b> Ninguém lembra de quem <b>${esc(DOES[ask])}</b>!`; taunt.classList.remove('on'); void taunt.offsetWidth; taunt.classList.add('on');
-    if (S.autoRead) Voice.speak(`Ninguém lembra de quem ${DOES[ask]}!`);
+    const id = order.shift(), A = ATK[id], C = CHARACTERS[id]; ask = id;
+    taunt.innerHTML = `<b>Névoa:</b> ${esc(A.taunt)}`; taunt.classList.remove('on'); void taunt.offsetWidth; taunt.classList.add('on'); taunt.dataset.ask = id; Audio8.sfx('villain');
+    nev.classList.remove('hit'); void nev.offsetWidth; nev.classList.add('hit');
+    setTimeout(() => {
+      /* o trabalhador chega para ajudar */
+      const x = 6 + rk * 26, e = spriteEl(id, x, 58, { w: 14, cls: 'herorow arrive' }); e.dataset.h = id; lay.appendChild(e); team.push({ id, x, e }); rk++;
+      { const hf = $('.mghead .hface img', ctx.stage); if (hf) hf.src = SPR.url(id); }
+      setHead(ctx, `<b>${esc(C.name)}:</b> ${esc(A.help)}`); Audio8.sfx('reveal');
+      if (A.kind === 'tap') {
+        need = A.n; setTimeout(() => { if (done) return; taunt.classList.remove('on'); setHead(ctx, `<b>${esc(C.name)}:</b> ${esc(A.act)}`);
+          for (let i = 0; i < A.n; i++) { const it = spriteEl(A.prop, 16 + RNG.next() * 120, 18 + RNG.next() * 28, { w: 13, cls: 'pick qte' }); it.style.animationDelay = (i * .1) + 's'; lay.appendChild(it);
+            it.onclick = () => { if (done || it.classList.contains('gone')) return; ctx.activity(); it.classList.add('gone'); sparkle(it, 5); Audio8.sfx('found'); setTimeout(() => it.remove(), 300); if (--need <= 0) strike(id); }; } }, 1200);
+      } else {
+        setTimeout(() => { if (done) return; const box = document.createElement('div'); box.className = 'bq'; box.innerHTML = A.opts.map((o, i) => `<button class="btn big" data-o="${i}">${esc(o)}</button>`).join(''); sc.appendChild(box);
+          $$('[data-o]', box).forEach(bt => bt.onclick = () => { ctx.activity(); if (+bt.dataset.o === A.ok) { Audio8.sfx('ok'); box.remove(); strike(id); } else { ctx.mistake(); Audio8.sfx('soft'); bt.classList.add('shake'); setTimeout(() => bt.classList.remove('shake'), 400); setHead(ctx, `<b>${esc(C.name)}:</b> Hmm... pensa no que a gente fez juntos!`); } }); }, 1000);
+      }
+    }, 1600);
+  };
+  const strike = id => {
+    const h = team.find(t => t.id === id), C = CHARACTERS[id]; ask = null; taunt.classList.remove('on');
+    if (h) { h.e.classList.remove('jump'); void h.e.offsetWidth; h.e.classList.add('jump'); beam(h.x + 7, 60, parseFloat(nev.style.left) / 100 * SW + 25, 14, 'help'); }
+    floatText(sc, `Obrigado, ${C.name}!`, ((h ? h.x : 70) + 6) / SW * 100, 44); hp = Math.max(0, hp - 100 / rounds); sparkle(nev, 10); Audio8.sfx('reveal');
+    setHead(ctx, `Você lembrou: <b>${esc(C.name)}</b> ${esc(DOES[id] || 'cuida da cidade')}!`); ctx.nextTurn(); upd(); setTimeout(nextAsk, 1500);
   };
   const finale = () => {
     phase = 3; smogs.forEach(s => { if (!s.gone) { s.gone = true; s.el.classList.add('sucked'); setTimeout(() => s.el.remove(), 380); } }); folks.forEach(f => { f.smog = null; f.e.classList.remove('sad'); f.e.classList.add('home'); }); hero.classList.add('home'); vac.classList.add('home'); if (helper) helper.e.classList.add('home');
-    const team = heroes.filter(id => DOES[id]);
-    team.forEach((id, i) => {
-      const x = 8 + i * (128 / Math.max(1, team.length - 1)), e = spriteEl(id, x, 58, { w: 14, cls: 'herorow arrive pick' }); e.style.animationDelay = (i * .1) + 's'; e.dataset.h = id; lay.appendChild(e);
-      e.onclick = () => {
-        if (done || phase !== 3 || !ask) return; ctx.activity();
-        if (id !== ask) { ctx.mistake(); Audio8.sfx('soft'); e.classList.remove('nope'); void e.offsetWidth; e.classList.add('nope'); floatText(sc, 'Hmm, não é...', (x + 6) / SW * 100, 50); return; }
-        const C = CHARACTERS[id]; e.classList.remove('jump'); void e.offsetWidth; e.classList.add('jump');
-        beam(x + 7, 60, parseFloat(nev.style.left) / 100 * SW + 25, 14, 'help'); Audio8.sfx('reveal');
-        floatText(sc, `Obrigado, ${C.name}!`, (x + 6) / SW * 100, 46); hp = Math.max(0, hp - 100 / rounds); nev.classList.remove('hit'); void nev.offsetWidth; nev.classList.add('hit'); sparkle(nev, 10);
-        ask = null; taunt.classList.remove('on'); ctx.nextTurn(); upd(); setTimeout(nextAsk, 1100);
-      };
-    });
-    rounds = Math.min(team.length, D === 'exp' ? 3 : D === 'inv' ? 4 : 5); order = shuffle(team).slice(0, rounds);
-    $('#bl', ctx.stage).textContent = 'Névoa'; $('#btip', ctx.stage).hidden = true; Audio8.sfx('villain'); hp = 100;
-    setHead(ctx, 'A Névoa diz que ninguém lembra deles. <b>Mostre que você lembra!</b>'); upd();
-    setTimeout(nextAsk, 900);
+    const pool = (G.album.filter(id => ATK[id]).length ? G.album.filter(id => ATK[id]) : ['cida', 'ze', 'joana', 'tania']);
+    rounds = Math.min(pool.length, D === 'exp' ? 3 : D === 'inv' ? 4 : 5); order = shuffle(pool).slice(0, rounds);
+    $('#bl', ctx.stage).textContent = 'Névoa'; $('#btip', ctx.stage).hidden = true; hp = 100;
+    setHead(ctx, 'A Névoa vai atacar com o <b>esquecimento</b>... mostre tudo o que você aprendeu!'); upd();
+    setTimeout(nextAsk, 1400);
   };
   const loop = setInterval(() => {
     if (done) return; tick++;
@@ -6326,9 +6380,9 @@ STEPS.boss = function (step, ctx) {
   };
   placeMe(); upd(); Audio8.sfx('villain'); setTimeout(spawn, 500); setTimeout(() => { const s = smogs.find(x => !x.gone); if (s) demoTap(s.el, 0); }, 1500);
   return {
-    speak: () => phase < 3 ? 'Toque na fumaça para aspirar a poluição e salvar os moradores!' : (ask ? `Quem ${DOES[ask]}? Toque nessa pessoa!` : 'Mostre que você lembra!'),
-    hint() { ctx.usedHint(); const s = phase < 3 ? (smogs.find(x => !x.gone) || {}).el : $(`.pick[data-h="${ask}"]`, ctx.stage); if (s) { s.classList.add('glow'); setTimeout(() => s.classList.remove('glow'), 1500); } },
-    autoStep() { if (done) return; if (phase === 3) { const e = ask && $(`.pick[data-h="${ask}"]`, ctx.stage); if (e) e.click(); } else { const s = smogs.filter(x => !x.gone).sort((a, b) => b.y - a.y)[0]; if (s) s.el.click(); } }
+    speak: () => phase < 3 ? 'Toque na fumaça para aspirar a poluição e salvar os moradores!' : 'Mostre tudo o que você aprendeu com cada trabalhador!',
+    hint() { ctx.usedHint(); const s = phase < 3 ? (smogs.find(x => !x.gone) || {}).el : ($('.qte:not(.gone)', ctx.stage) || $('.bq [data-o]', ctx.stage)); if (s) { s.classList.add('glow'); setTimeout(() => s.classList.remove('glow'), 1500); } },
+    autoStep() { if (done) return; if (phase === 3) { const q = $('.qte:not(.gone)', ctx.stage); if (q) q.click(); else if (ask && ATK[ask].kind === 'ask') { const bt = $(`.bq [data-o="${ATK[ask].ok}"]`, ctx.stage); if (bt) bt.click(); } } else { const s = smogs.filter(x => !x.gone).sort((a, b) => b.y - a.y)[0]; if (s) s.el.click(); } }
   };
 };
 

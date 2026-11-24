@@ -16,7 +16,7 @@ function headSay(head, html, kind) {
   bub.classList.remove('pop'); void bub.offsetWidth; bub.classList.add('pop');
   const f = head.querySelector('.hface'); if (f) { f.classList.remove('react'); void f.offsetWidth; f.classList.add('react'); }
 }
-function setHead(ctx, html) { const h = $('.mghead', ctx.stage); if (h) { h._main = html; headSay(h, html); } else { const t = $('#mgt', ctx.stage); if (t) t.innerHTML = html; } }
+function setHead(ctx, html) { const h = $('.mghead', ctx.stage); if (h) { h._main = html; h._set = true; clearTimeout(h._rt); h._rt = null; headSay(h, html); } else { const t = $('#mgt', ctx.stage); if (t) t.innerHTML = html; } }
 function hotBtn(x, y, w, h, attrs = '') { return `<button class="jhot" style="left:${pct(x, SW)};top:${pct(y, SH)};width:${pct(w, SW)};height:${pct(h, SH)}" ${attrs}></button>`; }
 function energize() { Audio8.energy = 1; onCleanup(() => { Audio8.energy = 0; }); }
 const money = v => 'R$ ' + v.toFixed(2).replace('.', ',');

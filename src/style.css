@@ -1433,3 +1433,22 @@ html { font-size: clamp(16px, calc(.55vmin + 10px), 21px); }
 }
 @media (pointer: fine), (min-width: 900px) and (min-height: 600px) { .reflect p, .reflect li { font-size: 1.2rem !important; line-height: 1.4; } .reflect h3 { font-size: 1.35rem; } }
 .map-banner.hook { font-size: 1.3rem; max-width: 80%; display: flex; gap: 10px; align-items: center; } .map-banner.hook img.px { width: 34px; flex: none; }
+.cook .reclab { width: 100%; font-size: .9rem; }
+.cook .chipi.need { opacity: .55; border-style: dashed; } .cook .chipi.have { background: #d6f0b8; }
+.ing.next { animation: pulse 1s infinite; box-shadow: 0 0 0 4px var(--glow), 3px 3px 0 var(--ink) !important; position: relative; }
+.ing.next::after { content: '👆'; position: absolute; top: -18px; right: -6px; font-size: 22px; animation: bob 1s ease-in-out infinite; }
+.cell.hintstep { box-shadow: inset 0 0 0 4px var(--glow) !important; animation: pulse 1.1s infinite; }
+.cell.hintstep::after { content: '▸'; position: absolute; inset: 0; display: grid; place-items: center; color: #c79400; font-size: 1.4rem; font-weight: 900; }
+.cell.goal { box-shadow: inset 0 0 0 4px #e98bb0 !important; }
+.cell { position: relative; }
+/* instruções mais enxutas, jogo maior */
+.prompt { padding: 6px 12px !important; gap: 8px !important; } .prompt p { font-size: 1rem !important; margin: 0; } .prompt img.px { width: 26px !important; height: auto !important; }
+.mghead.talky .hbub { padding: 6px 14px; } .mghead.talky .hbub b { font-size: 1rem; } .mghead.talky .hface { width: 48px; height: 48px; } .mghead.talky .hface img.px { width: 24px !important; height: 36px !important; }
+.match.waitb .col:last-child .mcard:not(.done), .match.waita .col:first-child .mcard:not(.done) { animation: pulse 1s infinite; box-shadow: 0 0 0 3px var(--glow), 3px 3px 0 var(--ink); }
+.match.waitb .col:last-child > b::after { content: ' ← toque no par'; color: #c79400; }
+.match.waita .col:first-child > b::after { content: ' ← toque no par'; color: #c79400; }
+.scene .layer .qte { pointer-events: auto; cursor: pointer; animation: arrive .45s cubic-bezier(.2,.9,.3,1.4) both, bob 1.2s .45s ease-in-out infinite; filter: drop-shadow(0 0 6px #fff1a8); z-index: 7; }
+.scene .layer .qte.gone { animation: sucked .3s forwards; }
+.bq { position: absolute; left: 50%; top: 48%; transform: translate(-50%, -50%); z-index: 12; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; animation: tipin .4s both; }
+.bq .btn { font-size: 1.3rem; min-width: 130px; box-shadow: 0 0 0 4px #fff1a8, 4px 4px 0 var(--ink); }
+@media (orientation: landscape) and (max-height: 520px) { .bq .btn { font-size: 1rem; min-width: 96px; padding: 8px 12px; } }

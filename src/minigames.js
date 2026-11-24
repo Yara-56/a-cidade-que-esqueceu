@@ -10,8 +10,8 @@ function mgSay(box, html, kind = 'ok') {
   /* no modo fluido, a reação sai do balão do personagem (não cobre o jogo) */
   const head = box.closest('.mg') && box.closest('.mg').querySelector('.mghead.talky');
   if (head && typeof flowOn === 'function' && flowOn()) {
-    if (head._main === undefined) head._main = head.querySelector('#mgt').innerHTML;
-    headSay(head, html, kind); clearTimeout(head._rt); head._rt = setTimeout(() => headSay(head, head._main), 2600); return;
+    if (head._main === undefined || !head._rt) head._main = head._main !== undefined && head._set ? head._main : head.querySelector('#mgt').innerHTML;
+    headSay(head, html, kind); clearTimeout(head._rt); head._rt = setTimeout(() => { head._rt = null; headSay(head, head._main); }, 2600); return;
   }
   box.innerHTML = html; box.className = 'mgsay on ' + kind;
   clearTimeout(box._t); box._t = setTimeout(() => box.className = 'mgsay', 2400);
@@ -130,7 +130,7 @@ STEPS.tidy = function (step, ctx) {
   { const f = items[0]; setTimeout(() => demoDrag(f.el, $(`.tbin[data-bin="${f.bin}"]`, ctx.stage), SPR.url(f.prop)), 400); }
   const foldPhase = () => {
     phase = 'fold'; Audio8.sfx('ok'); confetti(20);
-    $('#mgt', ctx.stage).textContent = 'Sala arrumada! Agora dobre as camisetas: toque 3 vezes em cada uma.';
+    setHead(ctx, 'Sala arrumada! Agora dobre as camisetas: toque 3 vezes em cada uma.');
     setTimeout(() => demoTap($('.shirt', ctx.stage)), 300);
     $('#bins', ctx.stage).hidden = true; $('.mgbar', ctx.stage).hidden = true;
     const f = $('#folds', ctx.stage); room.appendChild(f); f.hidden = false;
@@ -146,7 +146,7 @@ STEPS.tidy = function (step, ctx) {
     phase = 'done'; Audio8.sfx('win'); confetti(40);
     const c = spriteEl('cida', 170, 40); lay.appendChild(c); c.classList.add('flip'); setTimeout(() => moveEl(c, 110, 40, 1400, true), 60);
     room.classList.add('shine');
-    $('#mgt', ctx.stage).innerHTML = '<b>Casa brilhando!</b> A Dona Cida faz isso <b>todo dia</b>, e ainda cozinha, lava e passa.';
+    setHead(ctx, '<b>Casa brilhando!</b> A Dona Cida faz isso <b>todo dia</b>, e ainda cozinha, lava e passa.');
     if (S.autoRead) Voice.speak('Casa brilhando! A Dona Cida faz isso todo dia, e ainda cozinha, lava e passa.');
     ctx.complete();
   };
@@ -225,7 +225,7 @@ STEPS.cook = function (step, ctx) {
   const btn = (id, label, cls = '') => `<button class="ing ${cls}" data-ing="${id}">${SPR.img(id)}<span>${label}</span></button>`;
   const renderShop = () => {
     tray.innerHTML = `<p class="traylab">Despensa</p>` + shelf.map(id => btn(id, LABEL[id], got.has(id) ? 'used' : '')).join('');
-    $('#ctr', ctx.stage).innerHTML = [...got].map(id => `<span class="chipi">${SPR.img(id)}${ING[id]}</span>`).join('') || '<span class="muted">Ingredientes aparecem aqui</span>';
+    $('#ctr', ctx.stage).innerHTML = `<b class="reclab">Receita do Seu Zé:</b>` + Object.keys(ING).map(id => `<span class="chipi ${got.has(id) ? 'have' : 'need'}">${got.has(id) ? '✓' : SPR.img(id)} ${ING[id]}</span>`).join('');
     $$('.ing', tray).forEach(b => b.onclick = () => shopPick(b.dataset.ing, b));
   };
   const shopPick = (id, b) => {
@@ -241,9 +241,10 @@ STEPS.cook = function (step, ctx) {
     showStep(); setTimeout(() => demoTap($('[data-ing="escorredor"]', tray)), 300);
   };
   const showStep = () => {
-    const s = PLAN[k]; $('#mgt', ctx.stage).textContent = s.say; stirs = 0; wrongInRow = 0;
+    const s = PLAN[k]; setHead(ctx, `<b>Passo ${k + 1}:</b> ${s.say}`); stirs = 0; wrongInRow = 0;
     $$('#dots i', ctx.stage).forEach((d, i) => d.className = i < k ? 'ok' : i === k ? 'now' : '');
-    $$('.ing', tray).forEach(b => b.classList.remove('glow'));
+    $$('.ing', tray).forEach(b => b.classList.remove('glow', 'next'));
+    const nb = $(`[data-ing="${s.stir ? 'colher' : s.need}"]`, tray); if (nb) nb.classList.add('next');
     if (s.need === 'fogo') $('[data-ing="fogo"] span', tray).textContent = pot.fire ? 'Desligar' : 'Fogo';
     if (S.autoRead) Voice.speak(s.say);
   };
@@ -270,10 +271,12 @@ STEPS.cook = function (step, ctx) {
     ok();
   };
   const ok = () => {
-    const s = PLAN[k]; if (s.tip) mgSay(say, s.tip, 'info'); else mgSay(say, pick(['Isso!', 'Perfeito!', 'Muito bem!', 'Cheirinho bom!']));
-    k++; ctx.nextTurn();
+    const s = PLAN[k]; k++; ctx.nextTurn();
+    $$('.ing', tray).forEach(b => b.classList.remove('next'));
     if (k >= PLAN.length) return finish();
-    showStep();
+    /* o Seu Zé comenta o que você acabou de fazer, e só depois diz o próximo passo */
+    setHead(ctx, s.tip ? `👍 ${s.tip}` : pick(['Isso!', 'Perfeito!', 'Muito bem!', 'Cheirinho bom!']));
+    busy = true; setTimeout(() => { busy = false; showStep(); }, s.tip ? 2300 : 900);
   };
   const wrong = (b, msg) => {
     ctx.mistake(); wrongInRow++; Audio8.sfx('soft'); mgSay(say, msg, 'soft');
@@ -283,7 +286,7 @@ STEPS.cook = function (step, ctx) {
   const finish = () => {
     phase = 'done'; Audio8.sfx('win'); confetti(50);
     $$('#dots i', ctx.stage).forEach(d => d.className = 'ok');
-    $('#mgt', ctx.stage).innerHTML = '<b>Arroz soltinho!</b> Na escola, o Seu Zé faz <b>30 quilos</b> disso todo dia.';
+    setHead(ctx, '<b>Arroz soltinho!</b> Na escola, o Seu Zé faz <b>30 quilos</b> disso todo dia.');
     tray.innerHTML = `<div class="recipe"><b>Sua receita</b>${Object.keys(ING).map(id => `<span class="chipi">${SPR.img(id)}${ING[id]}</span>`).join('')}<p>Lavar · refogar o alho · refogar o arroz · água e sal · tampar até secar. <b>Sempre com um adulto no fogão!</b></p></div>`;
     $('#ctr', ctx.stage).innerHTML = '';
     if (S.autoRead) Voice.speak('Arroz soltinho! Na escola, o Seu Zé faz trinta quilos disso todo dia.');
