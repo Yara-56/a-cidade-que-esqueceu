@@ -469,7 +469,7 @@ function renderMission(id, idx) {
   const prim = $('#prim'), hintBtn = $('#hint');
   const ctx = {
     stage: $('#stage'), id, idx, step, colored: idx > revealIdx,
-    complete() { RUN.done = true; prim.disabled = false; prim.classList.add('ready'); if (flowOn()) { prim.innerHTML = `Continuar ${ICON.next}`; setTimeout(() => { if (prim.isConnected && RUN.done && typeof demoTap === 'function') demoTap(prim, 0); }, 1600); }
+    complete() { RUN.done = true; prim.disabled = false; prim.classList.add('ready'); if (RUN.comp) RUN.comp.burst(); if (flowOn()) { prim.innerHTML = `Continuar ${ICON.next}`; setTimeout(() => { if (prim.isConnected && RUN.done && typeof demoTap === 'function') demoTap(prim, 0); }, 1600); }
       if (['tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift', 'catch'].includes(step.t)) { addMedal('criatividade', 1, 'mg:' + id); if (!G.seen['eg:' + id]) { G.seen['eg:' + id] = 1; G.energy = (G.energy || 0) + 1; saveGame(); updEnergy(); } }
       const ms = 0; /* nada avança sozinho: o botão ▶ pulsa e a criança segue no tempo dela */
       if (ms) autoNext(prim, ms, () => prim.click()); },
@@ -477,7 +477,7 @@ function renderMission(id, idx) {
     mistake() { RUN.mistakes++; G.current.mistakes++; saveGame(); refreshHint(); heroTip(id, step, true); },
     usedHint() { if (!RUN.auto) { G.current.hints++; saveGame(); } },
     onTurn(fn) { RUN.turnFns.push(fn); },
-    nextTurn() { if (isJuntos()) { G.turn++; saveGame(); updateTurnChip(); RUN.turnFns.forEach(f => f()); } },
+    nextTurn() { if (RUN.comp) RUN.comp.cheer(); if (isJuntos()) { G.turn++; saveGame(); updateTurnChip(); RUN.turnFns.forEach(f => f()); } },
     activity() { resetIdle(); }
   };
   const refreshHint = () => {
@@ -491,13 +491,19 @@ function renderMission(id, idx) {
       if (RUN.done || $('#modal')) return;
       if (RUN.ctrl.hint) { RUN.auto = true; RUN.ctrl.hint(); RUN.auto = false; }
       const t = $('#stage .glow, #stage .hint-pulse, #stage .hot:not(.found):not(.checked), #stage .opt:not(:disabled), #stage button:not(:disabled):not([data-say])');
-      if (t && typeof demoTap === 'function') demoTap(t, 100);
+      if (t && flowOn() && RUN.comp) RUN.comp.go(t); else if (t && typeof demoTap === 'function') demoTap(t, 100);
       resetIdle();
     }, G.diff === 'exp' ? 7000 : 11000);
     if (G.diff === 'det') RUN.idle = setTimeout(() => { RUN.hinted = true; refreshHint(); }, 45000);
   };
   onCleanup(() => clearTimeout(RUN && RUN.idle));
   RUN.ctrl = STEPS[step.t](step, ctx) || {};
+  /* no modo fluido: a fala vai para dentro da cena e a Faísca voa junto, ajudando com a luz dela */
+  if (flowOn()) {
+    const sc = $('#stage .scene'), hd = $('#stage .mghead.talky');
+    if (sc && hd && !['dialog', 'reveal'].includes(step.t)) { sc.appendChild(hd); hd.classList.add('inscene'); }
+    if (sc && !['dialog', 'reveal', 'days'].includes(step.t)) RUN.comp = faiscaCompanion(sc);
+  }
   refreshHint(); resetIdle();
   setTimeout(() => heroTip(id, step, false), 2200);
   /* pensamentos: de vez em quando o personagem pensa alto (só quando a criança não está no meio de uma ação) */
@@ -540,6 +546,19 @@ function renderMission(id, idx) {
   }
 }
 /* segue direto para a próxima missão do roteiro (sem passar pelo mapa) */
+/* a Faísca dentro da cena: passeia, mostra o caminho com a luz e, no fim, limpa tudo com um clarão */
+function faiscaCompanion(sc) {
+  const f = document.createElement('div'); f.className = 'fcomp'; f.innerHTML = `<i class="fglow"></i>${SPR.img('faisca')}`; sc.appendChild(f);
+  let x = 88, y = 14, tx = x, ty = y, t = 0, hold = 0;
+  const place = () => { f.style.left = x + '%'; f.style.top = y + '%'; };
+  const iv = setInterval(() => { t++; if (hold > 0) hold--; else if (t % 60 === 0) { tx = 72 + Math.random() * 22; ty = 6 + Math.random() * 20; } x += (tx - x) * .08; y += (ty - y) * .08 + Math.sin(t / 6) * .15; place(); }, 50);
+  onCleanup(() => { clearInterval(iv); f.remove(); }); place();
+  return {
+    go(el) { const r = sc.getBoundingClientRect(), b = el.getBoundingClientRect(); if (!r.width) return; tx = Math.max(2, Math.min(94, (b.left + b.width / 2 - r.left) / r.width * 100 - 3)); ty = Math.max(2, Math.min(90, (b.top - r.top) / r.height * 100 - 12)); hold = 70; f.classList.remove('shine'); void f.offsetWidth; f.classList.add('shine'); el.classList.add('flit'); setTimeout(() => el.classList.remove('flit'), 2400); },
+    cheer() { f.classList.remove('cheer'); void f.offsetWidth; f.classList.add('cheer'); },
+    burst() { const b = document.createElement('div'); b.className = 'fburst'; b.style.left = (x + 3) + '%'; b.style.top = (y + 6) + '%'; sc.appendChild(b); setTimeout(() => b.remove(), 1400); sc.classList.add('cleaned'); Audio8.sfx('reveal'); }
+  };
+}
 function goNextMission() {
   /* a história segue: mesmo bairro → direto para a próxima pessoa; outro bairro → mapa com o gancho da Faísca */
   const nx = planMissions().find(x => !G.done[x]);
