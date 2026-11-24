@@ -181,9 +181,15 @@ const CHARACTERS = {
    level: 'det' = só no Detetive; 'inv' = Investigador e Detetive        */
 const MISSIONS = {
   tania: { title: 'A água que chega na torneira', char: 'tania', steps: [
-    { t: 'dialog', scene: 'sala', cast: [{ id: 'theo', x: 70, y: 52 }], lines: [
-      { who: 'theo', text: 'Abri a torneira e... nada!' },
-      { who: '?tania', text: 'Vem ver o caminho da água!' }] },
+    { t: 'dialog', scene: 'cozinha', cast: [{ id: 'you', x: 70, y: 52 }], lines: [
+      { who: 'you', text: 'A casa ficou limpinha! Agora é só lavar a louça...' },
+      { who: 'you', text: 'Ué... abri a torneira e não sai nada!' },
+      { who: 'faisca', text: 'Sem água, a louça só acumula. E não tem banho, nem comida, nem limpeza...' }] },
+    { t: 'dialog', scene: 'ruacasas', cast: [{ id: 'you', x: 30, y: 40 }, { id: 'tania', x: 104, y: 40 }], lines: [
+      { who: 'tania', text: 'Oi! Eu sou a Tânia, técnica de saneamento. A água parou de chegar na cidade inteira!' },
+      { who: 'tania', text: 'A Névoa sujou a estação de tratamento. Antes de chegar na sua torneira, a água precisa ser limpinha.' },
+      { who: 'you', text: 'E como eu posso ajudar?' },
+      { who: 'tania', text: 'Vem trabalhar comigo! Eu te mostro o caminho da água, passo a passo.' }] },
     { t: 'water' },
     { t: 'reveal', char: 'tania' },
     { t: 'choice', scene: 'sala', cast: [{ id: 'theo', x: 70, y: 52 }],
@@ -194,9 +200,10 @@ const MISSIONS = {
         { text: 'Fechar e contar para a família.', kind: true, result: 'Água limpa é de todo mundo. Cuidar é com a gente também!' }] }
   ] },
   joana: { title: 'Fogo na rua das casas!', char: 'joana', steps: [
-    { t: 'dialog', scene: 'ruacasas', cast: [{ id: 'davi', x: 40, y: 40 }], lines: [
-      { who: 'davi', text: 'Socorro! Tem fumaça na rua!' },
-      { who: '?joana', text: 'Bombeiros chegando! Me ajuda?' }] },
+    { t: 'dialog', scene: 'ruacasas', cast: [{ id: 'you', x: 30, y: 40 }, { id: 'joana', x: 104, y: 40 }], lines: [
+      { who: 'faisca', text: 'Que fumaça é aquela? Tem FOGO numa casa!' },
+      { who: 'joana', text: 'Sou a Tenente Joana, bombeira! O fogo está aumentando e tem gente perto!' },
+      { who: 'joana', text: 'Bombeiro treina todos os dias pra agir em minutos. Vem comigo: primeiro, a mangueira no hidrante!' }] },
     { t: 'fire' },
     { t: 'reveal', char: 'joana' },
     { t: 'choice', scene: 'ruacasas', cast: [{ id: 'joana', x: 100, y: 40 }],
@@ -207,9 +214,10 @@ const MISSIONS = {
         { text: 'Jogar água no fio.', kind: false, result: 'Nunca! Água e eletricidade juntas dão choque. Ligue 193.' }] }
   ] },
   carlos: { title: 'A travessia da escola', char: 'carlos', steps: [
-    { t: 'dialog', scene: 'ruacasas', cast: [{ id: 'bia', x: 40, y: 40 }], lines: [
-      { who: 'bia', text: 'Tanto carro! Como eu atravesso?' },
-      { who: '?carlos', text: 'Eu cuido da travessia. Me ajuda?' }] },
+    { t: 'dialog', scene: 'ruacasas', cast: [{ id: 'you', x: 30, y: 40 }, { id: 'carlos', x: 104, y: 40 }], lines: [
+      { who: 'faisca', text: 'Hora da saída da escola... e olha quanto carro correndo!' },
+      { who: 'carlos', text: 'Sou o Sargento Carlos. Todo dia eu protejo a travessia das crianças.' },
+      { who: 'carlos', text: 'Fica do meu lado: quando as crianças chegarem, a gente para o trânsito!' }] },
     { t: 'cross' },
     { t: 'reveal', char: 'carlos' },
     { t: 'choice', scene: 'ruacasas', cast: [{ id: 'bia', x: 40, y: 40 }],
@@ -290,9 +298,13 @@ const MISSIONS = {
 
   /* ===== VILA DO APRENDIZADO ===== */
   ze: { title: 'O cheiro que sumiu', char: 'ze', steps: [
-    { t: 'dialog', scene: 'salaaula', cast: [{ id: 'bia', x: 60, y: 46 }], lines: [
-      { who: 'bia', text: 'Sumiu o cheirinho de arroz da escola!' },
-      { who: 'faisca', text: 'Quem faz a comida? Pra cozinha!' }] },
+    { t: 'dialog', scene: 'salaaula', cast: [{ id: 'you', x: 40, y: 46 }, { id: 'bia', x: 96, y: 46 }], lines: [
+      { who: 'bia', text: 'Já tá na hora do recreio... e cadê o cheirinho de comida?' },
+      { who: 'faisca', text: 'Alguém faz essa comida todo dia. Vamos até a cozinha!' }] },
+    { t: 'dialog', scene: 'cozinha', cast: [{ id: 'you', x: 30, y: 52 }, { id: 'ze', x: 100, y: 50 }], lines: [
+      { who: 'ze', text: 'Oi, criança! Eu sou o Seu Zé, o merendeiro. Cozinho pra escola inteira, todo santo dia.' },
+      { who: 'ze', text: 'A Névoa bagunçou minha cozinha e a merenda tem que sair já já!' },
+      { who: 'ze', text: 'Pra muita criança, é a refeição mais importante do dia. Me ajuda a fazer o arroz?' }] },
     { t: 'investigate', scene: 'cozinha', need: 4, prompt: 'Explore a cozinha: como a merenda é feita?',
       items: [
         { prop: 'touca', x: 8, y: 24, clue: true, label: 'Touca e avental', text: 'Touca e avental: higiene é regra!' },
@@ -456,9 +468,10 @@ const MISSIONS = {
   ] },
 
   rafa: { title: 'Entregas na chuva', char: 'rafa', steps: [
-    { t: 'dialog', scene: 'feira', cast: [{ id: 'rafa', x: 100, y: 52, mode: 'sil' }], lines: [
-      { who: 'faisca', text: 'Choveu e o mapa embaralhou!' },
-      { who: '?rafa', text: 'Me ajuda a planejar as entregas?' }] },
+    { t: 'dialog', scene: 'feira', cast: [{ id: 'you', x: 30, y: 54 }, { id: 'rafa', x: 100, y: 52 }], lines: [
+      { who: 'faisca', text: 'A chuva embaralhou as ruas... e tem gente esperando entrega!' },
+      { who: 'rafa', text: 'Oi! Sou o Rafa, entregador. Tem remédio, comida e encomenda pra chegar hoje!' },
+      { who: 'rafa', text: 'Faça chuva ou faça sol, eu tô na rua. Me ajuda a planejar o caminho? Remédio primeiro!' }] },
     { t: 'route', prompt: 'Toque nas ruas e entregue tudo! Remédio primeiro.',
       grids: {
         exp: { w: 6, h: 5, start: [0, 2], drops: [{ x: 5, y: 0, prop: 'casa', label: 'Casa da Dona Neide' }, { x: 4, y: 4, prop: 'farmacia', label: 'Remédio para o Seu Osvaldo' }],
@@ -590,9 +603,10 @@ const MISSIONS = {
   ] },
 
   pedro: { title: 'Religar as luzes', char: 'pedro', steps: [
-    { t: 'dialog', scene: 'ruanoite', cast: [{ id: 'pedro', x: 64, y: 44, mode: 'sil' }], lines: [
-      { who: 'faisca', text: 'Os postes apagaram! Que perigo!' },
-      { who: '?pedro', text: 'Eu conserto, com segurança. Me ajudam?' }] },
+    { t: 'dialog', scene: 'ruanoite', cast: [{ id: 'you', x: 30, y: 44 }, { id: 'pedro', x: 100, y: 44 }], lines: [
+      { who: 'you', text: 'Ficou tudo escuro!' },
+      { who: 'pedro', text: 'Sou o Pedro, eletricista. A Névoa derrubou a energia da cidade!' },
+      { who: 'pedro', text: 'Sem luz, o posto de saúde e as casas param. Vem comigo? Segurança em primeiro lugar!' }] },
     { t: 'match', prompt: 'Para que serve cada equipamento?', left: 'Equipamento', right: 'Para quê',
       pairs: [
         { a: { prop: 'capacete', label: 'Capacete' }, b: { label: 'Proteger a cabeça.' }, ok: 'Isso! O capacete protege contra batidas e objetos que caem.' },
@@ -815,4 +829,14 @@ const THOUGHTS = {
   joana: ['Meu coração dispara, mas eu não paro!', 'Salvar alguém é o melhor sentimento do mundo.'],
   carlos: ['Primeiro as crianças, sempre!', 'Proteger a cidade é cuidar de todo mundo.'],
   faisca: ['Minha luz está ficando mais forte!', 'Você é demais, sabia?', 'Hmm... e agora?']
+};
+
+/* ganchos: o que puxa a criança para o próximo bairro (aparece no mapa) */
+const HOOKS = {
+  tania: 'Abri a torneira e não sai água! Alguém precisa consertar isso...',
+  ze: 'Ouviu o sinal da escola? Tem algo errado na cozinha! Vamos até a <b>Vila do Aprendizado</b>!',
+  joana: 'Olha aquela fumaça perto da <b>Estação da Saúde</b>! Corre!',
+  rafa: 'Tem gente esperando remédio lá no <b>Mercado</b>! Vamos ajudar!',
+  pedro: 'Ih... as luzes dos <b>Caminhos</b> apagaram! Vamos até lá!',
+  carlos: 'Já é hora da saída da escola. Vamos ver a travessia!'
 };

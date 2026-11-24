@@ -1432,3 +1432,4 @@ html { font-size: clamp(16px, calc(.55vmin + 10px), 21px); }
   .reflect { gap: 18px; } .reflect > * { font-size: 1.15rem; padding: 18px 20px; }
 }
 @media (pointer: fine), (min-width: 900px) and (min-height: 600px) { .reflect p, .reflect li { font-size: 1.2rem !important; line-height: 1.4; } .reflect h3 { font-size: 1.35rem; } }
+.map-banner.hook { font-size: 1.3rem; max-width: 80%; display: flex; gap: 10px; align-items: center; } .map-banner.hook img.px { width: 34px; flex: none; }

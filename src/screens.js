@@ -412,6 +412,8 @@ function screenMap() {
     if (goal) { const ang = Math.atan2((goal.y - P.y) * .6, goal.x - P.x), far = Math.hypot(goal.x - P.x, (goal.y - P.y) * .6) > 7; cmp.style.left = P.x + '%'; cmp.style.top = (P.y - 7) + '%'; cmp.style.transform = `translate(-50%, -50%) rotate(${ang + Math.PI / 2}rad)`; cmp.style.opacity = far ? 1 : 0; }
   }, 30);
   onCleanup(() => clearInterval(loop));
+  /* gancho da história: a Faísca chama para o próximo bairro */
+  if (G.hook) { const hk = G.hook; G.hook = null; saveGame(); setTimeout(() => { banner.innerHTML = `${SPR.img('faisca')} ${hk}`; banner.classList.add('on', 'hook'); Audio8.sfx('page'); setTimeout(() => banner.classList.remove('on'), 5200); }, 500); }
   /* primeira vez: mostra como andar */
   if (!G.seen['tut:map']) { G.seen['tut:map'] = 1; saveGame(); setTimeout(() => { banner.innerHTML = matchMedia('(pointer: coarse)').matches ? 'Arraste o dedo para andar!' : 'Use as <b>setas</b> do teclado (ou clique) para andar!'; banner.classList.add('on'); setTimeout(() => banner.classList.remove('on'), 3200); if (matchMedia('(pointer: coarse)').matches && goal) demoTap($('.marker.next') || av, 0); }, 600); }
 }
@@ -539,7 +541,15 @@ function renderMission(id, idx) {
 }
 /* segue direto para a próxima missão do roteiro (sem passar pelo mapa) */
 function goNextMission() {
-  if (G.prologue && G.mode !== 'sala') { go(screenMap); return; }
+  /* a história segue: mesmo bairro → direto para a próxima pessoa; outro bairro → mapa com o gancho da Faísca */
+  const nx = planMissions().find(x => !G.done[x]);
+  if (nx && G.prologue && G.mode !== 'sala') {
+    const rNext = regionOf(nx), same = rNext && G.lastRegion === rNext.id;
+    if (same) { G.current = { mission: nx, step: 0 }; saveGame(); go(renderMission, nx, 0); return; }
+    G.hook = (typeof HOOKS !== 'undefined' && HOOKS[nx]) || `Alguém precisa de ajuda em <b>${esc(rNext ? rNext.name : 'outro bairro')}</b>! Vamos?`; saveGame();
+    go(screenMap); return;
+  }
+  if (G.prologue && G.mode !== 'sala' && progress() < 1) { go(screenMap); return; }
   if (progress() >= 1) { G.current = { mission: '_finale' }; saveGame(); go(screenFinale); return; }
   const m = planMissions().find(x => !G.done[x]);
   if (!m) { go(screenMap); return; }
@@ -556,7 +566,7 @@ function calcStars() {
 }
 function finishMission(id) {
   const first = !G.done[id], stars = calcStars(), info = { mistakes: (G.current || {}).mistakes || 0, hints: (G.current || {}).hints || 0 };
-  G.done[id] = true; unlockCharacter(MISSIONS[id].char); G.current = null;
+  G.done[id] = true; unlockCharacter(MISSIONS[id].char); G.current = null; { const rr = regionOf(id); if (rr) G.lastRegion = rr.id; }
   G.stars[id] = Math.max(G.stars[id] || 0, stars);
   addMedal('colaboracao', 1, 'mis:' + id);
   saveGame(); go(screenReward, id, first, stars, info);
@@ -582,7 +592,7 @@ function screenReward(id, first, stars = 1, info = {}) {
       <div style="display:grid;gap:10px;max-width:420px;text-align:left">
         <div class="fact" style="color:var(--ink)"><p>Sem <b>${esc(c.name)}</b>, a cidade não funciona!</p></div>
         <div class="medal-row">${medalsHTML()}</div></div></div>
-    <div class="row center"><button class="btn primary big" id="go">${regionDone && first ? 'Continuar a história' : progress() >= 1 ? 'Ir para o grande final' : 'Voltar para a cidade'} ${ICON.next}</button></div></div>`;
+    <div class="row center"><button class="btn primary big" id="go">${progress() >= 1 ? 'Ir para o grande final' : 'Continuar a história'} ${ICON.next}</button></div></div>`;
   $('#go').onclick = () => {
     if (regionDone && first) { const rs = planRegions(); go(screenInterlude, r.id, rs.filter(x => regionState(x.id) === 'done').length, rs.length); }
     else goNextMission();
