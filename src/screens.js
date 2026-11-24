@@ -413,7 +413,7 @@ function screenMap() {
   }, 30);
   onCleanup(() => clearInterval(loop));
   /* gancho da história: a Faísca chama para o próximo bairro */
-  if (G.hook) { const hk = G.hook; G.hook = null; saveGame(); setTimeout(() => { banner.innerHTML = `${SPR.img('faisca')} ${hk}`; banner.classList.add('on', 'hook'); Audio8.sfx('page'); setTimeout(() => banner.classList.remove('on'), 5200); }, 500); }
+  if (G.hook) { const hk = G.hook; G.hook = null; saveGame(); setTimeout(() => { banner.innerHTML = `${SPR.img('faisca')}<span>${hk}</span>`; banner.classList.add('on', 'hook'); Audio8.sfx('page'); setTimeout(() => banner.classList.remove('on'), 5200); }, 500); }
   /* primeira vez: mostra como andar */
   if (!G.seen['tut:map']) { G.seen['tut:map'] = 1; saveGame(); setTimeout(() => { banner.innerHTML = matchMedia('(pointer: coarse)').matches ? 'Arraste o dedo para andar!' : 'Use as <b>setas</b> do teclado (ou clique) para andar!'; banner.classList.add('on'); setTimeout(() => banner.classList.remove('on'), 3200); if (matchMedia('(pointer: coarse)').matches && goal) demoTap($('.marker.next') || av, 0); }, 600); }
 }

@@ -1647,6 +1647,11 @@ html.flowfoot .mg.job .mgbar { padding-right: 64px; }
   html.sala #stage .mg.job .jobscene { width: min(100%, calc((100dvh - 330px) * 16 / 9)) !important; }
 }
 .scene .sprite.famsad { filter: grayscale(1) brightness(.75); } .scene .sprite.famhappy { filter: drop-shadow(0 0 6px #fff1a8); }
+/* celular deitado: o balão não fica embaixo do botão Continuar */
+@media (orientation: landscape) and (max-height: 520px) {
+  html.flowfoot .screen.stage:has(> .cut) > #cb, html.flowfoot #stage:has(> .scene.cap) > #bub { width: auto; justify-self: start; margin-left: 2%; margin-right: 150px; max-width: 74%; }
+}
+.map-banner.hook span { display: block; }
 </style>
 </head>
 <body>
@@ -4885,7 +4890,7 @@ function screenMap() {
   }, 30);
   onCleanup(() => clearInterval(loop));
   /* gancho da história: a Faísca chama para o próximo bairro */
-  if (G.hook) { const hk = G.hook; G.hook = null; saveGame(); setTimeout(() => { banner.innerHTML = `${SPR.img('faisca')} ${hk}`; banner.classList.add('on', 'hook'); Audio8.sfx('page'); setTimeout(() => banner.classList.remove('on'), 5200); }, 500); }
+  if (G.hook) { const hk = G.hook; G.hook = null; saveGame(); setTimeout(() => { banner.innerHTML = `${SPR.img('faisca')}<span>${hk}</span>`; banner.classList.add('on', 'hook'); Audio8.sfx('page'); setTimeout(() => banner.classList.remove('on'), 5200); }, 500); }
   /* primeira vez: mostra como andar */
   if (!G.seen['tut:map']) { G.seen['tut:map'] = 1; saveGame(); setTimeout(() => { banner.innerHTML = matchMedia('(pointer: coarse)').matches ? 'Arraste o dedo para andar!' : 'Use as <b>setas</b> do teclado (ou clique) para andar!'; banner.classList.add('on'); setTimeout(() => banner.classList.remove('on'), 3200); if (matchMedia('(pointer: coarse)').matches && goal) demoTap($('.marker.next') || av, 0); }, 600); }
 }

@@ -1639,3 +1639,8 @@ html.flowfoot .mg.job .mgbar { padding-right: 64px; }
   html.sala #stage .mg.job .jobscene { width: min(100%, calc((100dvh - 330px) * 16 / 9)) !important; }
 }
 .scene .sprite.famsad { filter: grayscale(1) brightness(.75); } .scene .sprite.famhappy { filter: drop-shadow(0 0 6px #fff1a8); }
+/* celular deitado: o balão não fica embaixo do botão Continuar */
+@media (orientation: landscape) and (max-height: 520px) {
+  html.flowfoot .screen.stage:has(> .cut) > #cb, html.flowfoot #stage:has(> .scene.cap) > #bub { width: auto; justify-self: start; margin-left: 2%; margin-right: 150px; max-width: 74%; }
+}
+.map-banner.hook span { display: block; }
