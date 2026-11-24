@@ -91,7 +91,7 @@ STEPS.boss = function (step, ctx) {
   Audio8.energy = 1; onCleanup(() => { Audio8.energy = 0; });
   const D = G.diff, goal = D === 'exp' ? 9 : D === 'inv' ? 13 : 17, hits = D === 'exp' ? 1 : D === 'inv' ? 2 : 3;
   const met = G.album.filter(id => CHARACTERS[id]), helperId = met.length ? met[met.length - 1] : 'denise', heroes = (met.length ? met : ['denise', 'pedro', 'cida']).slice(-8);
-  const folks = ['theo', 'bia', 'iara', 'davi', 'theo', 'bia'].map((id, i) => ({ id, x: 14 + i * 24, smog: null }));
+  const folks = ['theo', 'bia', 'iara', 'davi', 'neide', 'olimpia'].map((id, i) => ({ id, x: 14 + i * 24, smog: null }));
   let phase = 1, cleared = 0, smogs = [], tick = 0, done = false, hp = 100, helper = null, helperT = 0, me = { x: 74 };
   ctx.stage.innerHTML = `<div class="mg job bossg">${mgHead('faisca', 'A Névoa está soltando <b>poluição</b>! Toque na fumaça para <b>aspirar</b> e salvar os moradores!')}
     <div class="scene jobscene bossscene" id="js"><img class="bg px" src="${composeScene('festa').toDataURL()}" alt="Praça à noite com a Névoa"><div class="bossdark" id="bd"></div><div class="layer" id="lay"></div>
@@ -249,6 +249,7 @@ const HERO_TIPS = {
 };
 function heroTip(id, step, err) {
   const tips = HERO_TIPS[step.t]; if (!tips || !document.body.contains($('#stage'))) return;
+  if (typeof flowOn === 'function' && flowOn()) return; /* no modo fluido quem fala é o personagem dentro da cena */
   const who = (MISSIONS[id] && MISSIONS[id].char) || 'faisca';
   RUN.tipK = (RUN.tipK || 0) + (err ? 1 : 0);
   if (err && RUN.tipT && Date.now() - RUN.tipT < 2500) return; RUN.tipT = Date.now();

@@ -600,18 +600,21 @@ function screenReward(id, first, stars = 1, info = {}) {
   const nWin = 6, on = Math.round(nWin * rp.plan.filter(m => G.done[m]).length / rp.plan.length);
   Audio8.sfx(regionDone ? 'win' : 'light'); if (first) confetti(regionDone ? 90 : 40);
   const p = Math.round(progress() * 100);
-  app().innerHTML = `<div class="screen reward">
-    <h2>${regionDone ? `${esc(r.name)} restaurado!` : 'Lumiara ganhou mais luz!'}</h2>
-
-    <div class="star-big">${starsHTML(stars)}</div>
-    <p class="star-why">${starsHTML(1, 1)} Missão concluída &nbsp; ${starsHTML((info.mistakes || 0) <= DIFFS[G.diff].star ? 1 : 0, 1)} Poucos tropeços (${info.mistakes || 0}) &nbsp; ${starsHTML((info.hints || 0) === 0 ? 1 : 0, 1)} Sem pedir dica${stars < 3 ? '<br><span style="opacity:.85">Quer as 3 estrelas? Dá para jogar a missão de novo pela região.</span>' : ''}</p>
-    <div class="windows" aria-label="${on} de ${nWin} janelas acesas">${Array.from({ length: nWin }, (_, i) => `<div class="win ${i < on ? 'on' : ''}" style="--d:${i * .15}s"></div>`).join('')}</div>
-    <div style="width:min(520px,100%)" class="lights"><div class="hud" style="margin:0"><span class="lbl">Luz de Lumiara</span><div class="bar"><i style="width:${p}%"></i></div><span class="pct">${p}%</span></div></div>
-    <div class="row center" style="align-items:flex-start">${charCardHTML(M.char).replace('class="cardbig"', 'class="cardbig" style="--rc:' + r.color + ';width:260px"')}
-      <div style="display:grid;gap:10px;max-width:420px;text-align:left">
-        <div class="fact" style="color:var(--ink)"><p>Sem <b>${esc(c.name)}</b>, a cidade não funciona!</p></div>
-        <div class="medal-row">${medalsHTML()}</div></div></div>
-    <div class="row center"><button class="btn primary big" id="go">${progress() >= 1 ? 'Ir para o grande final' : 'Continuar a história'} ${ICON.next}</button></div></div>`;
+  const thank = personal((typeof THANK !== 'undefined' && THANK[M.char]) || 'Obrigado por me ajudar!');
+  app().innerHTML = `<div class="screen reward rw2">
+    <div class="rwL">${charCardHTML(M.char).replace('class="cardbig"', 'class="cardbig" style="--rc:' + r.color + '"')}</div>
+    <div class="rwR">
+      <h2>${regionDone ? `${esc(r.name)} restaurado!` : 'Lumiara ganhou mais luz!'}</h2>
+      <div class="thankbub"><img class="px" src="${SPR.url(M.char)}" alt=""><p><b>${esc(c.name)}:</b> “${esc(thank)}”</p></div>
+      ${(() => { const rf = M.steps.find(x => x.t === 'reflect'), q = (rf && rf.challenge) || (typeof LIFE_QUEST !== 'undefined' && LIFE_QUEST[M.char]); return q ? `<p class="lifequest">${SPR.img('estrela')} <b>Missão na vida real:</b> ${esc(q)}</p>` : ''; })()}
+      <div class="star-big">${starsHTML(stars)}</div>
+      <p class="star-why">${starsHTML(1, 1)} Missão concluída &nbsp; ${starsHTML((info.mistakes || 0) <= DIFFS[G.diff].star ? 1 : 0, 1)} Poucos tropeços (${info.mistakes || 0}) &nbsp; ${starsHTML((info.hints || 0) === 0 ? 1 : 0, 1)} Sem pedir dica</p>
+      <div class="windows" aria-label="${on} de ${nWin} janelas acesas">${Array.from({ length: nWin }, (_, i) => `<div class="win ${i < on ? 'on' : ''}" style="--d:${i * .15}s"></div>`).join('')}</div>
+      <div class="lights"><div class="hud" style="margin:0"><span class="lbl">Luz de Lumiara</span><div class="bar"><i style="width:${p}%"></i></div><span class="pct">${p}%</span></div></div>
+      <div class="medal-row">${medalsHTML()}</div>
+      <div class="row center"><button class="btn primary big" id="go">${progress() >= 1 ? 'Ir para o grande final' : 'Continuar a história'} ${ICON.next}</button></div>
+    </div></div>`;
+  if (S.autoRead) Voice.speak(c.name + ' diz: ' + thank);
   $('#go').onclick = () => {
     if (regionDone && first) { const rs = planRegions(); go(screenInterlude, r.id, rs.filter(x => regionState(x.id) === 'done').length, rs.length); }
     else goNextMission();

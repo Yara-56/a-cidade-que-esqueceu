@@ -101,89 +101,113 @@ STEPS.fire = function (step, ctx) {
 
 /* ---------------- SANEAMENTO: o caminho da água ---------------- */
 STEPS.water = function (step, ctx) {
+  /* A jornada da Gotinha: do rio sujo até a torneira da família, com uma ação diferente em cada parada */
   energize();
   const ST = [
-    { id: 'bomba', x: 21, y: 52, w: 14, h: 18, say: 'Ligue a <b>bomba</b> para puxar a água do rio!', tag: 'Captação' },
-    { id: 'grade', x: 37, y: 52, w: 13, h: 20, say: 'Tire o <b>lixo</b> da grade!', tag: 'Grade', trash: 3 },
-    { id: 'mistura', x: 53, y: 50, w: 18, h: 22, say: '<b>Mexa</b> para a sujeira grudar em bolinhas!', tag: 'Floculação', taps: 4 },
-    { id: 'decanta', x: 73, y: 50, w: 18, h: 22, say: 'Toque e <b>espere</b> a sujeira descer...', tag: 'Decantação', wait: 1800 },
-    { id: 'filtro', x: 93, y: 50, w: 14, h: 22, say: 'Passe pelo <b>filtro</b> de areia e carvão!', tag: 'Filtração' },
-    { id: 'cloro', x: 108, y: 54, w: 10, h: 14, say: 'Só <b>uma gotinha</b> de cloro!', tag: 'Cloro' },
-    { id: 'reserva', x: 120, y: 30, w: 18, h: 36, say: 'Encha o <b>reservatório</b>!', tag: 'Reservatório' },
-    { id: 'casa', x: 139, y: 40, w: 21, h: 32, say: 'Abra a <b>torneira</b> da casa!', tag: 'Sua casa' }];
-  const COL = ['#7a5a33', '#7a5a33', '#86704a', '#8e8a6a', '#9cc3cf', '#7fd0f0', '#5fb8ff', '#5fb8ff', '#5fb8ff'];
-  let k = 0, taps = 0, trash = 0, busy = false, done = false, t = 0;
-  ctx.stage.innerHTML = `<div class="mg job">${mgHead('tania', ST[0].say)}
-    <div class="scene jobscene" id="js"><canvas class="px" id="wc" width="160" height="90" aria-label="Estação de tratamento de água"></canvas><div class="layer" id="lay"></div>
-      ${ST.map((s, i) => hotBtn(s.x, s.y, s.w, s.h, `data-st="${i}" aria-label="${s.tag}"`)).join('')}<div class="mgsay" id="say"></div></div>
+    { tag: 'Rio', say: 'A Gotinha está suja lá no rio! <b>Toque na bomba</b> para puxar ela.', x: 22, act: 'pump', n: 3 },
+    { tag: 'Grade', say: 'Vem lixo junto! <b>Toque no lixo</b> antes que ele entre no cano.', x: 42, act: 'catch', n: 4 },
+    { tag: 'Mistura', say: '<b>Mexa a água</b> para a sujeira grudar em bolinhas!', x: 62, act: 'stir', n: 5 },
+    { tag: 'Descanso', say: '<b>Segure o botão</b> e espere a sujeira afundar...', x: 80, act: 'hold', ms: 1800 },
+    { tag: 'Filtro', say: 'Monte o filtro de baixo pra cima: <b>pedrinhas, areia, carvão</b>!', x: 97, act: 'build' },
+    { tag: 'Cloro', say: 'Quanto cloro mata os germes sem fazer mal?', x: 112, act: 'ask' },
+    { tag: 'Casa', say: 'A família está esperando! <b>Abra a torneira!</b>', x: 146, act: 'tap' }];
+  const COL = ['#7a5a33', '#7a5a33', '#86704a', '#8e8a6a', '#a9c9d0', '#7fd0f0', '#5fb8ff', '#5fb8ff'];
+  let k = 0, cnt = 0, busy = false, done = false, t = 0, floc = 0, sed = 0, layers = [], glass = 0, gx = 8, gy = 58;
+  ctx.stage.innerHTML = `<div class="mg job water2">${mgHead('tania', ST[0].say)}
+    <div class="scene jobscene" id="js"><canvas class="px" id="wc" width="160" height="90" aria-label="Caminho da água"></canvas><div class="layer" id="lay"></div><div class="mgsay" id="say"></div><div class="wctl" id="wctl"></div></div>
     <div class="wsteps">${ST.map((s, i) => `<span data-w="${i}">${s.tag}</span>`).join('<i>›</i>')}</div></div>`;
   wireSay(ctx.stage, () => ST[k] ? ST[k].say.replace(/<[^>]+>/g, '') : 'Água limpinha!');
-  const cv = $('#wc', ctx.stage), g = cv.getContext('2d'), say = $('#say', ctx.stage), lay = $('#lay', ctx.stage), sc = $('#js', ctx.stage);
+  const cv = $('#wc', ctx.stage), g = cv.getContext('2d'), lay = $('#lay', ctx.stage), sc = $('#js', ctx.stage), ctl = $('#wctl', ctx.stage);
   const P = (c, x, y, w = 1, h = 1) => { g.fillStyle = col(c); g.fillRect(x, y, w, h); };
-  let floc = 0, sed = 0, res = 0, glass = 0;
+  /* a Gotinha, que fica limpa aos poucos */
+  const drop = spriteEl('gotasuja', gx, gy, { w: 12, cls: 'gotinha' }); lay.appendChild(drop);
+  const moveDrop = () => { const x = (ST[Math.min(k, ST.length - 1)].x) - 6; drop.style.left = pct(x, SW); drop.style.top = pct(k >= 6 ? 40 : 46, SH); if (k >= 4) drop.src = SPR.url('gota'); };
+  /* família da casa: cinza e tristinha até a água chegar */
+  const fam = ['theo', 'bia'].map((id, i) => { const e = spriteEl(id, 128 + i * 12, 58, { w: 11 }); e.classList.add('famsad'); lay.appendChild(e); return e; });
   const draw = () => {
     t++;
     P('skyD', 0, 0, 160, 20); P('sky', 0, 12, 160, 30); P('#cfeefa', 0, 34, 160, 8);
     P('greenD', 0, 40, 160, 4); P('green', 0, 44, 160, 46); for (let i = 0; i < 40; i++) P('greenL', (i * 37) % 160, 46 + (i * 11) % 40, 2, 1);
-    /* rio */
-    P('#6e5a3a', 0, 46, 20, 44); for (let i = 0; i < 6; i++) P('#8a7450', (t + i * 7) % 20, 52 + i * 6, 5, 1);
-    /* cano principal */
-    P('ink', 18, 69, 124, 5); P('greyL', 18, 70, 124, 3);
-    for (let i = 0; i < ST.length; i++) { const x0 = i ? ST[i - 1].x + ST[i - 1].w : 18, x1 = ST[i].x; if (i <= k - 1 || (i === k && k > 0)) { for (let x = x0; x < x1; x++) if ((x + t) % 4) P(COL[Math.min(i, 8)], x, 71, 1, 1); } }
-    /* bomba */
-    P('ink', 21, 52, 14, 18); P('greyL', 22, 53, 12, 16); P('red', 24, 56, 8, 8); P('white', 27, 59, 2, 2); if (k > 0) P('green', 32, 54, 2, 2);
-    /* grade */
-    P('#6e5a3a', 37, 60, 13, 12); for (let x = 38; x < 50; x += 3) P('ink', x, 52, 1, 20); P('greyD', 37, 52, 13, 1);
-    /* floculação */
-    P('ink', 53, 50, 18, 22); P(k > 2 ? COL[3] : COL[2], 54, 54, 16, 17); P('greyL', 54, 51, 16, 3);
-    if (floc) for (let i = 0; i < 6; i++) P('#5e4a2a', 56 + ((i * 5 + t * (k === 2 ? 1 : 0)) % 12), 57 + (i * 3) % 12, 2, 2);
-    /* decantação */
-    P('ink', 73, 50, 18, 22); P(k > 3 ? COL[4] : COL[3], 74, 54, 16, 17); P('greyL', 74, 51, 16, 3); P('#5e4a2a', 74, 71 - sed, 16, sed);
-    /* filtro */
-    P('ink', 93, 50, 14, 22); P(k > 4 ? COL[5] : '#9cc3cf', 94, 52, 12, 6); P('tan', 94, 58, 12, 5); P('ink', 94, 63, 12, 3); P('grey', 94, 66, 12, 5);
-    /* cloro */
-    P('ink', 108, 54, 10, 14); P('white', 109, 57, 8, 10); P('green', 109, 61, 8, 3); P('greyD', 111, 55, 4, 2);
-    /* reservatório na torre */
-    P('ink', 122, 46, 1, 24); P('ink', 136, 46, 1, 24); P('ink', 121, 30, 17, 17); P('greyL', 122, 31, 15, 15); P('#5fb8ff', 122, 46 - res, 15, res);
-    /* casa com caixa d'água e torneira */
-    P('ink', 140, 50, 19, 22); P('cream', 141, 51, 17, 20); P('ink', 138, 45, 23, 6); P('red', 139, 46, 21, 4); P('ink', 150, 40, 8, 6); P('blue', 151, 41, 6, 4);
-    P('ink', 143, 54, 6, 6); P('glass', 144, 55, 4, 4); P('greyD', 152, 58, 5, 2); P('greyD', 155, 58, 2, 4);
-    if (k >= 8) { if (t % 2) P('#5fb8ff', 156, 62, 1, 3); P('ink', 152, 64, 6, 7); P('glass', 153, 65, 4, 5); P('#5fb8ff', 153, 70 - glass, 4, glass); }
+    P('#6e5a3a', 0, 46, 16, 44); for (let i = 0; i < 6; i++) P('#8a7450', (t + i * 7) % 16, 52 + i * 6, 4, 1);
+    P('ink', 14, 69, 110, 5); P('greyL', 14, 70, 110, 3);
+    for (let x = 14; x < 124; x++) { const st = ST.findIndex(s => s.x > x); const idx = st < 0 ? 6 : st; if (idx <= k && (x + t) % 4) P(COL[Math.min(idx, 7)], x, 71, 1, 1); }
+    /* bomba */ P('ink', 17, 52, 12, 17); P('greyL', 18, 53, 10, 15); const r = (t * (k === 0 ? cnt + 1 : 0)) % 4; P('red', 20 + (r % 2) * 2, 56 + (r > 1 ? 2 : 0), 4, 4); if (k > 0) P('green', 26, 54, 2, 2);
+    /* grade */ P('#6e5a3a', 36, 58, 12, 11); for (let x = 37; x < 48; x += 3) P('ink', x, 52, 1, 17); P('greyD', 36, 52, 12, 1);
+    /* mistura */ P('ink', 54, 50, 16, 19); P(k > 2 ? COL[3] : COL[2], 55, 54, 14, 14); P('greyL', 55, 51, 14, 3); for (let i = 0; i < 6; i++) { const big = floc >= 3; P('#5e4a2a', 56 + ((i * 5 + t * (k === 2 ? 1 : 0)) % 11), 56 + (i * 3) % 10, big ? 3 : 1, big ? 2 : 1); }
+    /* descanso */ P('ink', 72, 50, 16, 19); P(k > 3 ? COL[4] : COL[3], 73, 54, 14, 14); P('greyL', 73, 51, 14, 3); P('#5e4a2a', 73, 68 - sed, 14, sed);
+    /* filtro: camadas montadas */ P('ink', 90, 46, 14, 23); P('#e8f4f8', 91, 47, 12, 21); const LC = { pedra: 'grey', areia: 'tan', carvao: 'ink' }; layers.forEach((l, i) => P(LC[l], 91, 63 - i * 5, 12, 5));
+    /* cloro */ P('ink', 108, 54, 9, 14); P('white', 109, 57, 7, 10); P('green', 109, 61, 7, 3); P('greyD', 110, 55, 4, 2);
+    /* casa */ P('ink', 126, 44, 32, 4); P('red', 127, 45, 30, 2); P('ink', 128, 48, 28, 22); P('cream', 129, 49, 26, 20); P('ink', 150, 52, 6, 6); P('glass', 151, 53, 4, 4); P('greyD', 140, 52, 5, 2); P('greyD', 143, 52, 2, 4);
+    if (k >= 6 && glass > 0) { if (t % 2) P('#5fb8ff', 143, 56, 1, 4); P('ink', 140, 60, 6, 8); P('glass', 141, 61, 4, 6); P('#5fb8ff', 141, 67 - glass, 4, glass); }
   };
-  const loop = setInterval(draw, 120); onCleanup(() => clearInterval(loop)); draw();
+  const loop = setInterval(draw, 110); onCleanup(() => clearInterval(loop)); draw();
+  const hotAt = (x, w = 16, extra = '') => { const b = document.createElement('button'); b.className = 'jhot glow'; b.style.left = pct(x - w / 2, SW); b.style.top = pct(46, SH); b.style.width = pct(w, SW); b.style.height = pct(26, SH); b.innerHTML = extra; sc.appendChild(b); return b; };
+  let hot = null;
+  const clearCtl = () => { ctl.innerHTML = ''; if (hot) { hot.remove(); hot = null; } };
+  const next = () => {
+    clearCtl(); k++; cnt = 0; ctx.nextTurn(); Audio8.sfx('ok');
+    if (k >= ST.length) return finish();
+    setHead(ctx, pick(['Isso! A Gotinha está ficando limpa!', 'Muito bem!', 'Olha a cor da água mudando!']));
+    busy = true; setTimeout(() => { busy = false; showStep(); }, 1000);
+  };
   const showStep = () => {
     $$('.wsteps span', ctx.stage).forEach((e, i) => e.className = i < k ? 'ok' : i === k ? 'now' : '');
-    $$('.jhot', ctx.stage).forEach(b => b.classList.toggle('glow', +b.dataset.st === k));
-    if (ST[k]) setHead(ctx, ST[k].say);
-    if (ST[k] && ST[k].trash) {
-      ['garrafa', 'folhas', 'saco'].forEach((p, i) => { const b = document.createElement('button'); b.className = 'trashit'; b.dataset.tr = i; b.style.left = pct(37 + i * 3, SW); b.style.top = pct(54 + i * 5, SH); b.style.width = pct(10, SW); b.innerHTML = SPR.img(p); lay.appendChild(b);
-        b.onclick = () => { if (b.classList.contains('gone')) return; ctx.activity(); b.classList.add('gone'); trash++; Audio8.sfx('found'); setTimeout(() => b.remove(), 400); if (trash >= 3) next(); }; });
+    moveDrop(); const s = ST[k]; setHead(ctx, s.say);
+    if (s.act === 'pump' || s.act === 'stir' || s.act === 'tap') {
+      hot = hotAt(s.x, s.act === 'tap' ? 14 : 16);
+      hot.onclick = () => { if (busy || done) return; ctx.activity(); cnt++; Audio8.sfx('step');
+        if (s.act === 'stir') { floc = cnt; floatText(sc, 'Mexe!', s.x / SW * 100, 48); }
+        if (s.act === 'pump') floatText(sc, 'Puxa!', s.x / SW * 100, 48);
+        if (s.act === 'tap') { busy = true; const iv = setInterval(() => { glass = Math.min(6, glass + 1); if (glass >= 6) { clearInterval(iv); busy = false; finish(); } }, 200); onCleanup(() => clearInterval(iv)); return; }
+        if (cnt >= s.n) next(); };
+    }
+    if (s.act === 'catch') {
+      const items = ['garrafa', 'folhas', 'saco', 'garrafa']; let left = s.n;
+      items.forEach((p, i) => setTimeout(() => {
+        if (done || k !== 1) return; const e = spriteEl(p, 14, 56 + (i % 2) * 4, { w: 9, cls: 'pick qte' }); lay.appendChild(e); let x = 14;
+        const mv = setInterval(() => { if (!e.isConnected) return clearInterval(mv); x += .35; if (x > 34) x = 14; e.style.left = pct(x, SW); }, 40); onCleanup(() => clearInterval(mv));
+        e.onclick = () => { if (e.classList.contains('gone')) return; ctx.activity(); e.classList.add('gone'); Audio8.sfx('found'); sparkle(e, 4); setTimeout(() => e.remove(), 300); if (--left <= 0) next(); };
+      }, i * 700));
+    }
+    if (s.act === 'hold') {
+      ctl.innerHTML = `<button class="btn big holdb" id="hb">⏳ Segure para esperar</button>`; const hb = $('#hb', ctl); let iv = null, el = 0;
+      const stop = () => { clearInterval(iv); iv = null; hb.classList.remove('on'); };
+      hb.addEventListener('pointerdown', e => { e.preventDefault(); if (busy || iv) return; ctx.activity(); hb.classList.add('on'); iv = setInterval(() => { el += 100; sed = Math.min(6, Math.round(el / 300)); hb.style.setProperty('--p', Math.min(100, el / s.ms * 100) + '%'); if (el >= s.ms) { stop(); next(); } }, 100); });
+      ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => hb.addEventListener(ev, stop));
+      hb.onclick = () => { if (!iv && el < s.ms) setHead(ctx, '<b>Segure</b> o botão apertado... a sujeira afunda devagar!'); };
+      hb._auto = () => { el = s.ms; sed = 6; next(); };
+    }
+    if (s.act === 'build') {
+      const order = ['pedra', 'areia', 'carvao'], L = { pedra: 'Pedrinhas', areia: 'Areia', carvao: 'Carvão' };
+      ctl.innerHTML = shuffle(order).map(l => `<button class="btn big" data-l="${l}">${L[l]}</button>`).join('');
+      $$('[data-l]', ctl).forEach(b => b.onclick = () => { if (busy) return; ctx.activity(); const want = order[layers.length];
+        if (b.dataset.l === want) { layers.push(want); b.disabled = true; Audio8.sfx('found'); if (layers.length === 3) next(); }
+        else { ctx.mistake(); Audio8.sfx('soft'); b.classList.add('shake'); setTimeout(() => b.classList.remove('shake'), 400); setHead(ctx, `<b>Tânia:</b> Embaixo vão as coisas mais pesadas! Agora: <b>${L[want]}</b>.`); } });
+    }
+    if (s.act === 'ask') {
+      ctl.innerHTML = ['Um balde inteiro', 'Uma gotinha certinha', 'Nada de cloro'].map((o, i) => `<button class="btn big" data-o="${i}">${o}</button>`).join('');
+      $$('[data-o]', ctl).forEach(b => b.onclick = () => { if (busy) return; ctx.activity(); if (b.dataset.o === '1') { Audio8.sfx('found'); setHead(ctx, '<b>Tânia:</b> Isso! Na medida certa, o cloro mata os germes e não faz mal.'); busy = true; setTimeout(() => { busy = false; next(); }, 1800); }
+        else { ctx.mistake(); Audio8.sfx('soft'); setHead(ctx, b.dataset.o === '0' ? '<b>Tânia:</b> Demais faz mal pra gente!' : '<b>Tânia:</b> Sem cloro, os germes deixam as pessoas doentes!'); } });
     }
   };
-  const next = () => { k++; ctx.nextTurn(); Audio8.sfx('ok'); if (k >= ST.length) return finish(); mgSay(say, pick(['Isso!', 'A água está ficando limpa!', 'Muito bem!'])); showStep(); };
-  $$('.jhot', ctx.stage).forEach(b => b.onclick = () => {
-    if (done || busy) return; ctx.activity();
-    const i = +b.dataset.st, s = ST[k];
-    if (i !== k) { ctx.mistake(); Audio8.sfx('soft'); mgSay(say, `Ainda não! Agora é: ${s.tag}.`, 'soft'); return; }
-    if (s.trash) { mgSay(say, 'Toque em cada lixo preso na grade!', 'info'); return; }
-    if (s.taps) { taps++; floc = taps; Audio8.sfx('step'); floatText(sc, 'Mexe!', 60 + taps * 3, 50); if (taps >= s.taps) next(); return; }
-    if (s.wait) { busy = true; const iv = setInterval(() => { sed = Math.min(5, sed + 1); }, 300); setTimeout(() => { clearInterval(iv); busy = false; next(); }, s.wait); return; }
-    if (s.id === 'reserva') { busy = true; const iv = setInterval(() => { res = Math.min(14, res + 2); if (res >= 14) { clearInterval(iv); busy = false; next(); } }, 120); onCleanup(() => clearInterval(iv)); return; }
-    if (s.id === 'casa') { k = 8; busy = true; const iv = setInterval(() => { glass = Math.min(5, glass + 1); if (glass >= 5) { clearInterval(iv); busy = false; finish(); } }, 220); onCleanup(() => clearInterval(iv)); return; }
-    next();
-  });
   const finish = () => {
-    done = true; k = 8; Audio8.sfx('win'); confetti(40);
-    $$('.wsteps span', ctx.stage).forEach(e => e.className = 'ok'); $$('.jhot', ctx.stage).forEach(b => b.classList.remove('glow'));
-    setHead(ctx, '<b>Água limpinha na torneira!</b> Muita gente trabalhou para ela chegar aqui.');
-    if (S.autoRead) Voice.speak('Água limpinha na torneira! Muita gente trabalhou para ela chegar aqui.');
+    done = true; clearCtl(); Audio8.sfx('win'); confetti(40);
+    fam.forEach(e => { e.classList.remove('famsad'); e.classList.add('famhappy'); });
+    $$('.wsteps span', ctx.stage).forEach(e => e.className = 'ok');
+    setHead(ctx, '<b>Água limpinha na torneira!</b> A Tânia e muita gente trabalham todo dia pra ela chegar assim.');
+    if (S.autoRead) Voice.speak('Água limpinha na torneira! A Tânia e muita gente trabalham todo dia pra ela chegar assim.');
     ctx.complete();
   };
-  showStep(); setTimeout(() => demoTap($('.jhot[data-st="0"]', ctx.stage)), 500);
+  showStep(); moveDrop();
   return {
     speak: () => ST[k] ? ST[k].say.replace(/<[^>]+>/g, '') : 'Água limpinha!',
-    hint() { ctx.usedHint(); showStep(); },
-    autoStep() { if (done || busy) return; const tr = $('.trashit:not(.gone)', ctx.stage); if (tr) return tr.click(); const b = $(`.jhot[data-st="${k}"]`, ctx.stage); if (b) b.click(); }
+    hint() { ctx.usedHint(); const t2 = $('.jhot', sc) || $('.qte:not(.gone)', sc) || $('#wctl button:not(:disabled)', sc); if (t2) { t2.classList.add('glow'); demoTap(t2, 0); } },
+    autoStep() { if (done || busy) return; const s = ST[k]; if (!s) return;
+      if (s.act === 'catch') { const q = $('.qte:not(.gone)', sc); if (q) q.click(); return; }
+      if (s.act === 'hold') { const hb = $('#hb', ctl); if (hb && hb._auto) hb._auto(); return; }
+      if (s.act === 'build') { const want = ['pedra', 'areia', 'carvao'][layers.length]; const b = $(`[data-l="${want}"]`, ctl); if (b) b.click(); return; }
+      if (s.act === 'ask') { const b = $('[data-o="1"]', ctl); if (b) b.click(); return; }
+      if (hot) hot.click(); }
   };
 };
 

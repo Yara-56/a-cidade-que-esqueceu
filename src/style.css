@@ -1469,3 +1469,172 @@ html { font-size: clamp(16px, calc(.55vmin + 10px), 21px); }
 @keyframes fburst { to { width: 260%; height: 460%; opacity: 0; } }
 .scene.cleaned > img.bg { animation: cleanup 1.4s ease-out; } @keyframes cleanup { 30% { filter: brightness(1.6) saturate(1.4); } }
 .cook .reclab { color: #fff; }
+/* jornada da Gotinha */
+.gotinha { z-index: 6; transition: left .8s cubic-bezier(.3,.8,.3,1.2), top .8s; animation: bob 1s ease-in-out infinite; filter: drop-shadow(0 0 4px #fff8); }
+.famsad { filter: grayscale(1) brightness(.75); transition: filter .8s; } .famhappy { animation: herojump .6s ease-out 3; }
+.wctl { position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 12; flex-wrap: wrap; justify-content: center; width: 96%; }
+.wctl .btn { font-size: 1.05rem; box-shadow: 0 0 0 3px #fff1a8, 3px 3px 0 var(--ink); }
+.holdb { position: relative; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+.holdb::before { content: ''; position: absolute; inset: 0; width: var(--p, 0%); background: #a5d97f; z-index: -1; transition: width .1s; }
+.holdb.on { transform: scale(.97); }
+@media (orientation: landscape) and (max-height: 520px) { .wctl .btn { font-size: .85rem; padding: 6px 10px; min-height: 0; } }
+.mg.water2 { grid-template-columns: minmax(0, 1fr) !important; }
+.mg.water2 .wsteps { display: flex; flex-wrap: nowrap; justify-content: center; gap: 3px; overflow: hidden; font-size: .75rem; }
+.mg.water2 .wsteps i { display: none; }
+.mg.water2 .scene.jobscene { max-width: min(100%, calc((100dvh - 120px) * 16 / 9)) !important; }
+@media (orientation: landscape) and (max-height: 520px) { .mg.water2 .scene.jobscene { max-width: calc((100dvh - 46px) * 16 / 9) !important; } .mg.water2 .wsteps { font-size: .62rem; } }
+.footbar.flow #prim.ready { white-space: nowrap; }
+.mg.water2 > * { grid-column: 1 !important; } .mg.water2 > .scene { justify-self: center; width: 100%; }
+/* ===== mais jogo, menos fundo ===== */
+@media (pointer: fine), (min-width: 900px) and (min-height: 600px) {
+  #app { max-width: min(99vw, calc(100dvh * 2.1)) !important; padding-left: 6px !important; padding-right: 6px !important; }
+  .scene.cap { max-width: min(100%, calc((100dvh - 96px) * 16 / 9)) !important; }
+  .screen.stage:has(> .cut) > .cut, #stage:has(> .scene.cap) > .scene.cap { width: min(100%, calc((100dvh - 70px) * 16 / 9)) !important; }
+  .mg .scene.jobscene, .mg .scene.tidyroom, .mg.bossg .scene.jobscene, .mg.catchg .scene.jobscene, .mg.water2 .scene.jobscene { max-width: min(100%, calc((100dvh - 120px) * 16 / 9)) !important; }
+  .cook .kitchen { min-height: calc(100dvh - 260px); }
+}
+/* janelas altas (celular em pé, painel estreito): controles embaixo, cena na largura toda */
+@media (max-aspect-ratio: 6/5) {
+  .mg, .two, .match-wrap { grid-template-columns: minmax(0, 1fr) !important; }
+  .mg > *, .two > * { grid-column: 1 !important; grid-row: auto !important; }
+  .mg .scene.jobscene, .mg .scene.tidyroom { max-width: 100% !important; width: 100%; }
+  .bins { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; }
+}
+/* ===== Um dia com a Dona Cida ===== */
+.mg.tidy.day { display: grid; gap: 8px; grid-template-columns: minmax(0, 1fr); }
+.mg.tidy.day .tidyroom { width: 100%; margin-inline: auto; }
+.mg.tidy.day .mgbar { display: none; }
+.dclock { position: absolute; right: 1.5%; top: 2.5%; z-index: 8; display: flex; align-items: center; gap: 6px; background: #fffdf7f2; border: 3px solid var(--ink); border-radius: 99px; padding: 2px 12px 2px 4px; box-shadow: 0 3px 0 rgba(43,34,51,.3); font-family: var(--title); font-size: 1.1rem; color: var(--ink); }
+.dclock .sun { width: 22px; height: 22px; border-radius: 50%; background: radial-gradient(circle, #fff1a8 0 35%, #f4c542 36% 70%, transparent 71%); box-shadow: 0 0 8px #f4c542; transition: background .6s, box-shadow .6s; }
+.tidyroom[data-hour="3"] .dclock .sun { background: radial-gradient(circle, #ffd0a0 0 35%, #f08a3c 36% 70%, transparent 71%); box-shadow: 0 0 8px #f08a3c; }
+.dclock b { animation: gulp .5s; }
+.dmess { position: absolute; left: 34%; right: 30%; bottom: 1.5%; z-index: 7; display: flex; align-items: center; gap: 6px; background: #2b2233cc; color: #fff; border-radius: 99px; padding: 3px 10px; font-weight: 800; font-size: .8rem; }
+.dmess .bar { flex: 1; height: 9px; background: #fff3; border-radius: 99px; overflow: hidden; }
+.dmess .bar i { display: block; height: 100%; background: linear-gradient(90deg, #d9534f, #f08a3c); transition: width .4s; }
+.dmess b { color: var(--glow); font-family: var(--title); min-width: 26px; }
+.dusk { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, #ff9a5a55, #5a3d8a66); opacity: 0; transition: opacity 1.6s; z-index: 2; }
+.tidyroom.evening .dusk { opacity: 1; }
+.tidyroom.sunny::before { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none; background: radial-gradient(circle at 70% 8%, #fff7c2cc, transparent 55%); animation: shine 1.6s ease-out; }
+.dsteps span { white-space: nowrap; }
+.cidawork { z-index: 3; transition-property: left, top; transition-timing-function: ease-in-out; }
+.dline { position: absolute; height: 3px; background: #8a6a4a; border-radius: 3px; box-shadow: 0 2px 0 #0003; z-index: 3; }
+.dline::before, .dline::after { content: ''; position: absolute; top: -2px; width: 6px; height: 60px; background: #8a6a4a; border-radius: 3px; }
+.dline::before { left: -3px; } .dline::after { right: -3px; }
+.dbasket { position: absolute; z-index: 3; pointer-events: none; } .dbasket img { width: 100%; }
+.wetc { position: absolute; z-index: 5; border: 0; background: none; padding: 0; cursor: pointer; transition: left .55s cubic-bezier(.3,1.3,.5,1), top .55s cubic-bezier(.3,1.3,.5,1), transform .3s; animation: wiggle 1.1s ease-in-out infinite; }
+.wetc img { width: 100%; display: block; filter: hue-rotate(var(--hue, 0deg)) saturate(.7) brightness(.85) drop-shadow(2px 2px 0 #0006); transition: filter .8s; }
+.wetc .drip { position: absolute; left: 45%; bottom: -10%; width: 10%; height: 14%; background: #7fd0f0; border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%; animation: drip 1s ease-in infinite; }
+@keyframes drip { from { transform: translateY(0); opacity: 1; } to { transform: translateY(160%); opacity: 0; } }
+.wetc.hung { animation: sway 2.2s ease-in-out infinite; cursor: default; transform-origin: 50% 0; }
+@keyframes sway { 50% { transform: rotate(5deg); } }
+.wetc.dry img { filter: hue-rotate(var(--hue, 0deg)) drop-shadow(0 0 6px #fff1a8) drop-shadow(2px 2px 0 #0006); }
+.wetc.dry .drip { display: none; }
+.wetc.gone { animation: gone .4s forwards; }
+.shirt img.px { filter: hue-rotate(var(--hue, 0deg)); }
+.scbub { z-index: 9; font-size: clamp(.75rem, 1.6vw, 1.05rem); white-space: normal; max-width: 46%; text-align: center; }
+@media (min-width: 701px) and (min-height: 521px) {
+  .mg.tidy.day { grid-template-columns: minmax(0, 1fr) 132px; align-items: start; }
+  .mg.tidy.day .tidyroom { grid-column: 1; grid-row: 1; width: min(100%, calc((100dvh - 74px) * 16 / 9)); }
+  .mg.tidy.day .bins { grid-column: 2; grid-row: 1; grid-template-columns: 1fr; align-self: center; }
+  .mg.tidy.day .dsteps { grid-column: 1 / -1; grid-row: 2; }
+  .mg.tidy.day:has(.bins[hidden]) { grid-template-columns: minmax(0, 1fr); }
+  .mg.tidy.day:has(.bins[hidden]) .tidyroom { width: min(100%, calc((100dvh - 74px) * 16 / 9)); }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  .mg.tidy.day { grid-template-columns: minmax(0, 1fr) 104px; align-items: start; gap: 4px 6px; }
+  .mg.tidy.day .tidyroom { grid-column: 1; grid-row: 1; width: min(100%, calc((100dvh - 46px) * 16 / 9)); }
+  .mg.tidy.day .bins { grid-column: 2; grid-row: 1; grid-template-columns: 1fr; gap: 4px; }
+  .mg.tidy.day .dsteps { grid-column: 1 / -1; font-size: .65rem; }
+  .dclock { font-size: .8rem; padding: 0 8px 0 2px; } .dclock .sun { width: 16px; height: 16px; }
+}
+@media (max-width: 700px) and (orientation: portrait) { .mg.tidy.day .bins { grid-template-columns: repeat(4, 1fr); gap: 5px; } .mg.tidy.day .tbin { font-size: .68rem; padding: 4px 2px; } .mg.tidy.day .tbin img.px { width: 34px; height: 34px; } .dsteps { font-size: .62rem; } .dclock { font-size: .8rem; } }
+/* ===== cozinha do Seu Zé dentro da cena ===== */
+.kitchen2 { position: relative; }
+.kitchen2 .potc { position: absolute; left: 22%; bottom: 4%; width: 46%; image-rendering: pixelated; cursor: pointer; z-index: 3; filter: drop-shadow(3px 4px 0 #0004); }
+.kitchen2 .stepdots { left: auto; right: 2%; top: auto; bottom: 3%; z-index: 4; background: #2b2233aa; padding: 4px 6px; border-radius: 99px; }
+.kitchen2 .clock { z-index: 6; top: 14%; }
+.zecook { z-index: 2; animation: bob 1.6s ease-in-out infinite; }
+.mg.cook:has(.kitchen2) { display: grid; gap: 8px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 701px) and (min-height: 521px) {
+  .mg.cook:has(.kitchen2) { grid-template-columns: minmax(0, 1fr) minmax(240px, 300px); align-items: center; }
+  .mg.cook .kitchen2 { grid-column: 1; grid-row: 1 / span 2; width: min(100%, calc((100dvh - 60px) * 16 / 9)); justify-self: center; min-height: 0; }
+  .mg.cook:has(.kitchen2) .counter { grid-column: 2; grid-row: 1; align-self: end; }
+  .mg.cook:has(.kitchen2) .tray { grid-column: 2; grid-row: 2; align-self: start; grid-template-columns: repeat(3, 1fr); }
+  .mg.cook:has(.kitchen2) .chipi { font-size: .78rem; }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  .mg.cook:has(.kitchen2) { grid-template-columns: minmax(0, 1fr) 220px; gap: 4px 6px; align-items: start; }
+  .mg.cook .kitchen2 { grid-column: 1; grid-row: 1 / span 2; width: min(100%, calc((100dvh - 24px) * 16 / 9)); padding: 0; }
+  .mg.cook:has(.kitchen2) .counter { grid-column: 2; grid-row: 1; } .mg.cook:has(.kitchen2) .tray { grid-column: 2; grid-row: 2; grid-template-columns: repeat(3, 1fr); }
+  .mg.cook:has(.kitchen2) .chipi { font-size: .62rem; padding: 1px 4px; } .mg.cook:has(.kitchen2) .chipi img.px { width: 14px; height: 14px; }
+}
+/* ===== tela grande: mais jogo, menos fundo ===== */
+@media (min-width: 701px) and (min-height: 521px) {
+  #stage .mg.job .jobscene { width: min(100%, calc((100dvh - 132px) * 16 / 9)) !important; max-width: none !important; justify-self: center; }
+  #stage .mg.job.water2 .jobscene { width: min(100%, calc((100dvh - 70px) * 16 / 9)) !important; }
+  #stage .mg.bossg, #stage .mg.catchg { grid-template-columns: minmax(0, 1fr) 200px; }
+  #stage .mg.bossg .jobscene, #stage .mg.catchg .jobscene { width: min(100%, calc((100dvh - 40px) * 16 / 9)) !important; }
+  .route-wrap { grid-template-columns: auto minmax(220px, 1fr); }
+  .route-wrap .cell { width: min(96px, calc((100dvh - 150px) / var(--gh, 5) - 6px), calc((100vw - 380px) / var(--gw, 7) - 6px)); }
+}
+.cell img.bikeimg { position: absolute; inset: 6%; width: 88%; height: 88%; z-index: 2; }
+html.flowfoot .crossbar { padding-right: 64px; }
+html.flowfoot .mg.job .mgbar { padding-right: 64px; }
+/* recompensa: o trabalhador agradece, tudo cabe na tela */
+.reward.rw2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; justify-items: center; align-content: center; min-height: calc(100dvh - 30px); }
+.rw2 .rwR { display: grid; gap: 8px; justify-items: center; width: min(560px, 100%); }
+.rw2 .rwR h2 { font-size: clamp(1.4rem, 3vw, 2rem); }
+.rw2 .star-big { margin: 0; } .rw2 .star-why { margin: 0; font-size: .85rem; }
+.rw2 .lights { width: min(460px, 100%); }
+.rw2 .windows { transform: scale(.8); margin: -8px 0; }
+.thankbub { display: flex; align-items: flex-end; gap: 8px; animation: tipin .5s .3s cubic-bezier(.2,.9,.3,1.3) both; }
+.thankbub img.px { width: 48px; height: 72px; filter: drop-shadow(0 0 8px #fff1a8); animation: bob 1.3s ease-in-out infinite; }
+.thankbub p { margin: 0 0 18px; background: var(--paper); color: var(--ink); border: 3px solid var(--ink); border-radius: 18px 18px 18px 4px; padding: 8px 14px; box-shadow: 3px 3px 0 var(--ink); font-weight: 700; text-align: left; font-size: 1.02rem; }
+.rw2 .medal-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; width: 100%; }
+.rw2 .medal { padding: 4px; } .rw2 .medal .disc { width: 46px; height: 46px; } .rw2 .medal span { font-size: .72rem; }
+.rw2 .cardbig { width: 240px; }
+@media (min-width: 760px) and (orientation: landscape) {
+  .reward.rw2 { grid-template-columns: 250px minmax(0, 560px); justify-content: center; align-items: center; gap: 24px; }
+}
+@media (max-width: 759px), (orientation: portrait) { .rw2 .rwL { display: none; } }
+@media (orientation: landscape) and (max-height: 520px) { .rw2 .rwL { display: none; } .reward.rw2 { grid-template-columns: 1fr; } .rw2 .windows, .rw2 .star-why { display: none; } .thankbub img.px { width: 36px; height: 54px; } }
+.rw2 .medal { width: auto; } .rw2 .medal .disc img.px { width: 28px; }
+@media (orientation: landscape) and (max-height: 520px) {
+  .mg.job:not(:has(> .mghead)) .jobscene { grid-row: 1 / span 4; }
+  .mg.job:not(:has(> .mghead)) { align-items: center; }
+  .mg.job .jobscene { width: min(100%, calc((100dvh - 24px) * 16 / 9)) !important; }
+  .daysfilm .scene { max-width: min(100%, calc((100dvh - 70px) * 16 / 9)) !important; }
+  .mg.bossg .jobscene, .mg.catchg .jobscene { width: min(100%, calc((100dvh - 24px) * 16 / 9)) !important; }
+}
+.lifequest { margin: 0; background: #2b2233; color: #fff1a8; border: 3px solid var(--ink); border-radius: 14px; padding: 6px 12px; font-weight: 700; font-size: .92rem; display: flex; gap: 8px; align-items: center; text-align: left; box-shadow: 0 0 12px #f4c54244; }
+.lifequest img.px { width: 22px; height: 22px; flex: none; } .lifequest b { color: var(--glow); white-space: nowrap; }
+@media (orientation: landscape) and (max-height: 520px) { .lifequest { font-size: .75rem; padding: 3px 8px; } }
+@media (orientation: landscape) and (max-height: 520px) {
+  .reward.rw2 { gap: 4px; min-height: calc(100dvh - 16px); } .rw2 .rwR { gap: 4px; }
+  .rw2 .rwR h2 { font-size: 1.2rem; } .rw2 .star-big img, .rw2 .star-big svg { width: 30px; height: 30px; } .rw2 .star-big { transform: scale(.7); margin: -8px 0; }
+  .rw2 .medal .disc { width: 28px; height: 28px; } .rw2 .medal .disc img.px { width: 18px; } .rw2 .medal span { font-size: .6rem; } .rw2 .medal { padding: 2px; gap: 1px; } .rw2 .medal .meter { height: 6px; }
+  .thankbub p { font-size: .85rem; padding: 5px 10px; margin-bottom: 8px; }
+  .rw2 #go { padding: 6px 18px; font-size: 1rem; }
+}
+.mg.routeg { gap: 8px; }
+.mg.routeg .mghead { max-width: 100%; }
+@media (min-width: 701px) and (min-height: 521px) { #stage .mg.job.wout .jobscene { width: min(100%, calc((100dvh - 240px) * 16 / 9)) !important; } }
+.mg.bossg .bosshp { top: auto; bottom: 3%; }
+.cw-opts.sw { grid-template-columns: repeat(4, minmax(0, 92px)); }
+@media (orientation: landscape) and (max-height: 520px) { .cw-opts.sw { grid-template-columns: repeat(4, minmax(0, 64px)); } }
+.title-art { width: min(100%, calc(40vh * 16 / 9)); }
+@media (min-width: 701px) and (min-height: 521px), (orientation: landscape) and (max-height: 520px) {
+  .mg.tidy.day:has(> .mghead) > .mghead { grid-column: 1 / -1; grid-row: 1; }
+  .mg.tidy.day:has(> .mghead) .tidyroom, .mg.tidy.day:has(> .mghead) .bins { grid-row: 2; }
+  .mg.tidy.day:has(> .mghead) .dsteps { grid-row: 3; }
+  .mg.tidy.day:has(> .mghead) .tidyroom { width: min(100%, calc((100dvh - 150px) * 16 / 9)); }
+}
+/* sala de aula: há barra do topo e do professor, a cena divide o espaço */
+@media (min-width: 701px) and (min-height: 521px) {
+  html.sala .mg.tidy.day:has(> .mghead) .tidyroom { width: min(100%, calc((100dvh - 300px) * 16 / 9)); }
+  .mg.cook:has(> .mghead):has(.kitchen2) > .mghead { grid-column: 1 / -1; grid-row: 1; }
+  .mg.cook:has(> .mghead) .kitchen2 { grid-row: 2 / span 2 !important; }
+  .mg.cook:has(> .mghead):has(.kitchen2) .counter { grid-row: 2; } .mg.cook:has(> .mghead):has(.kitchen2) .tray { grid-row: 3; }
+  html.sala .mg.cook .kitchen2 { width: min(100%, calc((100dvh - 300px) * 16 / 9)); }
+  html.sala #stage .mg.job .jobscene { width: min(100%, calc((100dvh - 330px) * 16 / 9)) !important; }
+}

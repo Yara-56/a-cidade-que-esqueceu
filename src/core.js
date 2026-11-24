@@ -249,8 +249,10 @@ function speakerInfo(who) {
   if (who[0] === '?') { const id = who.slice(1); return G.album.includes(id) ? { img: SPR.url(id), name: CHARACTERS[id].name } : { img: SPR.url(id, 'sil'), name: '???' }; }
   return { img: SPR.url(who), name: (CHARACTERS[who] && CHARACTERS[who].name) || NAMES[who] || who };
 }
+function myNick() { try { const n = (G && G.players && G.mode === 'solo' && G.players[0].name) || S.myName || ''; return n && !/^(você|jogador|jogadora)\b/i.test(n) ? n : ''; } catch (e) { return ''; } }
+function personal(t) { const n = myNick(); t = String(t); return n ? t.replace(/\{nome\}/g, n) : t.replace(/,\s*\{nome\}/g, '').replace(/\{nome\},\s*/g, '').replace(/\{nome\}/g, 'você'); }
 function bubbleHTML(who, text) {
-  const s = speakerInfo(who);
+  const s = speakerInfo(who); text = personal(text);
   return `<div class="bubble ${who === 'you' || String(who).startsWith('nevoa') ? 'right' : ''} ${String(who).startsWith('nevoa') ? 'villain' : ''}"><div class="who"><div class="face"><img class="px" src="${s.img}" alt=""></div><b>${esc(s.name)}</b></div><div class="text" aria-live="polite"><p>${esc(text)}</p><span class="tapnext" aria-hidden="true">toque para continuar ▸</span></div></div>`;
 }
 /* vida na cidade: vira-lata caramelo, bicicletas, carros e passarinhos (decoração animada) */

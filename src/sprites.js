@@ -173,6 +173,8 @@ const PROPS = {
   grama: { ops: [['greenL', 0, 10, 16, 6], ['green', 0, 13, 16, 3], ['green', 2, 8, 1, 2], ['green', 6, 9, 1, 1], ['green', 10, 8, 1, 2], ['green', 14, 9, 1, 1]] },
   bancoparque: { ops: [['brownL', 0, 6, 16, 3], ['brownL', 0, 2, 16, 3], ['brown', 0, 9, 16, 2], ['greyD', 1, 11, 2, 5], ['greyD', 13, 11, 2, 5]] },
   aspirador: { ops: [['ink', 1, 7, 9, 7], ['purple', 2, 8, 7, 5], ['white', 3, 9, 2, 1], ['ink', 2, 13, 2, 2], ['ink', 7, 13, 2, 2], ['greyD', 9, 9, 3, 1], ['greyD', 11, 4, 1, 6], ['greyD', 11, 3, 4, 1], ['ink', 13, 1, 3, 4], ['yellow', 14, 2, 1, 2]] },
+  gota: { ops: [['ink', 6, 1, 4, 1], ['ink', 5, 2, 1, 2], ['ink', 10, 2, 1, 2], ['ink', 4, 4, 1, 2], ['ink', 11, 4, 1, 2], ['ink', 3, 6, 1, 6], ['ink', 12, 6, 1, 6], ['ink', 4, 12, 1, 2], ['ink', 11, 12, 1, 2], ['ink', 5, 14, 6, 1], ['blue', 6, 2, 4, 2], ['blue', 5, 4, 6, 2], ['blue', 4, 6, 8, 6], ['blue', 5, 12, 6, 2], ['blueL', 5, 5, 2, 3], ['white', 5, 6, 1, 1], ['ink', 6, 8, 1, 2], ['ink', 9, 8, 1, 2], ['pink', 5, 10, 1, 1], ['pink', 10, 10, 1, 1], ['ink', 7, 11, 2, 1]] },
+  gotasuja: { ops: [['ink', 6, 1, 4, 1], ['ink', 5, 2, 1, 2], ['ink', 10, 2, 1, 2], ['ink', 4, 4, 1, 2], ['ink', 11, 4, 1, 2], ['ink', 3, 6, 1, 6], ['ink', 12, 6, 1, 6], ['ink', 4, 12, 1, 2], ['ink', 11, 12, 1, 2], ['ink', 5, 14, 6, 1], ['brown', 6, 2, 4, 2], ['brown', 5, 4, 6, 2], ['brown', 4, 6, 8, 6], ['brown', 5, 12, 6, 2], ['brownL', 5, 5, 2, 3], ['ink', 6, 8, 1, 2], ['ink', 9, 8, 1, 2], ['ink', 7, 12, 2, 1], ['ink', 6, 11, 1, 1], ['ink', 9, 11, 1, 1]] },
   coracao: { ops: [['red', 2, 3, 5, 6], ['red', 9, 3, 5, 6], ['red', 1, 5, 14, 4], ['red', 3, 9, 10, 2], ['red', 5, 11, 6, 2], ['red', 7, 13, 2, 1], ['white', 3, 4, 2, 2]] },
   estrela: { ops: [['yellow', 7, 0, 2, 4], ['yellow', 0, 5, 16, 3], ['yellow', 3, 4, 10, 6], ['yellow', 4, 10, 3, 4], ['yellow', 9, 10, 3, 4], ['yellow', 2, 13, 3, 2], ['yellow', 11, 13, 3, 2], ['yellowL', 6, 5, 2, 2]] },
   casa: { ops: [['cream', 2, 7, 12, 9], ['red', 0, 6, 16, 2], ['red', 2, 4, 12, 2], ['red', 4, 2, 8, 2], ['red', 6, 0, 4, 2], ['brown', 7, 11, 3, 5], ['glass', 3, 9, 3, 3], ['glass', 11, 9, 3, 3]] },
@@ -329,7 +331,7 @@ const LAYERS = {
 const LOOKS = {
   /* tons de pele distribuídos de forma equilibrada entre as profissões (3 de cada tom),
      idades variadas e nenhum padrão entre cor de pele e tipo de trabalho */
-  cida: { S: 's2', H: '#6b3e26', T: 'teal', U: 'tealD', P: 'blue', F: 'brownD', A: 'yellow', layers: ['bun', 'earrings', 'smile'] },
+  cida: { S: 's2', H: '#4a2a1c', T: 'teal', U: 'tealD', P: 'purple', F: 'brownD', A: 'pink', B: 'pinkD', layers: ['bun', 'earrings', 'apron', 'skirt', 'smile'] },
   jorge: { S: 's1', H: '#3a2626', T: 'navy', U: 'ink', P: 'greyD', F: 'ink', B: 'yellow', layers: ['short', 'badge', 'smile'] },
   ze: { S: 's3', H: '#2b2233', T: 'white', U: 'greyL', P: 'greyD', F: 'ink', A: 'orange', B: 'orangeD', W: 'white', layers: ['touca', 'beard', 'apron', 'smile'] },
   katia: { S: 's1', H: '#b5562c', T: 'blueL', U: 'blue', P: 'navy', F: 'ink', G: 'yellow', A: 'pink', layers: ['pony', 'band', 'gloves', 'smile'] },

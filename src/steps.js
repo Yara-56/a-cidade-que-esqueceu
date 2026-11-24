@@ -335,12 +335,14 @@ const STEPS = {
     const key = (x, y) => x + ',' + y;
     const blockAt = (x, y) => g.blocks.find(b => b.x === x && b.y === y);
     const dropAt = (x, y) => g.drops.findIndex(d => d.x === x && d.y === y);
-    ctx.stage.innerHTML = promptHTML(step.prompt) + `<div class="route-wrap"><div class="grid" id="grid" style="grid-template-columns:repeat(${g.w},auto);--gw:${g.w};--gh:${g.h}" role="grid" aria-label="Mapa das entregas"></div>
+    const fl = flowOn() && MISSIONS[RUN.id] && CHARACTERS[MISSIONS[RUN.id].char];
+    const THX = { casa: 'Dona Neide: “Ai, que alegria! Obrigada por lembrar de mim!”', farmacia: 'Seu Osvaldo: “Meu remédio! Agora eu fico bem. Muito obrigado!”', predio: 'Edifício Ipê: “Pizza quentinha! Valeu, Rafa!”', livro: 'Escola: “O lanche chegou! Uhuu!”' };
+    ctx.stage.innerHTML = (fl ? `<div class="mg routeg">${mgHead(MISSIONS[RUN.id].char, step.prompt.replace('remédio primeiro', '<b>remédio primeiro</b>'))}` : promptHTML(step.prompt)) + `<div class="route-wrap"><div class="grid" id="grid" style="grid-template-columns:repeat(${g.w},auto);--gw:${g.w};--gh:${g.h}" role="grid" aria-label="Mapa das entregas"></div>
       <div class="route-side"><div class="drop-list" id="dl"></div><div class="arrows" aria-label="Setas para mover">
         <span></span><button class="btn" data-mv="0,-1" aria-label="Para cima">▲</button><span></span>
         <button class="btn" data-mv="-1,0" aria-label="Para a esquerda">◀</button><button class="btn" id="undo" aria-label="Desfazer">${ICON.undo}</button><button class="btn" data-mv="1,0" aria-label="Para a direita">▶</button>
         <span></span><button class="btn" data-mv="0,1" aria-label="Para baixo">▼</button><span></span></div>
-        <div id="fb"></div></div></div>`;
+        <div id="fb"></div></div></div>${fl ? '</div>' : ''}`;
     wireSay(ctx.stage, () => step.prompt);
     const fb = $('#fb', ctx.stage);
     /* caminho mais curto (desviando de obra e alagamento) */
@@ -391,6 +393,7 @@ const STEPS = {
       if (d >= 0 && !delivered.has(d)) {
         delivered.add(d); Audio8.sfx('found');
         feedback(fb, 'ok', `<b class="kind">Entregue!</b>${esc(g.drops[d].label)}`, g.drops[d].prop);
+        if (fl && THX[g.drops[d].prop]) mgSay(fb, esc(THX[g.drops[d].prop]), 'ok');
         if (delivered.size === g.drops.length) { draw(); feedback(fb, 'ok', `<b class="kind">Tudo entregue!</b>${esc(step.ok)}`, 'bike'); Audio8.sfx('ok'); ctx.complete(); return; }
         ctx.nextTurn();
       }
@@ -614,9 +617,11 @@ const STEPS = {
       </div></div>`;
     Audio8.sfx('reveal'); sparkle($('.cardbig', ctx.stage), 20);
     { /* mini-vídeo: a pessoa chega com o objeto de trabalho e a rotina passa em legendas */
-      const vl = $('#vl', ctx.stage), w = spriteEl(step.char, -18, 54), tool = spriteEl(c.prop, -8, 66, { cls: 'work' });
+      /* na rua, a pessoa fica na calçada (os carros passam pela pista, nunca por cima dela) */
+      const wy = ['ruacasas', 'rua', 'ruanoite', 'portaria'].includes(vscene) ? 40 : 54;
+      const vl = $('#vl', ctx.stage), w = spriteEl(step.char, -18, wy), tool = spriteEl(c.prop, -8, wy + 12, { cls: 'work' });
       vl.appendChild(w); vl.appendChild(tool);
-      setTimeout(() => { moveEl(w, 64, 54, 1600, true); moveEl(tool, 76, 64, 1600); }, 80);
+      setTimeout(() => { moveEl(w, 64, wy, 1600, true); moveEl(tool, 76, wy + 10, 1600); }, 80);
       let k = 0; const cap = $('#vc', ctx.stage);
       const next = () => { if (!document.body.contains(cap)) return; cap.classList.remove('in'); void cap.offsetWidth; cap.textContent = c.routine[k % c.routine.length]; cap.classList.add('in'); k++; if (k % 2 === 0) sparkle(tool, 6); };
       setTimeout(next, 1400); const iv = setInterval(next, 2600); onCleanup(() => clearInterval(iv));

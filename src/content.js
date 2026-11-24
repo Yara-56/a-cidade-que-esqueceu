@@ -232,11 +232,14 @@ const MISSIONS = {
     { t: 'dialog', scene: 'ruacasas', cast: [{ id: 'you', x: 96, y: 34 }], lines: [
       { who: 'faisca', text: 'Corre! Os Fumacinhas estão vindo atrás da gente!' },
       { who: 'you', text: 'Por aqui! Aquela ali é a minha casa!' }] },
-    { t: 'dialog', scene: 'sala', cast: [{ id: 'you', x: 70, y: 52 }], lines: [
+    { t: 'dialog', scene: 'sala', cast: [{ id: 'you', x: 40, y: 52 }, { id: 'cida', x: 112, y: 48 }], lines: [
       { who: 'faisca', text: 'Ufa! Na sua casa a gente está segura.' },
       { who: 'you', text: 'Ué... a casa fica arrumadinha sozinha?!' },
-      { who: 'faisca', text: 'Sozinha? Alguém cuida dela todo dia... e a Névoa fez todo mundo esquecer quem!' }] },
-    { t: 'investigate', scene: 'sala', need: 4, prompt: 'Ache as pistas: quem trabalhou aqui?',
+      { who: 'faisca', text: 'Sozinha? Alguém cuida dela todo dia... e a Névoa fez todo mundo esquecer quem!' },
+      { who: 'cida', text: 'Fui eu, {nome}! Sou a Dona Cida. Cuido desta casa desde que você era bebê.' },
+      { who: 'cida', text: 'A Névoa bagunçou tudo e a família nem lembra mais do meu nome... Me ajuda hoje? Vem trabalhar comigo!' },
+      { who: 'you', text: 'Bora! Eu quero ver como é o seu dia.' }] },
+    { t: 'investigate', scene: 'sala', need: 4, prompt: 'Olhe a casa: o que a Dona Cida já fez hoje?',
       items: [
         { prop: 'roupa', x: 56, y: 35, clue: true, label: 'Roupas dobradas', text: 'Lavadas, secas e dobradas: horas de trabalho!' },
         { prop: 'panela', x: 115, y: 24, clue: true, label: 'Panela no fogão', text: 'Feijão no fogo! Alguém fez o almoço.' },
@@ -803,10 +806,10 @@ for (const mid in DAYS) {
 
 /* ---------------- INTERLÚDIOS DA NÉVOA (entre regiões) ---------------- */
 const INTERLUDES = [
-  [{ who: 'nevoa', text: 'Hmm? Uma luz acendeu lá embaixo... Por que vocês se importam tanto com essas pessoas?' }, { who: 'faisca', text: 'Sem elas, nada funciona! E olha: minha luz ficou mais forte!' }],
+  [{ who: 'nevoa', text: 'Hmm? Uma luz acendeu lá embaixo... Por que vocês se importam tanto com essas pessoas?' }, { who: 'faisca', text: 'Sem elas, nada funciona! E olha, {nome}: minha luz ficou mais forte!' }],
   [{ who: 'nevoa', text: 'Sabe... antigamente eu era só uma nuvenzinha do tamanho de uma pipoca.' }, { who: 'nevoa', text: 'Quando ninguém olha um trabalhador, eu cresço.' }, { who: 'faisca', text: 'Eu sei como é ser esquecida... Na cidade, quase ninguém repara numa vaga-lume.' }],
   [{ who: 'nevoa', text: 'Quando vocês sorriem para quem trabalha... eu sinto um calorzinho estranho. Parece que eu encolho.' }, { who: 'faisca', text: 'Ela está diminuindo! Se a gente continuar, quem sabe minha família volta pro parque?' }],
-  [{ who: 'nevoa', text: 'Vocês estão me deixando pequena... e eu não sei se isso é ruim.' }, { who: 'nevoa', text: 'Ninguém nunca me agradeceu...' }, { who: 'faisca', text: 'Obrigada por enxergar quem ninguém vê. Inclusive eu.' }],
+  [{ who: 'nevoa', text: 'Vocês estão me deixando pequena... e eu não sei se isso é ruim.' }, { who: 'nevoa', text: 'Ninguém nunca me agradeceu...' }, { who: 'faisca', text: 'Obrigada por enxergar quem ninguém vê, {nome}. Inclusive eu.' }],
   [{ who: 'nevoa', text: 'Eu vi vocês ajudando, conversando, agradecendo... Eu queria saber fazer isso também.' }, { who: 'faisca', text: 'Ainda dá tempo, Névoa!' }],
   [{ who: 'nevoa', text: 'Me encontrem na praça. Quero ver as luzes!' }]
 ];
@@ -839,4 +842,29 @@ const HOOKS = {
   rafa: 'Tem gente esperando remédio lá no <b>Mercado</b>! Vamos ajudar!',
   pedro: 'Ih... as luzes dos <b>Caminhos</b> apagaram! Vamos até lá!',
   carlos: 'Já é hora da saída da escola. Vamos ver a travessia!'
+};
+
+/* o "obrigado" de cada trabalhador ao final da missão (vínculo: a criança é vista também) */
+const THANK = {
+  cida: 'Hoje alguém viu o meu trabalho de verdade. Obrigada, {nome}!',
+  tania: 'Agora você sabe o caminho da água. Lembra de mim quando abrir a torneira?',
+  ze: 'Arroz soltinho e criançada feliz: é pra isso que eu acordo às 5 da manhã!',
+  joana: 'Você teve coragem e cuidado ao mesmo tempo. Isso é coisa de bombeiro!',
+  carlos: 'Com você do meu lado, todo mundo atravessou seguro. Valeu, parceria!',
+  rafa: 'Cada entrega é alguém esperando do outro lado da porta. Obrigado por pedalar comigo!',
+  pedro: 'Hoje à noite, quando a rua acender, lembra que alguém subiu no poste!',
+  jorge: 'Obrigado por me chamar pelo nome. Parece pouco, mas muda o meu dia.',
+  katia: 'Amanhã a sala vai amanhecer limpinha... e agora você sabe quem limpou!',
+  lucia: 'Saúde começa com uma visita e um sorriso. Obrigada por vir comigo!',
+  benedito: 'Cuidar é ter paciência e carinho. Você teve os dois!',
+  zefa: 'Da próxima vez que comer um tomate, lembra da minha roça, tá?',
+  marina: 'Separar o lixo em casa já é trabalhar junto comigo. Conto com você!',
+  joaquim: 'Plantinha bem cuidada, cidade feliz. Obrigado pela ajuda!',
+  denise: 'Rua limpa não é mágica: é gente. E hoje essa gente foi você também!'
+};
+/* missões na vida real para quem não tem a etapa de reflexão */
+const LIFE_QUEST = {
+  tania: 'Feche a torneira enquanto escova os dentes e conte para alguém de casa por quê.',
+  joana: 'Descubra com sua família o número dos bombeiros (193) e por onde vocês sairiam de casa numa emergência.',
+  carlos: 'Na próxima travessia, espere o sinal fechar e atravesse na faixa, de mão dada com um adulto.'
 };

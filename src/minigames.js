@@ -11,7 +11,7 @@ function mgSay(box, html, kind = 'ok') {
   const head = box.closest('.mg') && box.closest('.mg').querySelector('.mghead.talky');
   if (head && typeof flowOn === 'function' && flowOn()) {
     if (head._main === undefined || !head._rt) head._main = head._main !== undefined && head._set ? head._main : head.querySelector('#mgt').innerHTML;
-    headSay(head, html, kind); clearTimeout(head._rt); head._rt = setTimeout(() => { head._rt = null; headSay(head, head._main); }, 2600); return;
+    headSay(head, html, kind); clearTimeout(head._rt); head._rt = setTimeout(() => { head._rt = null; headSay(head, head._main); }, Math.max(2600, String(html).replace(/<[^>]+>/g, '').length * 65)); return;
   }
   box.innerHTML = html; box.className = 'mgsay on ' + kind;
   clearTimeout(box._t); box._t = setTimeout(() => box.className = 'mgsay', 2400);
@@ -47,7 +47,15 @@ function floatText(root, html, x = 50, y = 40) {
   e.style.left = x + '%'; e.style.top = y + '%'; root.appendChild(e); setTimeout(() => e.remove(), 1300);
 }
 
-/* ---------------- ARRUMA-ARRUMA (Dona Cida) ---------------- */
+/* ---------------- UM DIA COM A DONA CIDA (arrumar, varal, dobrar) ---------------- */
+/* balãozinho de fala em cima de alguém, dentro da cena */
+function sceneBub(lay, x, y, html, ms = 2600) {
+  if (!lay) return null; const b = document.createElement('div'); b.className = 'npc-bub scbub'; b.innerHTML = html;
+  b.style.left = pct(x, SW); b.style.top = pct(y, SH); lay.appendChild(b);
+  requestAnimationFrame(() => b.classList.add('on'));
+  if (ms) setTimeout(() => { b.classList.remove('on'); setTimeout(() => b.remove(), 300); }, ms);
+  return b;
+}
 STEPS.tidy = function (step, ctx) {
   Audio8.energy = 1; onCleanup(() => { Audio8.energy = 0; });
   const BINS = [
@@ -63,20 +71,30 @@ STEPS.tidy = function (step, ctx) {
   const NAMES = { roupasuja: 'Camiseta suja', meia: 'Meia', louca: 'Panela', xicara: 'Xícara', prato: 'Prato', bola: 'Bola', brinquedos: 'Carrinho', livro: 'Livro', caderno: 'Caderno' };
   const BC = { cesto: '#8fd6cf', pia: '#a5d97f', caixa: '#e98bb0', estante: '#f4c542' };
   const SPOTS = [[10, 62], [30, 70], [52, 66], [74, 72], [96, 64], [118, 70], [138, 62], [22, 50], [64, 56], [108, 54]];
-  const n = G.diff === 'exp' ? 7 : 10;
+  const STAGES = [{ tag: 'Arrumar', h: '8h' }, { tag: 'Varal', h: '11h' }, { tag: 'Dobrar', h: '15h' }, { tag: 'Fim do dia', h: '18h' }];
+  const n = G.diff === 'exp' ? 6 : 8;
   const spots = shuffle(SPOTS.slice());
-  const items = shuffle(ALL.slice()).slice(0, n).map(([prop, bin], k) => ({ prop, bin, k, x: spots[k][0], y: spots[k][1], done: false }));
-  let sel = null, combo = 0, lastOk = 0, phase = 'tidy', folds = [0, 0, 0], left = items.length;
+  /* sempre ao menos um de cada lugar, para a criança usar todos */
+  const pickItems = () => { const per = {}; ALL.forEach(([p, b]) => (per[b] = per[b] || []).push(p)); const base = Object.entries(per).map(([b, ps]) => [pick(ps), b]); const rest = shuffle(ALL.filter(a => !base.some(x => x[0] === a[0] && x[1] === a[1]))); return shuffle(base.concat(rest).slice(0, n)); };
+  const items = pickItems().map(([prop, bin], k) => ({ prop, bin, k, x: spots[k][0], y: spots[k][1], done: false }));
+  let sel = null, combo = 0, lastOk = 0, phase = 'tidy', st = 0, folds = [0, 0, 0], left = items.length, hung = 0, busy = false;
+  const WET = 4;
 
-  ctx.stage.innerHTML = `<div class="mg tidy">
-    ${mgHead('cida', 'Arruma-arruma! <b>Arraste</b> cada coisa para o lugar certo.')}
-    <div class="scene tidyroom" id="room"><img class="bg px" src="${composeScene('sala').toDataURL()}" alt="Sala bagunçada">
-      <div class="dust" id="dust"></div><div class="layer" id="lay"></div><div class="mgsay" id="say"></div></div>
-    <div class="mgbar"><span>Bagunça</span><div class="bar"><i id="mess" style="width:100%"></i></div><b id="cmb"></b></div>
+  ctx.stage.innerHTML = `<div class="mg tidy day">
+    ${mgHead('cida', 'Bom dia! Vamos arrumar? <b>Arraste</b> cada coisa para o lugar dela.')}
+    <div class="scene tidyroom" id="room"><img class="bg px" src="${composeScene('sala').toDataURL()}" alt="Sala da casa">
+      <div class="dust" id="dust"></div><div class="dusk" id="dusk"></div><div class="layer" id="lay"></div><div class="mgsay" id="say"></div>
+      <div class="dclock" id="dclk"><i class="sun"></i><b id="dhr">8h</b></div>
+      <div class="dmess" id="dmess"><span>Bagunça</span><div class="bar"><i id="mess" style="width:100%"></i></div><b id="cmb"></b></div></div>
     <div class="bins" id="bins">${BINS.map(b => `<button class="tbin" data-bin="${b.id}" style="--bc:${BC[b.id]}">${SPR.img(b.prop)}<span>${b.label}</span></button>`).join('')}</div>
+    <div class="wsteps dsteps">${STAGES.map((s, i) => `<span data-w="${i}">${s.h} · ${s.tag}</span>`).join('<i>›</i>')}</div>
     <div class="folds" id="folds" hidden></div></div>`;
-  wireSay(ctx.stage, () => phase === 'tidy' ? 'Arruma-arruma! Toque num objeto e depois no lugar certo dele.' : 'Agora dobre as camisetas! Toque três vezes em cada uma.');
+  const sayNow = () => phase === 'tidy' ? 'Arraste cada coisa para o lugar dela.' : phase === 'hang' ? 'Toque nas roupas molhadas para pendurar no varal.' : phase === 'fold' ? 'Toque três vezes em cada camiseta para dobrar.' : 'Que dia!';
+  wireSay(ctx.stage, sayNow);
   const lay = $('#lay', ctx.stage), room = $('#room', ctx.stage), say = $('#say', ctx.stage);
+  const cida = spriteEl('cida', 128, 40, { cls: 'cidawork' }); lay.appendChild(cida);
+  const markStage = () => { $$('.dsteps span', ctx.stage).forEach((e, i) => e.className = i < st ? 'ok' : i === st ? 'now' : ''); $('#dhr', ctx.stage).textContent = STAGES[st].h; room.dataset.hour = st; };
+  markStage();
   items.forEach(it => {
     const b = document.createElement('button'); b.className = 'mess-it'; b.dataset.it = it.k;
     b.style.left = pct(it.x - 6, SW); b.style.top = pct(it.y - 8, SH); b.style.width = pct(19, SW); b.style.setProperty('--bc', BC[it.bin]);
@@ -85,10 +103,7 @@ STEPS.tidy = function (step, ctx) {
     lay.appendChild(b); it.el = b;
     b.onclick = () => { if (it.done || phase !== 'tidy' || (b._dragged && Date.now() - b._dragged < 400)) return; ctx.activity(); Audio8.sfx('select'); if (sel) sel.el.classList.remove('sel'); sel = it; b.classList.add('sel'); $('#bins', ctx.stage).classList.add('ready'); };
   });
-  const upd = () => {
-    const p = left / items.length; $('#mess', ctx.stage).style.width = (p * 100) + '%';
-    $('#dust', ctx.stage).style.opacity = .55 * p;
-  };
+  const upd = () => { const p = left / items.length; $('#mess', ctx.stage).style.width = (p * 100) + '%'; $('#dust', ctx.stage).style.opacity = .55 * p; };
   const tryPut = b => {
     if (phase !== 'tidy') return; ctx.activity();
     if (!sel) { mgSay(say, 'Primeiro toque num objeto bagunçado!', 'info'); b.classList.add('shake'); setTimeout(() => b.classList.remove('shake'), 400); return; }
@@ -99,13 +114,15 @@ STEPS.tidy = function (step, ctx) {
       const now = Date.now(); combo = now - lastOk < 3500 ? combo + 1 : 1; lastOk = now;
       Audio8.sfx(combo >= 3 ? 'medal' : 'found'); sparkle(b, 6);
       floatText(room, combo >= 2 ? `Combo x${combo}!` : pick(['Isso!', 'Boa!', 'Guardado!', 'Uhuu!']), (it.x / SW) * 100, (it.y / SH) * 100 - 10);
-      $('#cmb', ctx.stage).textContent = combo >= 2 ? `Combo x${combo}` : '';
+      $('#cmb', ctx.stage).textContent = combo >= 2 ? `x${combo}` : '';
+      moveEl(cida, Math.max(14, Math.min(140, it.x - 4)), 40, 700, true);
       $('#bins', ctx.stage).classList.remove('ready'); upd(); ctx.nextTurn();
-      if (!left) setTimeout(foldPhase, 600);
+      if (left === Math.ceil(items.length / 2)) mgSay(say, pick(['Metade já foi! A Dona Cida faz isso todo dia.', 'Tá ficando lindo!']), 'ok');
+      if (!left) setTimeout(hangPhase, 700);
     } else {
       ctx.mistake(); combo = 0; Audio8.sfx('soft'); b.classList.add('shake'); setTimeout(() => b.classList.remove('shake'), 400);
       const nm = BINS.find(x => x.id === it.bin).label;
-      mgSay(say, ctx.colored || G.diff === 'exp' ? `Ops! Esse vai em <b>${nm}</b>.` : 'Ops! Não é aí. Tente outro lugar!', 'soft');
+      mgSay(say, ctx.colored || G.diff === 'exp' ? `Quase! Esse vai em <b>${nm}</b>.` : 'Quase! Não é aí. Tente outro lugar!', 'soft');
     }
   };
   $$('.tbin', ctx.stage).forEach(b => b.onclick = () => tryPut(b));
@@ -128,38 +145,79 @@ STEPS.tidy = function (step, ctx) {
     });
   });
   { const f = items[0]; setTimeout(() => demoDrag(f.el, $(`.tbin[data-bin="${f.bin}"]`, ctx.stage), SPR.url(f.prop)), 400); }
+
+  /* 11h: pendurar a roupa no varal */
+  const hangPhase = () => {
+    phase = 'hang'; st = 1; markStage(); Audio8.sfx('ok'); confetti(16);
+    $('#bins', ctx.stage).hidden = true; $('#dmess', ctx.stage).hidden = true; room.classList.add('phase2');
+    setHead(ctx, 'Sala arrumada! Agora a roupa lavada: <b>toque em cada peça</b> para pendurar no varal.');
+    moveEl(cida, 36, 40, 900, true);
+    lay.insertAdjacentHTML('beforeend', `<div class="dline" style="left:${pct(30, SW)};top:${pct(17, SH)};width:${pct(100, SW)}"></div><div class="dbasket" style="left:${pct(6, SW)};top:${pct(56, SH)};width:${pct(26, SW)}">${SPR.img('cesto')}</div>`);
+    const HUE = [0, 140, 260, 40];
+    for (let i = 0; i < WET; i++) {
+      const b = document.createElement('button'); b.className = 'wetc'; b.dataset.w = i;
+      b.style.left = pct(8 + i * 5, SW); b.style.top = pct(50 - (i % 2) * 3, SH); b.style.width = pct(12, SW); b.style.setProperty('--hue', HUE[i] + 'deg');
+      b.innerHTML = SPR.img('camiseta') + '<i class="drip"></i>'; b.setAttribute('aria-label', 'Roupa molhada');
+      lay.appendChild(b);
+      b.onclick = () => {
+        if (phase !== 'hang' || b.classList.contains('hung') || busy) return; ctx.activity(); Audio8.sfx('step');
+        b.classList.add('hung'); b.style.left = pct(36 + hung * 23, SW); b.style.top = pct(16, SH); hung++; ctx.nextTurn();
+        floatText(room, pick(['Pendurada!', 'Pro varal!', 'Isso!']), (36 + hung * 23) / SW * 100, 14);
+        if (hung >= WET) { busy = true; setTimeout(sunDry, 600); }
+      };
+    }
+    setTimeout(() => demoTap($('.wetc', ctx.stage)), 500);
+  };
+  const sunDry = () => {
+    setHead(ctx, 'Agora é esperar o sol secar... <b>☀</b>', 'think');
+    room.classList.add('sunny'); Audio8.sfx('select');
+    setTimeout(() => { $$('.wetc', ctx.stage).forEach(b => b.classList.add('dry')); Audio8.sfx('found'); setTimeout(() => { busy = false; foldPhase(); }, 900); }, 1600);
+  };
+  /* 15h: dobrar */
   const foldPhase = () => {
-    phase = 'fold'; Audio8.sfx('ok'); confetti(20);
-    setHead(ctx, 'Sala arrumada! Agora dobre as camisetas: toque 3 vezes em cada uma.');
-    setTimeout(() => demoTap($('.shirt', ctx.stage)), 300);
-    $('#bins', ctx.stage).hidden = true; $('.mgbar', ctx.stage).hidden = true;
+    phase = 'fold'; st = 2; markStage(); room.classList.remove('sunny'); Audio8.sfx('ok');
+    $$('.wetc', ctx.stage).forEach(b => b.classList.add('gone'));
+    setHead(ctx, 'Sequinha! Agora a parte que eu mais gosto: <b>dobrar</b>. Toque 3 vezes em cada camiseta.');
+    moveEl(cida, 112, 40, 900, true);
     const f = $('#folds', ctx.stage); room.appendChild(f); f.hidden = false;
-    f.innerHTML = folds.map((_, i) => `<button class="shirt" data-f="${i}">${SPR.img('camiseta')}<span class="dots"><i></i><i></i><i></i></span></button>`).join('') + `<div class="drawer">${SPR.img('roupa')}<span>Gaveta</span></div>`;
+    f.innerHTML = folds.map((_, i) => `<button class="shirt" data-f="${i}" style="--hue:${[0, 140, 260][i]}deg">${SPR.img('camiseta')}<span class="dots"><i></i><i></i><i></i></span></button>`).join('') + `<div class="drawer">${SPR.img('roupa')}<span>Gaveta</span></div>`;
+    setTimeout(() => demoTap($('.shirt', ctx.stage)), 300);
     $$('.shirt', ctx.stage).forEach(b => b.onclick = () => {
-      const i = +b.dataset.f; if (folds[i] >= 3) return; ctx.activity();
+      const i = +b.dataset.f; if (folds[i] >= 3 || phase !== 'fold') return; ctx.activity();
       folds[i]++; Audio8.sfx('step'); b.dataset.s = folds[i]; $$('.dots i', b)[folds[i] - 1].className = 'on';
-      if (folds[i] === 3) { b.querySelector('img').src = SPR.url('dobrada'); b.classList.add('folded'); Audio8.sfx('found'); sparkle(b, 6); floatText(room, 'Dobradinha!', 30 + i * 20, 30); }
-      if (folds.every(v => v >= 3)) finish();
+      if (folds[i] === 3) { b.querySelector('img').src = SPR.url('dobrada'); b.classList.add('folded'); Audio8.sfx('found'); sparkle(b, 6); floatText(room, 'Dobradinha!', 30 + i * 20, 30); ctx.nextTurn(); }
+      if (folds.every(v => v >= 3)) setTimeout(endOfDay, 500);
     });
   };
-  const finish = () => {
-    phase = 'done'; Audio8.sfx('win'); confetti(40);
-    const c = spriteEl('cida', 170, 40); lay.appendChild(c); c.classList.add('flip'); setTimeout(() => moveEl(c, 110, 40, 1400, true), 60);
-    room.classList.add('shine');
-    setHead(ctx, '<b>Casa brilhando!</b> A Dona Cida faz isso <b>todo dia</b>, e ainda cozinha, lava e passa.');
-    if (S.autoRead) Voice.speak('Casa brilhando! A Dona Cida faz isso todo dia, e ainda cozinha, lava e passa.');
-    ctx.complete();
+  /* 18h: a família chega e acha que a casa se arrumou sozinha */
+  const endOfDay = () => {
+    phase = 'end'; st = 3; markStage(); Audio8.sfx('win'); confetti(30);
+    $('#folds', ctx.stage).hidden = true; room.classList.add('shine', 'evening'); setTimeout(() => room.classList.remove('shine'), 1300); $$('.dline', ctx.stage).forEach(e => e.remove());
+    setHead(ctx, 'Ufa! Já são <b>6 da tarde</b>. Hora de ir pra minha casa...');
+    sceneBub(lay, 112, 30, 'Até amanhã! 👋', 2200);
+    setTimeout(() => { moveEl(cida, 176, 40, 1600, true); }, 1200);
+    const fam = [spriteEl('theo', -20, 44), spriteEl('bia', -34, 44)]; fam.forEach(e => lay.appendChild(e));
+    setTimeout(() => { moveEl(fam[0], 60, 44, 1500, true); moveEl(fam[1], 44, 44, 1500, true); }, 2300);
+    setTimeout(() => { sceneBub(lay, 64, 34, 'Uau! A casa se arrumou <b>sozinha</b>!', 3200); Audio8.sfx('select'); }, 4000);
+    setTimeout(() => {
+      const line = 'Sozinha?! Foi a Dona Cida, das 8h às 18h. Você viu tudo... eles, não.';
+      setHead(ctx, `<b>Faísca:</b> ${line}`, 'think'); const h = $('.mghead', ctx.stage); if (h) { const im = h.querySelector('.hface img'); if (im) im.src = SPR.url('faisca'); }
+      if (S.autoRead) Voice.speak(line.replace(/<[^>]+>/g, ''));
+      ctx.complete();
+    }, 6800);
   };
   upd();
   return {
-    speak: () => phase === 'tidy' ? 'Toque num objeto e depois no lugar certo dele.' : 'Toque três vezes em cada camiseta para dobrar.',
+    speak: sayNow,
     hint() {
       ctx.usedHint();
       if (phase === 'tidy') { const it = sel || items.find(i => !i.done); if (!it) return; if (!sel) it.el.click(); const b = $(`.tbin[data-bin="${it.bin}"]`, ctx.stage); b.classList.add('glow'); setTimeout(() => b.classList.remove('glow'), 1800); }
+      else if (phase === 'hang') { const b = $('.wetc:not(.hung)', ctx.stage); if (b) demoTap(b, 0); }
       else mgSay(say, 'Toque 3 vezes em cada camiseta!', 'info');
     },
     autoStep() {
       if (phase === 'tidy') { const it = items.find(i => !i.done); if (!it) return; it.el.click(); $(`.tbin[data-bin="${it.bin}"]`, ctx.stage).click(); }
+      else if (phase === 'hang') { const b = $('.wetc:not(.hung)', ctx.stage); if (b) b.click(); }
       else if (phase === 'fold') { const b = $$('.shirt', ctx.stage).find(x => +(x.dataset.s || 0) < 3); if (b) b.click(); }
     }
   };
@@ -190,12 +248,13 @@ STEPS.cook = function (step, ctx) {
 
   ctx.stage.innerHTML = `<div class="mg cook">
     ${mgHead('ze', 'Vamos fazer arroz! Pegue só o que vai na receita.')}
-    <div class="kitchen" id="kit"><canvas id="pot" width="64" height="48" aria-label="Panela no fogão"></canvas>
+    <div class="scene kitchen2" id="kit"><img class="bg px" src="${composeScene('cozinha').toDataURL()}" alt="Cozinha da escola"><div class="layer" id="klay"></div><canvas class="potc" id="pot" width="64" height="48" aria-label="Panela no fogão"></canvas>
       <div class="stepdots" id="dots">${PLAN.map(() => '<i></i>').join('')}</div><div class="mgsay" id="say"></div><div class="clock" id="clk" hidden></div></div>
     <div class="counter" id="ctr"></div>
     <div class="tray" id="tray"></div></div>`;
   wireSay(ctx.stage, () => phase === 'shop' ? 'Vamos fazer arroz! Pegue só o que vai na receita.' : PLAN[k] ? PLAN[k].say : 'Arroz pronto!');
   const say = $('#say', ctx.stage), tray = $('#tray', ctx.stage), kit = $('#kit', ctx.stage);
+  { const z = spriteEl('ze', 122, 38, { cls: 'zecook' }); $('#klay', ctx.stage).appendChild(z); }
   const cv = $('#pot', ctx.stage), g = cv.getContext('2d');
 
   /* --- desenho da panela (pixel art animada) --- */

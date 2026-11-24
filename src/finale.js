@@ -94,7 +94,7 @@ function screenEnding() {
     <div class="logo"><h1>Lumiara está acesa!</h1><p>Uma cidade só funciona porque muitas pessoas fazem a sua parte. Ninguém deveria ser invisível.</p></div>
     <div class="scene cap"><img class="bg px" src="${composeScene('festa', [], [{ id: 'nevoaFeliz', x: 62, y: 2 }, ...G.album.slice(0, 6).map((id, i) => ({ id, x: 8 + i * 25, y: 60 }))]).toDataURL()}" alt="Festa em Lumiara com os trabalhadores lembrados"></div>
     <div class="epi"><div class="ffly">${Array.from({ length: 9 }, (_, i) => `<i style="--d:${i * .37}s;--x:${8 + (i * 11) % 84}%;--y:${10 + (i * 23) % 60}%"></i>`).join('')}<img class="px" src="${SPR.url('faisca')}" alt="Faísca"></div>
-      <p><b>Faísca:</b> Olha!! Minha família voltou pro parque! Quando a cidade lembra de quem cuida dela, cuida melhor da natureza também. Obrigada por me enxergar.</p></div>
+      <p><b>Faísca:</b> Olha!! Minha família voltou pro parque! Quando a cidade lembra de quem cuida dela, cuida melhor da natureza também. Obrigada por me enxergar${myNick() ? ', ' + esc(myNick()) : ''}. Eu nunca vou esquecer de você.</p></div>
     <div class="cert"><span class="tag">Certificado</span><h2>Guardiões da Memória de Lumiara</h2>
       <div class="row center">${G.players.map(p => `<img class="px" style="width:48px;height:72px" src="${SPR.url(avatarOf(p))}" alt="">`).join('')}</div><p class="names">${esc(names)}</p>
       <p style="font-weight:800;font-size:1.2rem;margin:0">${starsHTML(1, 1)} ${totalStars()} estrelas conquistadas</p>
@@ -106,8 +106,9 @@ function screenEnding() {
       <p>Quantas você conhece? Lumiara ainda guarda muita gente esperando para ser lembrada:</p>
       <div class="row center">${[['costureira', 'Quem costurou a sua roupa?'], ['motorista', 'Quem dirige o seu ônibus?'], ['pedreiro', 'Quem levantou a sua casa?'], ['caixa', 'Quem passa as suas compras?']].map(([k, q], i) => `<div class="mystery"><div class="sil">${SPR.img(['theo', 'bia', 'davi', 'iara'][i], 'sil')}<b>?</b></div><small>${q}</small></div>`).join('')}</div>
       ${met < total ? `<p style="font-weight:800;margin:6px 0 0">E ainda faltam ${total - met} pessoas de Lumiara no seu álbum: toque em <b>Conhecer mais gente da cidade</b>!</p>` : ''}</div>
-    <div class="row center"><button class="btn big" id="alb">${ICON.book} Ver o álbum</button><button class="btn big" id="map">${ICON.map} Passear pelo mapa</button>${G.plan && Object.values(G.plan).flat().length < 15 ? `<button class="btn primary big" id="more">${ICON.map} Conhecer mais gente da cidade</button>` : ''}<button class="btn big" id="again">Jogar de novo</button></div></div>`;
+    <div class="row center"><button class="btn primary big" id="keep">${SPR.img('estrela')} Guardar minha lembrança</button><button class="btn big" id="alb">${ICON.book} Ver o álbum</button><button class="btn big" id="map">${ICON.map} Passear pelo mapa</button>${G.plan && Object.values(G.plan).flat().length < 15 ? `<button class="btn primary big" id="more">${ICON.map} Conhecer mais gente da cidade</button>` : ''}<button class="btn big" id="again">Jogar de novo</button></div></div>`;
   $('#alb').onclick = openAlbum;
+  $('#keep').onclick = () => saveMemoryCard();
   $('#map').onclick = () => go(screenMap);
   if ($('#more')) $('#more').onclick = () => { G.plan = JSON.parse(JSON.stringify(PLANS.full.regions)); G.extended = true; saveGame(); toast('Novos bairros acordaram! A Faísca vai te mostrar o caminho.', 'faisca'); go(screenMap); };
   $('#again').onclick = () => confirmBox('Começar uma nova aventura? O álbum desta partida será apagado.', 'Começar de novo', () => go(screenSetup));
@@ -130,3 +131,23 @@ finishMission = function (id) {
   if (id !== '_finale') return _finish(id);
   G.finished = true; G.current = null; saveGame(); go(screenOutro);
 };
+
+/* lembrança: um cartão para guardar ou mandar, com o personagem, a Faísca e quem a criança lembrou */
+function saveMemoryCard() {
+  const W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d'); g.imageSmoothingEnabled = false;
+  const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#1b2142'); gr.addColorStop(1, '#3b2a6e'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  for (let i = 0; i < 60; i++) { g.fillStyle = `rgba(255,241,168,${.3 + (i % 5) / 8})`; g.fillRect((i * 173) % W, (i * 97) % 620, 6, 6); }
+  const spr = (id, x, y, s) => { const cv = SPR.canvas(id); g.drawImage(cv, x, y, cv.width * s, cv.height * s); };
+  g.fillStyle = '#fbf3e4'; g.strokeStyle = '#2b2233'; g.lineWidth = 10; g.beginPath(); g.roundRect(60, 60, W - 120, H - 120, 40); g.fill(); g.stroke();
+  g.fillStyle = '#2b2233'; g.textAlign = 'center'; g.font = "700 64px 'Pixelify Sans', monospace"; g.fillText('A Cidade que Esqueceu', W / 2, 170);
+  g.font = "900 40px 'Nunito', sans-serif"; g.fillText(myNick() ? `${myNick()} ajudou Lumiara a lembrar` : 'Você ajudou Lumiara a lembrar', W / 2, 240);
+  const av = G.players && G.players[0] ? avatarOf(G.players[0]) : 'theo'; spr(av, 250, 290, 14); spr('faisca', 640, 330, 12);
+  const ids = G.album.slice(0, 10); ids.forEach((id, i) => { const col = i % 5, row = Math.floor(i / 5); spr(id, 130 + col * 170, 720 + row * 220, 6); g.font = "800 22px 'Nunito', sans-serif"; g.fillText(CHARACTERS[id].name, 178 + col * 170, 900 + row * 220); });
+  g.font = "900 38px 'Nunito', sans-serif"; g.fillStyle = '#c0392b'; g.fillText('Ninguém deveria ser invisível.', W / 2, 1200);
+  g.font = "700 26px 'Nunito', sans-serif"; g.fillStyle = '#6b5f7a'; g.fillText('Agradeça hoje alguém que cuida de você.', W / 2, 1245);
+  c.toBlob(async blob => {
+    const file = new File([blob], 'lembranca-cidade-que-esqueceu.png', { type: 'image/png' });
+    try { if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'Minha lembrança de Lumiara' }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file.name; document.body.appendChild(a); a.click(); a.remove(); toast('Lembrança salva!', 'estrela');
+  }, 'image/png');
+}
