@@ -1644,3 +1644,28 @@ html.flowfoot .mg.job .mgbar { padding-right: 64px; }
   html.flowfoot .screen.stage:has(> .cut) > #cb, html.flowfoot #stage:has(> .scene.cap) > #bub { width: auto; justify-self: start; margin-left: 2%; margin-right: 150px; max-width: 74%; }
 }
 .map-banner.hook span { display: block; }
+.scene .layer .wetc { pointer-events: auto; }
+/* turma online na tela */
+.crew { position: fixed; z-index: 40; pointer-events: none; overflow: hidden; border-radius: 16px; }
+.crewm { position: absolute; width: 5.5%; min-width: 26px; transform: translate(-50%, -100%); transition: left .7s cubic-bezier(.3,.9,.4,1), top .7s cubic-bezier(.3,.9,.4,1); filter: drop-shadow(0 0 4px var(--pc)) drop-shadow(1px 2px 0 #0007); }
+.crewm img { width: 100%; display: block; }
+.crewm.flip img { transform: scaleX(-1); }
+.crewm.hop img { animation: herojump .5s ease-out; }
+.crewm.idle img { animation: bob .9s ease-in-out 2; }
+.crewn { position: absolute; left: 50%; top: 100%; transform: translateX(-50%); background: var(--pc); color: var(--ink); border: 2px solid var(--ink); border-radius: 99px; padding: 0 6px; font-weight: 900; font-size: clamp(.5rem, 1.1vw, .72rem); white-space: nowrap; }
+.crewm.me .crewn { box-shadow: 0 0 0 2px #fff; }
+.crewb { position: absolute; left: 50%; bottom: 100%; transform: translate(-50%, -4px); background: #fff; color: var(--ink); border: 2px solid var(--ink); border-radius: 12px; padding: 1px 8px; font-size: clamp(.6rem, 1.3vw, .85rem); white-space: nowrap; animation: tipin .3s cubic-bezier(.2,.9,.3,1.3) both; }
+.crewb.big { font-size: clamp(1.2rem, 3vw, 2rem); padding: 0 8px; border-radius: 14px; }
+.crewring { position: absolute; width: 34px; height: 34px; margin: -17px 0 0 -17px; border: 4px solid #fff; border-radius: 50%; animation: crewring .7s ease-out forwards; }
+@keyframes crewring { from { transform: scale(.3); opacity: 1; } to { transform: scale(1.6); opacity: 0; } }
+.crewfly { position: absolute; font-style: normal; font-size: clamp(1rem, 2.6vw, 1.7rem); transform: translate(-50%, -100%); animation: crewfly 1.4s ease-out forwards; }
+@keyframes crewfly { to { transform: translate(calc(-50% + var(--dx)), -340%); opacity: 0; } }
+.crewbar { position: fixed; left: 50%; bottom: max(8px, env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 60; display: flex; gap: 4px; background: #2b2233dd; border: 3px solid var(--ink); border-radius: 99px; padding: 4px 8px; box-shadow: 0 4px 0 #0005; }
+.crewbar button { border: 0; background: none; font-size: 1.35rem; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; transition: transform .12s; }
+.crewbar button:hover { background: #ffffff22; } .crewbar button:active { transform: scale(1.3); }
+@media (orientation: landscape) and (max-height: 520px) { .crewbar { left: auto; right: 74px; transform: none; padding: 2px 6px; } .crewbar button { width: 30px; height: 30px; font-size: 1.05rem; } }
+.crewc { position: absolute; left: 50%; top: -6%; width: 80%; transform: translate(-50%, -100%); filter: drop-shadow(0 0 4px #fff) drop-shadow(1px 2px 0 #0006); }
+.crewc.pop { animation: arrive .35s cubic-bezier(.2,.9,.3,1.4) both; }
+html:has(#turn) .mghead.talky.inscene { top: 13%; }
+@media (min-width: 701px) and (min-height: 521px) { html:has(#turn) .mghead.talky.inscene { top: 2.5%; } }
+.crew.onmap .crewm { width: 2.7%; min-width: 18px; } .crew.onmap .crewn { font-size: .62rem; }

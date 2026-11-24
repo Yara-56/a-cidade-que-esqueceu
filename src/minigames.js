@@ -156,7 +156,7 @@ STEPS.tidy = function (step, ctx) {
     const HUE = [0, 140, 260, 40];
     for (let i = 0; i < WET; i++) {
       const b = document.createElement('button'); b.className = 'wetc'; b.dataset.w = i;
-      b.style.left = pct(8 + i * 5, SW); b.style.top = pct(50 - (i % 2) * 3, SH); b.style.width = pct(12, SW); b.style.setProperty('--hue', HUE[i] + 'deg');
+      b.style.left = pct(4 + i * 7.5, SW); b.style.top = pct(50 - (i % 2) * 3, SH); b.style.width = pct(10, SW); b.style.setProperty('--hue', HUE[i] + 'deg');
       b.innerHTML = SPR.img('camiseta') + '<i class="drip"></i>'; b.setAttribute('aria-label', 'Roupa molhada');
       lay.appendChild(b);
       b.onclick = () => {

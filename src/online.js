@@ -40,7 +40,7 @@ document.addEventListener('click', e => {
   const el = e.target.closest(MIRROR_SEL); if (!el || el.closest('#modal') || el.closest('[data-local]')) return;
   const [rname, root] = rootOf(el); if (!root) return;
   const r = el.getBoundingClientRect();
-  netSend({ t: 'click', root: rname, path: pathOf(el, root), tag: el.tagName, sig: screenSig(), rx: (e.clientX - r.left) / (r.width || 1), ry: (e.clientY - r.top) / (r.height || 1) });
+  netSend({ t: 'click', who: NET.me, root: rname, path: pathOf(el, root), tag: el.tagName, sig: screenSig(), rx: (e.clientX - r.left) / (r.width || 1), ry: (e.clientY - r.top) / (r.height || 1) });
 }, true);
 ['pointerdown', 'pointerup'].forEach(type => document.addEventListener(type, e => {
   if (!NET.on || !NET.started || !e.isTrusted || NET.applying) return;
@@ -70,6 +70,7 @@ function applyRemote(msg) {
     if (msg.tag && el.tagName !== msg.tag) return;
     if (msg.t === 'ptr') { el.dispatchEvent(new PointerEvent(msg.type, { bubbles: true, cancelable: true })); return; }
     const r = el.getBoundingClientRect();
+    if (typeof crewRemoteClick === 'function') { try { crewRemoteClick(msg, el); } catch (e) {} }
     el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, clientX: r.left + msg.rx * r.width, clientY: r.top + msg.ry * r.height }));
   } finally { NET.applying = false; }
 }
@@ -88,6 +89,7 @@ function onData(raw, conn) {
       return;
     }
     if (['click', 'ptr', 'key', 'input'].includes(msg.t)) { applyRemote(msg); netSend(msg, conn); }
+    if (msg.t === 'emo' && typeof crewEmo === 'function') { crewEmo(msg.who, msg.e); netSend(msg, conn); }
     return;
   }
   /* convidado */
@@ -104,6 +106,7 @@ function onData(raw, conn) {
     return;
   }
   if (['click', 'ptr', 'key', 'input'].includes(msg.t)) applyRemote(msg);
+  if (msg.t === 'emo' && typeof crewEmo === 'function') crewEmo(msg.who, msg.e);
 }
 
 /* ---------- telas ---------- */
