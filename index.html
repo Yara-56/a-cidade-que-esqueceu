@@ -1677,6 +1677,10 @@ html.flowfoot .mg.job .mgbar { padding-right: 64px; }
 html:has(#turn) .mghead.talky.inscene { top: 13%; }
 @media (min-width: 701px) and (min-height: 521px) { html:has(#turn) .mghead.talky.inscene { top: 2.5%; } }
 .crew.onmap .crewm { width: 2.7%; min-width: 18px; } .crew.onmap .crewn { font-size: .62rem; }
+/* gente nunca vira "papel": personagens de frente não espelham; só veículos e bichos */
+.scene .sprite.flip:not(.veh), .crewm.flip img, .map-avatar.flip { transform: none; }
+.map-avatar.flip { transform: translate(-50%, -100%); }
+.map-npc.flip:not(.dog) { transform: translate(-50%, -85%); }
 </style>
 </head>
 <body>
@@ -5427,7 +5431,7 @@ function playCutscene(frames, { title = 'Lumiara', where = 'História', onDone }
       if (a.mode !== undefined && a.mode !== el._mode) { el._mode = a.mode; el.src = SPR.url(id, a.mode); }
       if (a.s && a.s !== el._name && a.s !== 'avatar') { el._name = a.s; el.src = SPR.url(a.s, el._mode); }
       if (a.w) el.style.width = pct(a.w, SW);
-      el.classList.toggle('flip', !!a.flip); el.style.opacity = 1;
+      el.classList.toggle('flip', !!a.flip); el.classList.toggle('veh', !(el._name && (LOOKS[el._name] || /^av/.test(el._name) || el._name === 'faisca'))); el.style.opacity = 1;
       moveEl(el, a.x, a.y, a.ms || 1400, a.walk);
     }
     if (f.sparkle) setTimeout(() => { for (let n = 0; n < 4; n++) setTimeout(() => sparkle($('#cut'), 14), n * 250); }, 300);
@@ -6317,7 +6321,7 @@ STEPS.cross = function (step, ctx) {
   const VAR = ['carro', 'carro2', 'carro3', 'taxi'];
   const addCar = lane => {
     const v = pick(VAR), x = lane === 0 ? -34 : 162, el = spriteEl(v, x, lane === 0 ? 66 : 75, { w: 32 }); el.style.transitionDuration = '0s';
-    if (lane === 1) el.classList.add('flip'); lay.appendChild(el); cars.push({ lane, x, el });
+    el.classList.add('veh'); if (lane === 1) el.classList.add('flip'); lay.appendChild(el); cars.push({ lane, x, el });
   };
   const zebraClear = () => !cars.some(c => c.x + 32 > ZX0 - 1 && c.x < ZX1 + 1);
   const spawnKids = () => {

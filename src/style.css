@@ -1669,3 +1669,7 @@ html.flowfoot .mg.job .mgbar { padding-right: 64px; }
 html:has(#turn) .mghead.talky.inscene { top: 13%; }
 @media (min-width: 701px) and (min-height: 521px) { html:has(#turn) .mghead.talky.inscene { top: 2.5%; } }
 .crew.onmap .crewm { width: 2.7%; min-width: 18px; } .crew.onmap .crewn { font-size: .62rem; }
+/* gente nunca vira "papel": personagens de frente não espelham; só veículos e bichos */
+.scene .sprite.flip:not(.veh), .crewm.flip img, .map-avatar.flip { transform: none; }
+.map-avatar.flip { transform: translate(-50%, -100%); }
+.map-npc.flip:not(.dog) { transform: translate(-50%, -85%); }

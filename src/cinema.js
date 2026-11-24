@@ -53,7 +53,7 @@ function playCutscene(frames, { title = 'Lumiara', where = 'História', onDone }
       if (a.mode !== undefined && a.mode !== el._mode) { el._mode = a.mode; el.src = SPR.url(id, a.mode); }
       if (a.s && a.s !== el._name && a.s !== 'avatar') { el._name = a.s; el.src = SPR.url(a.s, el._mode); }
       if (a.w) el.style.width = pct(a.w, SW);
-      el.classList.toggle('flip', !!a.flip); el.style.opacity = 1;
+      el.classList.toggle('flip', !!a.flip); el.classList.toggle('veh', !(el._name && (LOOKS[el._name] || /^av/.test(el._name) || el._name === 'faisca'))); el.style.opacity = 1;
       moveEl(el, a.x, a.y, a.ms || 1400, a.walk);
     }
     if (f.sparkle) setTimeout(() => { for (let n = 0; n < 4; n++) setTimeout(() => sparkle($('#cut'), 14), n * 250); }, 300);

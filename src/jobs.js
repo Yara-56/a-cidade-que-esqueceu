@@ -230,7 +230,7 @@ STEPS.cross = function (step, ctx) {
   const VAR = ['carro', 'carro2', 'carro3', 'taxi'];
   const addCar = lane => {
     const v = pick(VAR), x = lane === 0 ? -34 : 162, el = spriteEl(v, x, lane === 0 ? 66 : 75, { w: 32 }); el.style.transitionDuration = '0s';
-    if (lane === 1) el.classList.add('flip'); lay.appendChild(el); cars.push({ lane, x, el });
+    el.classList.add('veh'); if (lane === 1) el.classList.add('flip'); lay.appendChild(el); cars.push({ lane, x, el });
   };
   const zebraClear = () => !cars.some(c => c.x + 32 > ZX0 - 1 && c.x < ZX1 + 1);
   const spawnKids = () => {
