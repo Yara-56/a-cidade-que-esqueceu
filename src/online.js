@@ -25,6 +25,7 @@ function netSend(msg, except) {
 }
 function netReset() {
   try { NET.conns.forEach(c => c.close()); if (NET.host) NET.host.close(); if (NET.peer) NET.peer.destroy(); } catch (e) {}
+  try { if (NET.relayJoin) NET.relayJoin.cancel(); Relay.stop(); } catch (e) {}
   Object.assign(NET, { on: false, role: null, peer: null, conns: [], host: null, me: 0, code: '', started: false, applying: false, players: [], screen: '' });
 }
 
@@ -171,17 +172,19 @@ function startHost(cfg, tries = 0) {
   document.addEventListener('visibilitychange', wake); window.addEventListener('focus', wake);
   peer.on('error', err => {
     if (err.type === 'unavailable-id' && tries < 4) return startHost(cfg, tries + 1);
-    toast('Problema na conexão: ' + esc(err.type || 'erro') + '. Confira a internet.', 'nevoa');
+    if (err.type !== 'network' && err.type !== 'server-error' && err.type !== 'socket-error' && err.type !== 'disconnected') toast('Problema na conexão: ' + esc(err.type || 'erro') + '. Confira a internet.', 'nevoa');
   });
-  peer.on('connection', conn => {
-    NET.conns.push(conn);
-    conn.on('data', d => onData(d, conn));
+  const onConn = conn => {
+    conn.on('data', d => { if (!NET.conns.includes(conn)) { try { if (JSON.parse(d).t !== 'hello') return; } catch (e) { return; } NET.conns.push(conn); } onData(d, conn); });
     conn.on('close', () => {
+      if (!NET.conns.includes(conn)) return;
       NET.conns = NET.conns.filter(c => c !== conn);
       const p = NET.players[conn._idx]; if (p) toast(`${esc(p.name)} saiu da sala.`, 'nevoa');
       if (!NET.started && conn._idx) { NET.players.splice(conn._idx, 1); NET.conns.forEach((c, i) => c._idx = i + 1); netSend({ t: 'lobby', players: NET.players }); renderLobby(); }
     });
-  });
+  };
+  peer.on('connection', onConn);
+  try { Relay.host(code, onConn, () => renderLobby()); } catch (e) { }
 }
 function screenOnlineJoin(code0 = '') {
   const cfg = { name: S.myName || '', avatar: S.avatar ? JSON.parse(JSON.stringify(S.avatar)) : randomAvatar(), code: code0 };
@@ -205,21 +208,26 @@ function screenOnlineJoin(code0 = '') {
     const peer = NET.peer = new Peer(peerOptions());
     let tries = 0, opened = false, timer = null;
     const st = html => { const b = $('#st'); if (b) b.innerHTML = html; };
+    const myName = () => $('#on') ? ($('#on').value.trim() || cfg.name || 'Amigo') : 'Amigo';
+    /* quem abrir primeiro (conexão direta ou correio) vira a conexão com o anfitrião */
+    const adopt = conn => {
+      if (opened) { try { conn.close(); } catch (e) { } return; }
+      opened = true; clearTimeout(timer); NET.host = conn;
+      conn.on('data', d => onData(d, conn));
+      conn.on('close', () => { if (NET.host !== conn) return; const was = NET.started; netReset(); modal(`<h2>A sala foi fechada</h2><p style="font-weight:700">${was ? 'O anfitrião saiu ou a conexão caiu.' : 'Não deu para continuar na sala.'}</p><button class="btn primary" data-close>Voltar</button>`, { onClose: () => go(screenTitle) }); });
+      conn.send(JSON.stringify({ t: 'hello', name: myName(), avatar: cfg.avatar })); go(screenLobby);
+    };
     const attempt = () => {
       if (opened || !NET.on) return; tries++;
       st(`<div class="feedback info">Procurando a sala ${esc(code)}… ${tries > 1 ? `(tentativa ${tries})` : ''}</div>`);
-      const conn = NET.host = peer.connect(ROOM_PREFIX + code, { reliable: true });
+      const conn = peer.connect(ROOM_PREFIX + code, { reliable: true });
+      conn.on('open', () => adopt(conn));
       clearTimeout(timer); timer = setTimeout(() => { if (!opened) retry(); }, 7000);
-      conn.on('open', () => { opened = true; clearTimeout(timer); conn.send(JSON.stringify({ t: 'hello', name: $('#on') ? ($('#on').value.trim() || cfg.name || 'Amigo') : 'Amigo', avatar: cfg.avatar })); go(screenLobby); });
-      conn.on('data', d => onData(d, conn));
-      conn.on('close', () => { if (!opened) return; const was = NET.started; netReset(); modal(`<h2>A sala foi fechada</h2><p style="font-weight:700">${was ? 'O anfitrião saiu ou a conexão caiu.' : 'Não deu para continuar na sala.'}</p><button class="btn primary" data-close>Voltar</button>`, { onClose: () => go(screenTitle) }); });
     };
-    const retry = () => {
-      if (opened) return;
-      if (tries >= 6) { st(`<div class="feedback soft"><b>A sala ${esc(code)} não respondeu.</b> Peça para quem criou a sala deixar a tela do jogo aberta (sem bloquear o celular) e toque em Entrar de novo.</div>`); return; }
-      setTimeout(attempt, 1500);
-    };
-    peer.on('error', err => { if (err.type === 'peer-unavailable' || err.type === 'network' || err.type === 'disconnected') retry(); else st(`<div class="feedback soft">Problema na conexão (${esc(err.type || 'erro')}). Confira a internet e tente de novo.</div>`); });
+    const retry = () => { if (opened) return; if (tries >= 6) return; setTimeout(attempt, 1500); };
+    /* plano B: se a conexão direta demorar, entra pelo correio */
+    setTimeout(() => { if (opened || !NET.on) return; NET.relayJoin = Relay.join(code, cn => adopt(cn), () => { if (!opened) st(`<div class="feedback soft"><b>A sala ${esc(code)} não respondeu.</b> Confira o código e peça para quem criou a sala deixar a tela do jogo aberta. Depois toque em Entrar de novo.</div>`); }); }, 2500);
+    peer.on('error', err => { if (err.type === 'peer-unavailable') retry(); });
     peer.on('open', attempt);
   };
 }
@@ -232,7 +240,7 @@ function renderLobby() {
   const host = NET.role === 'host';
   box.innerHTML = `<h2>${host ? 'Sua sala está aberta!' : 'Você entrou na sala!'}</h2>
     <div class="panel stage" style="max-width:760px;margin:0 auto;text-align:center">
-      ${host ? `<p style="font-weight:800;margin:0">Mande este código para seus amigos:</p><div class="code big" style="margin:0 auto">${NET.peer && NET.peer.open ? NET.code : '····'}</div>
+      ${host ? `<p style="font-weight:800;margin:0">Mande este código para seus amigos:</p><div class="code big" style="margin:0 auto">${(NET.peer && NET.peer.open) || Relay.ready ? NET.code : '····'}</div>
         <div class="row center"><button class="btn primary" id="invite" data-local>${SPR.img('carta')} Convidar amigo</button><button class="btn" id="cpcode" data-local>Copiar código</button></div>
         ${host ? '<p class="muted" style="font-weight:800;margin:6px 0 0">Deixe esta tela aberta até seu amigo entrar. Se sair para o WhatsApp, volte aqui logo depois.</p>' : ''}
         <p class="muted" style="font-weight:700;margin:0">Seu amigo abre o link, digita o apelido e <b>monta o personagem dele</b>. Depois é só você tocar em Começar.</p>` : `<p style="font-weight:800;margin:0">Sala <span class="code">${esc(NET.code)}</span>. Esperando o anfitrião começar…</p>`}
