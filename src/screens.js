@@ -92,16 +92,43 @@ function screenTitle() {
   $('#cfg').onclick = () => { Audio8.init(); openSettings(); };
 }
 /* meu personagem: criado uma vez, salvo no aparelho e usado em todas as partidas */
+/* criador de personagem passo a passo (feito para o celular): um passo por tela, opções grandes, deslize para os lados */
+function openCharWizard({ avatar, name = '', askName = true, onDone, onCancel }) {
+  const av = JSON.parse(JSON.stringify(avatar || randomAvatar())), O = AVATAR_OPTS;
+  const STEPS_ = [
+    { k: 'skin', t: 'Escolha a cor da pele', kind: 'pic' }, { k: 'hair', t: 'Escolha o cabelo', kind: 'pic' }, { k: 'hairColor', t: 'Cor do cabelo', kind: 'sw' },
+    { k: 'shirt', t: 'Cor da camiseta', kind: 'sw' }, { k: 'bottom', t: 'Calça ou saia?', kind: 'pic' }, { k: 'bottomColor', t: 'Cor da roupa de baixo', kind: 'sw' },
+    { k: 'extra', t: 'Um detalhe especial', kind: 'pic' }, ...(askName ? [{ k: 'name', t: 'Como você quer ser chamada(o)?' }] : [])];
+  let st = 0, nm = name;
+  const ov = document.createElement('div'); ov.className = 'cwiz'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', 'Criar personagem'); document.body.appendChild(ov);
+  const close = () => ov.remove();
+  const swc = (k, v) => k === 'skin' ? col(PAL[v]) : (k === 'shirt' || k === 'bottomColor') ? col(v) : v;
+  const draw = (dir = 0) => {
+    const S_ = STEPS_[st], last = st === STEPS_.length - 1;
+    const opts = S_.k === 'name' ? `<input class="txt cw-name" id="cwn" maxlength="16" placeholder="Seu nome ou apelido" value="${esc(nm)}" autocomplete="off">`
+      : `<div class="cw-opts ${S_.kind}">${O[S_.k].map(v => `<button class="cw-o" data-v="${v}" aria-pressed="${av[S_.k] === v}" aria-label="${esc(S_.t)}">${S_.kind === 'sw' ? `<i style="background:${swc(S_.k, v)}"></i>` : SPR.img(avatarId({ ...av, [S_.k]: v }))}</button>`).join('')}</div>`;
+    ov.innerHTML = `<div class="cw-card">
+      <div class="cw-prev"><div class="cw-glow"></div><img class="px" id="cwimg" src="${SPR.url(avatarId(av))}" alt="Seu personagem"><button class="btn small" id="cwr">🎲 Surpresa!</button></div>
+      <div class="cw-step ${dir > 0 ? 'in-r' : dir < 0 ? 'in-l' : ''}"><div class="cw-top"><span class="cw-n">${st + 1}/${STEPS_.length}</span><h2>${esc(S_.t)}</h2></div>${opts}
+        <div class="cw-nav"><button class="btn" id="cwb">${st ? `${ICON.back} Voltar` : 'Fechar'}</button><div class="cw-dots">${STEPS_.map((_, i) => `<i class="${i === st ? 'on' : i < st ? 'done' : ''}"></i>`).join('')}</div><button class="btn primary" id="cwf">${last ? 'Pronto!' : 'Próximo'} ${ICON.next}</button></div></div></div>`;
+    const img = $('#cwimg', ov); let f = 0; const iv = setInterval(() => { if (!document.body.contains(img)) return clearInterval(iv); f ^= 1; img.src = SPR.url(avatarId(av), f ? 'walk' : null); }, 420);
+    $$('.cw-o', ov).forEach(b => b.onclick = () => { av[S_.k] = b.dataset.v; Audio8.sfx('click'); $$('.cw-o', ov).forEach(x => x.setAttribute('aria-pressed', x === b)); img.src = SPR.url(avatarId(av)); img.classList.remove('pop'); void img.offsetWidth; img.classList.add('pop'); clearTimeout(ov._t); ov._t = setTimeout(() => { if (st < STEPS_.length - 1) { st++; draw(1); } }, 550); });
+    $('#cwr', ov).onclick = () => { Object.assign(av, randomAvatar()); Audio8.sfx('select'); draw(); };
+    $('#cwb', ov).onclick = () => { if (st) { st--; draw(-1); } else { close(); onCancel && onCancel(); } };
+    $('#cwf', ov).onclick = () => { const n = $('#cwn', ov); if (n) nm = n.value.trim().slice(0, 16); if (!last) { st++; draw(1); return; } Audio8.sfx('win'); close(); onDone && onDone(av, nm); };
+    const n = $('#cwn', ov); if (n) { n.oninput = () => nm = n.value; n.onkeydown = e => { if (e.key === 'Enter') $('#cwf', ov).click(); }; setTimeout(() => n.focus(), 200); }
+  };
+  /* deslizar para os lados troca de passo */
+  let sx = null; ov.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+  ov.addEventListener('touchend', e => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; sx = null; if (Math.abs(dx) < 60 || document.activeElement && document.activeElement.id === 'cwn') return; if (dx < 0 && st < STEPS_.length - 1) { st++; draw(1); } else if (dx > 0 && st > 0) { st--; draw(-1); } });
+  draw();
+}
 function openMyChar(after) {
-  const cfg = { avatar: S.avatar ? JSON.parse(JSON.stringify(S.avatar)) : randomAvatar() };
-  const m = modal(`<h2 style="margin:0 0 6px">Meu personagem</h2><div id="mcbox"></div>
-    <label for="mcn" style="font-weight:800">Como quer ser chamada(o)?</label><input class="txt" id="mcn" maxlength="16" placeholder="Seu nome ou apelido" value="${esc(S.myName || '')}">
-    <button class="btn primary big" id="mcok" style="margin-top:10px;width:100%">${ICON.next} Pronto!</button>`, { label: 'Meu personagem' });
-  m.classList.add('mcmodal');
-  const draw = () => { $('#mcbox').innerHTML = avatarPickerHTML(cfg.avatar); wireAvatarPicker(cfg); };
-  const _w = wireAvatarPicker; draw();
-  $('#mcbox').addEventListener('click', () => setTimeout(() => { if (!$('#avp')) draw(); }, 0));
-  $('#mcok').onclick = () => { S.avatar = cfg.avatar; S.myName = $('#mcn').value.trim().slice(0, 16); saveSettings(); Audio8.sfx('win'); closeModal(); if (G && !G.finished && G.mode === 'solo' && G.players[0]) { G.players[0].avatar = JSON.parse(JSON.stringify(S.avatar)); if (S.myName) G.players[0].name = S.myName; saveGame(); } after && after(); };
+  openCharWizard({ avatar: S.avatar, name: S.myName || '', onDone: (av, nm) => {
+    S.avatar = av; S.myName = nm; saveSettings();
+    if (G && !G.finished && G.mode === 'solo' && G.players[0]) { G.players[0].avatar = JSON.parse(JSON.stringify(av)); if (nm) G.players[0].name = nm; saveGame(); }
+    after && after();
+  } });
 }
 function resumeGame() {
   if (G.current && G.current.mission) { if (G.current.mission === '_finale') go(screenFinale); else go(renderMission, G.current.mission, G.current.step || 0); }

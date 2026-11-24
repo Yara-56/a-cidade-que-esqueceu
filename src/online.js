@@ -106,6 +106,10 @@ function onData(raw, conn) {
 }
 
 /* ---------- telas ---------- */
+function myCharChipHTML(av, name) {
+  return `<button class="mychar wide" id="mych2" data-local><img class="px" src="${SPR.url(avatarId(av))}" alt=""><span><small>Seu personagem</small><b>${esc(name || 'Toque para criar')}</b></span><i>trocar</i></button>`;
+}
+function wireMyCharChip(cfg, redraw) { const b = $('#mych2'); if (b) b.onclick = () => openCharWizard({ avatar: cfg.avatar, name: cfg.name, onDone: (av, nm) => { cfg.avatar = av; if (nm) cfg.name = nm; S.avatar = av; if (nm) S.myName = nm; saveSettings(); redraw(); } }); }
 function avatarPickerHTML(av) {
   const O = AVATAR_OPTS, sw = (k, v) => `<button class="av-mini sw" data-ak="${k}" data-av="${v}" aria-pressed="${av[k] === v}" style="background:${col(k === 'skin' ? PAL[v] : v)}" aria-label="${k}"></button>`;
   const pic = (k, v) => `<button class="av-mini pic" data-ak="${k}" data-av="${v}" aria-pressed="${av[k] === v}">${SPR.img(avatarId({ ...av, [k]: v }))}</button>`;
@@ -141,12 +145,12 @@ function screenOnlineHost() {
     app().innerHTML = `<div class="screen setup"><h2>Criar uma sala</h2>
       <div class="panel stage" style="max-width:720px;margin:0 auto">
         <label for="on" style="font-weight:800">Seu apelido</label><input class="txt" id="on" maxlength="18" value="${esc(cfg.name)}" placeholder="Ex.: Yara">
-        ${avatarPickerHTML(cfg.avatar)}
+        ${myCharChipHTML(cfg.avatar, cfg.name)}
         <b>Nível</b><div class="chips">${Object.entries(DIFFS).map(([k, d]) => `<button class="chip" data-d="${k}" aria-pressed="${cfg.diff === k}">${d.label}</button>`).join('')}</div>
         <div class="row"><button class="btn" id="bk">${ICON.back} Voltar</button><span class="grow"></span><button class="btn primary big" id="go">Criar sala</button></div>
       </div></div>`;
     $('#on').oninput = e => cfg.name = e.target.value;
-    wireAvatarPicker(cfg);
+    wireMyCharChip(cfg, draw);
     $$('[data-d]').forEach(b => b.onclick = () => { cfg.diff = b.dataset.d; draw(); });
     $$('[data-l]').forEach(b => b.onclick = () => { cfg.length = b.dataset.l; draw(); });
     $('#bk').onclick = () => go(screenOnline);
@@ -162,6 +166,9 @@ function startHost(cfg, tries = 0) {
   const peer = NET.peer = new Peer(ROOM_PREFIX + code, peerOptions());
   go(screenLobby);
   peer.on('open', () => renderLobby());
+  peer.on('disconnected', () => { try { if (!peer.destroyed) peer.reconnect(); } catch (e) { } });
+  const wake = () => { if (document.visibilityState === 'visible' && NET.peer === peer && peer.disconnected && !peer.destroyed) { try { peer.reconnect(); } catch (e) { } } };
+  document.addEventListener('visibilitychange', wake); window.addEventListener('focus', wake);
   peer.on('error', err => {
     if (err.type === 'unavailable-id' && tries < 4) return startHost(cfg, tries + 1);
     toast('Problema na conexão: ' + esc(err.type || 'erro') + '. Confira a internet.', 'nevoa');
@@ -181,12 +188,13 @@ function screenOnlineJoin(code0 = '') {
   app().innerHTML = `<div class="screen setup"><h2>Entrar numa sala</h2>
     <div class="panel stage" style="max-width:720px;margin:0 auto">
       <label for="oc" style="font-weight:800">Código da sala</label><input class="txt code-in" id="oc" maxlength="4" autocomplete="off" autocapitalize="characters" placeholder="ABCD" value="${esc(cfg.code)}">
-      <label for="on" style="font-weight:800">Seu apelido</label><input class="txt" id="on" maxlength="18" placeholder="Ex.: Ana">
-      <p style="font-weight:800;margin:0">Monte o seu personagem:</p>${avatarPickerHTML(cfg.avatar)}
+      <label for="on" style="font-weight:800">Seu apelido</label><input class="txt" id="on" maxlength="18" placeholder="Ex.: Ana" value="${esc(cfg.name)}">
+      <div id="chipbox">${myCharChipHTML(cfg.avatar, cfg.name)}</div>
       <div id="st"></div>
       <div class="row"><button class="btn" id="bk">${ICON.back} Voltar</button><span class="grow"></span><button class="btn primary big" id="go">Entrar</button></div>
     </div></div>`;
-  wireAvatarPicker(cfg);
+  const rechip = () => { $('#chipbox').innerHTML = myCharChipHTML(cfg.avatar, cfg.name); if (cfg.name && !$('#on').value) $('#on').value = cfg.name; wireMyCharChip(cfg, rechip); };
+  wireMyCharChip(cfg, rechip);
   if (cfg.code) setTimeout(() => { const n = $('#on'); if (n) n.focus(); }, 50);
   $('#bk').onclick = () => { netReset(); go(screenOnline); };
   $('#go').onclick = () => {
@@ -195,13 +203,24 @@ function screenOnlineJoin(code0 = '') {
     netReset(); $('#st').innerHTML = '<div class="feedback info">Conectando…</div>';
     Object.assign(NET, { on: true, role: 'guest', code });
     const peer = NET.peer = new Peer(peerOptions());
-    peer.on('error', err => { $('#st') && ($('#st').innerHTML = `<div class="feedback soft">Não encontramos essa sala (${esc(err.type || 'erro')}). Confira o código e a internet.</div>`); });
-    peer.on('open', () => {
+    let tries = 0, opened = false, timer = null;
+    const st = html => { const b = $('#st'); if (b) b.innerHTML = html; };
+    const attempt = () => {
+      if (opened || !NET.on) return; tries++;
+      st(`<div class="feedback info">Procurando a sala ${esc(code)}… ${tries > 1 ? `(tentativa ${tries})` : ''}</div>`);
       const conn = NET.host = peer.connect(ROOM_PREFIX + code, { reliable: true });
-      conn.on('open', () => { conn.send(JSON.stringify({ t: 'hello', name: $('#on').value.trim() || 'Amigo', avatar: cfg.avatar })); go(screenLobby); });
+      clearTimeout(timer); timer = setTimeout(() => { if (!opened) retry(); }, 7000);
+      conn.on('open', () => { opened = true; clearTimeout(timer); conn.send(JSON.stringify({ t: 'hello', name: $('#on') ? ($('#on').value.trim() || cfg.name || 'Amigo') : 'Amigo', avatar: cfg.avatar })); go(screenLobby); });
       conn.on('data', d => onData(d, conn));
-      conn.on('close', () => { const was = NET.started; netReset(); modal(`<h2>A sala foi fechada</h2><p style="font-weight:700">${was ? 'O anfitrião saiu ou a conexão caiu.' : 'Não deu para continuar na sala.'}</p><button class="btn primary" data-close>Voltar ao início</button>`, { onClose: () => go(screenTitle) }); });
-    });
+      conn.on('close', () => { if (!opened) return; const was = NET.started; netReset(); modal(`<h2>A sala foi fechada</h2><p style="font-weight:700">${was ? 'O anfitrião saiu ou a conexão caiu.' : 'Não deu para continuar na sala.'}</p><button class="btn primary" data-close>Voltar</button>`, { onClose: () => go(screenTitle) }); });
+    };
+    const retry = () => {
+      if (opened) return;
+      if (tries >= 6) { st(`<div class="feedback soft"><b>A sala ${esc(code)} não respondeu.</b> Peça para quem criou a sala deixar a tela do jogo aberta (sem bloquear o celular) e toque em Entrar de novo.</div>`); return; }
+      setTimeout(attempt, 1500);
+    };
+    peer.on('error', err => { if (err.type === 'peer-unavailable' || err.type === 'network' || err.type === 'disconnected') retry(); else st(`<div class="feedback soft">Problema na conexão (${esc(err.type || 'erro')}). Confira a internet e tente de novo.</div>`); });
+    peer.on('open', attempt);
   };
 }
 function screenLobby() {
@@ -215,6 +234,7 @@ function renderLobby() {
     <div class="panel stage" style="max-width:760px;margin:0 auto;text-align:center">
       ${host ? `<p style="font-weight:800;margin:0">Mande este código para seus amigos:</p><div class="code big" style="margin:0 auto">${NET.peer && NET.peer.open ? NET.code : '····'}</div>
         <div class="row center"><button class="btn primary" id="invite" data-local>${SPR.img('carta')} Convidar amigo</button><button class="btn" id="cpcode" data-local>Copiar código</button></div>
+        ${host ? '<p class="muted" style="font-weight:800;margin:6px 0 0">Deixe esta tela aberta até seu amigo entrar. Se sair para o WhatsApp, volte aqui logo depois.</p>' : ''}
         <p class="muted" style="font-weight:700;margin:0">Seu amigo abre o link, digita o apelido e <b>monta o personagem dele</b>. Depois é só você tocar em Começar.</p>` : `<p style="font-weight:800;margin:0">Sala <span class="code">${esc(NET.code)}</span>. Esperando o anfitrião começar…</p>`}
       <div class="row center" style="gap:18px;margin-top:10px">${NET.players.map((p, i) => `<div style="display:grid;justify-items:center;gap:4px"><img class="px" src="${SPR.url(avatarId(p.avatar))}" style="width:56px;height:84px" alt=""><span class="tag" style="background:${p.color}">${esc(p.name)}${i === NET.me ? ' (você)' : ''}</span></div>`).join('')}</div>
       <p style="font-weight:700;margin:0">${NET.players.length} de 4 jogadores</p>
