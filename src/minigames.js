@@ -350,6 +350,11 @@ STEPS.cook = function (step, ctx) {
     $('#ctr', ctx.stage).innerHTML = '';
     if (S.autoRead) Voice.speak('Arroz soltinho! Na escola, o Seu Zé faz trinta quilos disso todo dia.');
     addMedal('curiosidade', 1, 'cook:' + ctx.id);
+    { /* a criançada chega para comer: o trabalho do Seu Zé chega em alguém */
+      const kl = $('#klay', ctx.stage); if (kl) { const kids = [spriteEl('theo', -20, 44), spriteEl('iara', -34, 44)]; kids.forEach(e => kl.appendChild(e));
+        setTimeout(() => { moveEl(kids[0], 20, 44, 1300, true); moveEl(kids[1], 6, 44, 1300, true); }, 300);
+        setTimeout(() => sceneBub(kl, 22, 34, 'Hmm, que cheiro bom! Obrigado, Seu Zé! 🍚', 3600), 1700);
+        setTimeout(() => sceneBub(kl, 128, 30, 'Bom apetite, criançada! ❤', 3000), 5200); } }
     ctx.complete();
   };
   renderShop(); setTimeout(() => demoTap($('[data-ing="arroz"]', tray)), 500);

@@ -1638,3 +1638,4 @@ html.flowfoot .mg.job .mgbar { padding-right: 64px; }
   html.sala .mg.cook .kitchen2 { width: min(100%, calc((100dvh - 300px) * 16 / 9)); }
   html.sala #stage .mg.job .jobscene { width: min(100%, calc((100dvh - 330px) * 16 / 9)) !important; }
 }
+.scene .sprite.famsad { filter: grayscale(1) brightness(.75); } .scene .sprite.famhappy { filter: drop-shadow(0 0 6px #fff1a8); }

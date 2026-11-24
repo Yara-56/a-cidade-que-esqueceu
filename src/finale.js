@@ -148,6 +148,8 @@ function saveMemoryCard() {
   c.toBlob(async blob => {
     const file = new File([blob], 'lembranca-cidade-que-esqueceu.png', { type: 'image/png' });
     try { if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'Minha lembrança de Lumiara' }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+    /* dentro do Claude: salvar pelo próprio aplicativo (link de download não funciona lá) */
+    try { if (window.claude && typeof window.claude.use === 'function') { const dl = await window.claude.use('downloads'); if (dl) { try { await dl.save({ filename: file.name, data: blob }); toast('Lembrança salva!', 'estrela'); } catch (e) { if (!e || e.code !== 'declined') toast('Não deu para salvar aqui. Abra o jogo no navegador para guardar.', 'estrela'); } return; } } } catch (e) {}
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file.name; document.body.appendChild(a); a.click(); a.remove(); toast('Lembrança salva!', 'estrela');
   }, 'image/png');
 }

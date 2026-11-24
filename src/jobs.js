@@ -88,6 +88,8 @@ STEPS.fire = function (step, ctx) {
     $('#ft', ctx.stage).style.opacity = 0;
     setHead(ctx, '<b>Fogo apagado!</b> Numa emergência, ligue <b>193</b>.');
     moveEl(jo, 70, 50, 1200, true);
+    { /* a família que estava perto agradece */ const fam = spriteEl('olimpia', 170, 44); lay.appendChild(fam); setTimeout(() => moveEl(fam, 112, 44, 1400, true), 600);
+      setTimeout(() => sceneBub(lay, 118, 34, 'Minha casa! Obrigada, Tenente Joana! 🧡', 3600), 2100); }
     if (S.autoRead) Voice.speak('Fogo apagado! Numa emergência, ligue 193.');
     ctx.complete();
   };
@@ -124,6 +126,7 @@ STEPS.water = function (step, ctx) {
   const moveDrop = () => { const x = (ST[Math.min(k, ST.length - 1)].x) - 6; drop.style.left = pct(x, SW); drop.style.top = pct(k >= 6 ? 40 : 46, SH); if (k >= 4) drop.src = SPR.url('gota'); };
   /* família da casa: cinza e tristinha até a água chegar */
   const fam = ['theo', 'bia'].map((id, i) => { const e = spriteEl(id, 128 + i * 12, 58, { w: 11 }); e.classList.add('famsad'); lay.appendChild(e); return e; });
+  setTimeout(() => { if (!done && typeof sceneBub === 'function') sceneBub(lay, 140, 50, 'Cadê a água? 😢', 3200); }, 900);
   const draw = () => {
     t++;
     P('skyD', 0, 0, 160, 20); P('sky', 0, 12, 160, 30); P('#cfeefa', 0, 34, 160, 8);
@@ -193,6 +196,7 @@ STEPS.water = function (step, ctx) {
   const finish = () => {
     done = true; clearCtl(); Audio8.sfx('win'); confetti(40);
     fam.forEach(e => { e.classList.remove('famsad'); e.classList.add('famhappy'); });
+    if (typeof sceneBub === 'function') setTimeout(() => sceneBub(lay, 140, 50, 'Água limpinha! Obrigado! 💧', 3600), 500);
     $$('.wsteps span', ctx.stage).forEach(e => e.className = 'ok');
     setHead(ctx, '<b>Água limpinha na torneira!</b> A Tânia e muita gente trabalham todo dia pra ela chegar assim.');
     if (S.autoRead) Voice.speak('Água limpinha na torneira! A Tânia e muita gente trabalham todo dia pra ela chegar assim.');
@@ -359,6 +363,7 @@ STEPS.power = function (step, ctx) {
   const finishNight = () => {
     night = 1; lit = 4; done = true; Audio8.sfx('win'); confetti(40);
     setHead(ctx, '<b>Água e sol: energia limpa!</b> E o Pedro leva a luz até o poste da sua rua.');
+    { let ly = $('#lay', ctx.stage); if (!ly) { const sc = $('#js', ctx.stage); if (sc) { ly = document.createElement('div'); ly.className = 'layer'; sc.appendChild(ly); } } if (ly) setTimeout(() => sceneBub(ly, 132, 36, 'A luz voltou! O posto de saúde reabriu! 💡', 3600), 900); }
     if (S.autoRead) Voice.speak('Água e sol: energia limpa! E o Pedro leva a luz até o poste da sua rua.');
     ctx.complete();
   };
