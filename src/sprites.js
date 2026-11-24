@@ -15,7 +15,7 @@ const PAL = {
   brown: '#8b5a2b', brownD: '#5e3c1e', brownL: '#c08a55', tan: '#dcb683',
   grey: '#9aa3ad', greyD: '#5d6573', greyL: '#d3d8de',
   sky: '#a8dcf2', skyD: '#7fbfe0', night: '#27305a', nightD: '#1b2142', glass: '#cfeef7',
-  s1: '#f6d3b3', s2: '#e0aa7e', s3: '#b97a4e', s4: '#7d4e31',
+  s1: '#f6d3b3', s7: '#ecc19a', s2: '#e0aa7e', s8: '#cf9566', s3: '#b97a4e', s5: '#9a6340', s4: '#7d4e31', s6: '#5a3622',
   vest: '#c6f05a', caramel: '#c98a3e', caramelD: '#8f5a26', caramelL: '#e6b574'
 };
 
@@ -366,7 +366,7 @@ const BODY_WALK = BODY.slice(0, 18).concat([
 
 /* ---------- avatares criados pelos jogadores ---------- */
 const AVATAR_OPTS = {
-  skin: ['s1', 's2', 's3', 's4'],
+  skin: ['s1', 's7', 's2', 's8', 's3', 's5', 's4', 's6'],
   hair: ['short', 'curly', 'afro', 'long', 'pony', 'braids', 'bun', 'cap'],
   hairColor: ['#22161d', '#5a3520', '#b5562c', '#e8c25a', '#cfcfd6', '#8f5fb8'],
   shirt: ['red', 'orange', 'yellow', 'green', 'teal', 'blue', 'purple', 'pink'],

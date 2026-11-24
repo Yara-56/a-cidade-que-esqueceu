@@ -96,27 +96,32 @@ function screenTitle() {
 function openCharWizard({ avatar, name = '', askName = true, onDone, onCancel }) {
   const av = JSON.parse(JSON.stringify(avatar || randomAvatar())), O = AVATAR_OPTS;
   const STEPS_ = [
-    { k: 'skin', t: 'Escolha a cor da pele', kind: 'pic' }, { k: 'hair', t: 'Escolha o cabelo', kind: 'pic' }, { k: 'hairColor', t: 'Cor do cabelo', kind: 'sw' },
+    { k: 'skin', t: 'Escolha a cor da pele', kind: 'sw', zoom: 1 }, { k: 'hair', t: 'Escolha o cabelo', kind: 'pic', zoom: 1 }, { k: 'hairColor', t: 'Cor do cabelo', kind: 'sw', zoom: 1 },
     { k: 'shirt', t: 'Cor da camiseta', kind: 'sw' }, { k: 'bottom', t: 'Calça ou saia?', kind: 'pic' }, { k: 'bottomColor', t: 'Cor da roupa de baixo', kind: 'sw' },
-    { k: 'extra', t: 'Um detalhe especial', kind: 'pic' }, ...(askName ? [{ k: 'name', t: 'Como você quer ser chamada(o)?' }] : [])];
+    { k: 'extra', t: 'Um detalhe especial', kind: 'pic', zoom: 1 }, ...(askName ? [{ k: 'name', t: 'Como você quer ser chamada(o)?' }] : [])];
   let st = 0, nm = name;
   const ov = document.createElement('div'); ov.className = 'cwiz'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', 'Criar personagem'); document.body.appendChild(ov);
   const close = () => ov.remove();
-  const swc = (k, v) => k === 'skin' ? col(PAL[v]) : (k === 'shirt' || k === 'bottomColor') ? col(v) : v;
+  const swc = (k, v) => k === 'skin' ? PAL[v] : (k === 'shirt' || k === 'bottomColor') ? col(v) : v;
+  const label = (k, v) => k === 'skin' ? SKIN_NAMES[v] : k === 'hair' ? HAIR_NAMES[v] : k === 'bottom' ? (v === 'pants' ? 'Calça' : 'Saia') : k === 'extra' ? EXTRA_NAMES[v] : COLOR_NAMES[v] || '';
   const draw = (dir = 0) => {
     const S_ = STEPS_[st], last = st === STEPS_.length - 1;
     const opts = S_.k === 'name' ? `<input class="txt cw-name" id="cwn" maxlength="16" placeholder="Seu nome ou apelido" value="${esc(nm)}" autocomplete="off">`
       : `<div class="cw-opts ${S_.kind}">${O[S_.k].map(v => `<button class="cw-o" data-v="${v}" aria-pressed="${av[S_.k] === v}" aria-label="${esc(S_.t)}">${S_.kind === 'sw' ? `<i style="background:${swc(S_.k, v)}"></i>` : SPR.img(avatarId({ ...av, [S_.k]: v }))}</button>`).join('')}</div>`;
     ov.innerHTML = `<div class="cw-card">
-      <div class="cw-prev"><div class="cw-glow"></div><img class="px" id="cwimg" src="${SPR.url(avatarId(av))}" alt="Seu personagem"><button class="btn small" id="cwr">🎲 Surpresa!</button></div>
+      <div class="cw-prev ${S_.zoom ? 'zoom' : ''}"><div class="cw-glow"></div><div class="cw-frame"><img class="px" id="cwimg" src="${SPR.url(avatarId(av))}" alt="Seu personagem (toque para ver ele pular)"></div>
+        <div class="cw-lab" id="cwl">${S_.k === 'name' ? esc(nm || 'Seu personagem') : esc(label(S_.k, av[S_.k]))}</div><button class="btn small" id="cwr">🎲 Surpresa!</button></div>
       <div class="cw-step ${dir > 0 ? 'in-r' : dir < 0 ? 'in-l' : ''}"><div class="cw-top"><span class="cw-n">${st + 1}/${STEPS_.length}</span><h2>${esc(S_.t)}</h2></div>${opts}
-        <div class="cw-nav"><button class="btn" id="cwb">${st ? `${ICON.back} Voltar` : 'Fechar'}</button><div class="cw-dots">${STEPS_.map((_, i) => `<i class="${i === st ? 'on' : i < st ? 'done' : ''}"></i>`).join('')}</div><button class="btn primary" id="cwf">${last ? 'Pronto!' : 'Próximo'} ${ICON.next}</button></div></div></div>`;
+        <div class="cw-nav"><button class="btn" id="cwb">${st ? `${ICON.back} Voltar` : 'Fechar'}</button><div class="cw-dots">${STEPS_.map((_, i) => `<i class="${i === st ? 'on' : i < st ? 'done' : ''}"></i>`).join('')}</div><button class="btn primary" id="cwf">${last ? 'Pronto!' : 'OK, próximo'} ${ICON.next}</button></div></div></div>`;
     const img = $('#cwimg', ov); let f = 0; const iv = setInterval(() => { if (!document.body.contains(img)) return clearInterval(iv); f ^= 1; img.src = SPR.url(avatarId(av), f ? 'walk' : null); }, 420);
-    $$('.cw-o', ov).forEach(b => b.onclick = () => { av[S_.k] = b.dataset.v; Audio8.sfx('click'); $$('.cw-o', ov).forEach(x => x.setAttribute('aria-pressed', x === b)); img.src = SPR.url(avatarId(av)); img.classList.remove('pop'); void img.offsetWidth; img.classList.add('pop'); clearTimeout(ov._t); ov._t = setTimeout(() => { if (st < STEPS_.length - 1) { st++; draw(1); } }, 550); });
+    const hop = () => { img.classList.remove('pop'); void img.offsetWidth; img.classList.add('pop'); };
+    $$('.cw-o', ov).forEach(b => b.onclick = () => { av[S_.k] = b.dataset.v; Audio8.sfx('select'); $$('.cw-o', ov).forEach(x => x.setAttribute('aria-pressed', x === b)); img.src = SPR.url(avatarId(av)); hop();
+      const l = $('#cwl', ov); l.textContent = label(S_.k, b.dataset.v); l.classList.remove('pop'); void l.offsetWidth; l.classList.add('pop'); $('#cwf', ov).classList.add('ready'); });
+    img.onclick = () => { hop(); Audio8.sfx('page'); const p = $('.cw-prev', ov); p.classList.toggle('turn'); };
     $('#cwr', ov).onclick = () => { Object.assign(av, randomAvatar()); Audio8.sfx('select'); draw(); };
     $('#cwb', ov).onclick = () => { if (st) { st--; draw(-1); } else { close(); onCancel && onCancel(); } };
     $('#cwf', ov).onclick = () => { const n = $('#cwn', ov); if (n) nm = n.value.trim().slice(0, 16); if (!last) { st++; draw(1); return; } Audio8.sfx('win'); close(); onDone && onDone(av, nm); };
-    const n = $('#cwn', ov); if (n) { n.oninput = () => nm = n.value; n.onkeydown = e => { if (e.key === 'Enter') $('#cwf', ov).click(); }; setTimeout(() => n.focus(), 200); }
+    const n = $('#cwn', ov); if (n) { n.oninput = () => { nm = n.value; $('#cwl', ov).textContent = nm || 'Seu personagem'; }; n.onkeydown = e => { if (e.key === 'Enter') $('#cwf', ov).click(); }; setTimeout(() => n.focus(), 200); }
   };
   /* deslizar para os lados troca de passo */
   let sx = null; ov.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
@@ -141,7 +146,7 @@ function confirmBox(text, yes, fn) {
 }
 
 /* ---------------- CONFIGURAÇÃO DA PARTIDA ---------------- */
-const SKIN_NAMES = { s1: 'Pele clara', s2: 'Pele morena clara', s3: 'Pele morena', s4: 'Pele negra' };
+const SKIN_NAMES = { s1: 'Pele bem clara', s7: 'Pele clara', s2: 'Pele morena clara', s8: 'Pele morena dourada', s3: 'Pele morena', s5: 'Pele morena escura', s4: 'Pele negra', s6: 'Pele negra retinta' };
 const HAIR_NAMES = { short: 'Curto', curly: 'Cacheado', afro: 'Black power', long: 'Longo', pony: 'Rabo de cavalo', braids: 'Tranças', bun: 'Coque', cap: 'Boné' };
 const COLOR_NAMES = { '#22161d': 'Preto', '#5a3520': 'Castanho', '#b5562c': 'Ruivo', '#e8c25a': 'Loiro', '#cfcfd6': 'Grisalho', '#8f5fb8': 'Roxo', red: 'Vermelho', orange: 'Laranja', yellow: 'Amarelo', green: 'Verde', teal: 'Verde-água', blue: 'Azul', purple: 'Roxo', pink: 'Rosa', navy: 'Azul-marinho', greyD: 'Cinza', brown: 'Marrom', greenD: 'Verde-escuro' };
 const EXTRA_NAMES = { none: 'Nada', glasses: 'Óculos', band: 'Faixa', freckles: 'Sardas' };
@@ -462,9 +467,9 @@ function renderMission(id, idx) {
   const prim = $('#prim'), hintBtn = $('#hint');
   const ctx = {
     stage: $('#stage'), id, idx, step, colored: idx > revealIdx,
-    complete() { RUN.done = true; prim.disabled = false; prim.classList.add('ready');
+    complete() { RUN.done = true; prim.disabled = false; prim.classList.add('ready'); if (flowOn()) prim.innerHTML = `Continuar ${ICON.next}`;
       if (['tidy', 'cook', 'fire', 'water', 'cross', 'power', 'recycle', 'shift', 'catch'].includes(step.t)) { addMedal('criatividade', 1, 'mg:' + id); if (!G.seen['eg:' + id]) { G.seen['eg:' + id] = 1; G.energy = (G.energy || 0) + 1; saveGame(); updEnergy(); } }
-      const ms = { dialog: flowOn() ? 1400 : 0, choice: 5200, reveal: flowOn() ? 6500 : 9000, thanks: 5000, mirror: 0, reflect: 0, days: 3200 }[step.t] ?? 2600;
+      const ms = 0; /* nada avança sozinho: o botão ▶ pulsa e a criança segue no tempo dela */
       if (ms) autoNext(prim, ms, () => prim.click()); },
     setPrimary(t) { prim.innerHTML = flowOn() ? `${ICON.next}` : `${esc(t)} ${ICON.next}`; prim.title = t; },
     mistake() { RUN.mistakes++; G.current.mistakes++; saveGame(); refreshHint(); heroTip(id, step, true); },
@@ -582,7 +587,7 @@ function screenReward(id, first, stars = 1, info = {}) {
     if (regionDone && first) { const rs = planRegions(); go(screenInterlude, r.id, rs.filter(x => regionState(x.id) === 'done').length, rs.length); }
     else goNextMission();
   };
-  autoNext($('#go'), 4500, () => $('#go').click());
+
 }
 function medalsHTML() {
   return Object.entries(MEDALS).map(([k, m]) => {

@@ -251,7 +251,7 @@ function speakerInfo(who) {
 }
 function bubbleHTML(who, text) {
   const s = speakerInfo(who);
-  return `<div class="bubble ${who === 'you' || String(who).startsWith('nevoa') ? 'right' : ''} ${String(who).startsWith('nevoa') ? 'villain' : ''}"><div class="who"><div class="face"><img class="px" src="${s.img}" alt=""></div><b>${esc(s.name)}</b></div><div class="text" aria-live="polite"><p>${esc(text)}</p></div></div>`;
+  return `<div class="bubble ${who === 'you' || String(who).startsWith('nevoa') ? 'right' : ''} ${String(who).startsWith('nevoa') ? 'villain' : ''}"><div class="who"><div class="face"><img class="px" src="${s.img}" alt=""></div><b>${esc(s.name)}</b></div><div class="text" aria-live="polite"><p>${esc(text)}</p><span class="tapnext" aria-hidden="true">toque para continuar ▸</span></div></div>`;
 }
 /* vida na cidade: vira-lata caramelo, bicicletas, carros e passarinhos (decoração animada) */
 const AMBIENT = {

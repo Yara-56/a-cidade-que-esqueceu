@@ -1403,3 +1403,32 @@ html.flowfoot .mg .mgsay { display: none !important; }
 .mychar.wide i { margin-left: auto; }
 .cw-card > * { min-width: 0; } .cwiz { overflow: hidden; } .cw-nav .btn { white-space: nowrap; } @media (orientation: portrait) { .cw-nav .btn { padding: 8px 12px; font-size: .95rem; } }
 .cw-step { min-width: 0; overflow: hidden; } .cw-step > * { min-width: 0; } .cw-opts { width: 100%; } @media (orientation: portrait) { .cw-dots { display: none; } .cw-nav { justify-content: space-between; } }
+/* criador: ver de perto, testar à vontade, OK para seguir */
+.cw-frame { position: relative; width: min(230px, 42vh); aspect-ratio: 2 / 3; display: grid; place-items: end center; overflow: hidden; border-radius: 26px; transition: .35s; }
+.cw-frame img.px { width: 100% !important; cursor: pointer; transform-origin: 50% 10%; transition: transform .45s cubic-bezier(.2,.9,.3,1.2); }
+.cw-prev.zoom .cw-frame { background: radial-gradient(circle at 50% 35%, #fff8, transparent 70%); border: 4px solid #fff3; }
+.cw-prev.zoom .cw-frame img.px { transform: scale(1.45); }
+.cw-prev.turn .cw-frame img.px { transform: scaleX(-1); } .cw-prev.zoom.turn .cw-frame img.px { transform: scale(1.45) scaleX(-1); }
+.cw-lab { position: relative; background: var(--ink); color: var(--glow); border-radius: 99px; padding: 4px 16px; font-weight: 900; font-size: 1.05rem; }
+.cw-lab.pop { animation: react .4s cubic-bezier(.2,.9,.3,1.5); }
+.cw-opts.sw .cw-o i { width: 60px; height: 60px; box-shadow: inset -6px -6px 0 #0002, inset 4px 4px 0 #fff5; }
+#cwf.ready { animation: pulse 1.1s infinite; }
+@media (orientation: landscape) and (max-height: 520px) { .cw-frame { width: min(170px, 46vh); } .cw-opts.sw .cw-o i { width: 44px; height: 44px; } .cw-lab { font-size: .85rem; padding: 2px 12px; } }
+@media (orientation: portrait) { .cw-frame { width: min(150px, 26vh); } }
+.bubble .tapnext { display: block; margin-top: 4px; font-size: .8rem; font-weight: 800; color: #8a7f9a; opacity: 0; animation: tapin .4s 1.2s forwards, bob 1.2s 1.6s ease-in-out infinite; }
+.bubble.right .tapnext { text-align: right; } .bubble.villain .tapnext { color: #c3a3e0; }
+@keyframes tapin { to { opacity: 1; } }
+.footbar.flow #prim.ready, .footbar.cutfoot #nx { animation: pulse 1.4s infinite; }
+.footbar.flow #prim.ready { width: auto !important; height: auto !important; border-radius: 99px !important; padding: 12px 26px !important; font-size: 1.15rem !important; display: inline-flex; gap: 8px; }
+.footbar.cutfoot #nx { animation: none; }
+/* ===== telas grandes (notebook/monitor): o jogo cresce junto ===== */
+html { font-size: clamp(16px, calc(.55vmin + 10px), 21px); }
+@media (pointer: fine), (min-width: 900px) and (min-height: 600px) {
+  #app { max-width: min(96vw, calc(100dvh * 1.85)) !important; }
+  .screen.mission { min-height: calc(100dvh - 24px); display: flex; flex-direction: column; justify-content: center; }
+  .screen.mission > #stage { width: 100%; }
+  .scene.cap { max-width: min(100%, calc((100dvh - 190px) * 16 / 9)) !important; }
+  .mg .scene.jobscene, .mg .scene.tidyroom { max-width: min(100%, calc((100dvh - 200px) * 16 / 9)) !important; }
+  .reflect { gap: 18px; } .reflect > * { font-size: 1.15rem; padding: 18px 20px; }
+}
+@media (pointer: fine), (min-width: 900px) and (min-height: 600px) { .reflect p, .reflect li { font-size: 1.2rem !important; line-height: 1.4; } .reflect h3 { font-size: 1.35rem; } }

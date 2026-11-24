@@ -98,7 +98,7 @@ const STEPS = {
       $('#bub', ctx.stage).innerHTML = bubbleHTML(l.who, l.text);
       ctx.setPrimary(i < lines.length - 1 ? 'Continuar' : 'Vamos lá!');
       if (S.autoRead) Voice.speak(l.text);
-      if (cancelT) cancelT(); cancelT = autoNext($('#prim'), Math.max(2400, l.text.length * 70) + (i === 0 ? 900 : 0), () => $('#prim').click());
+      if (cancelT) { cancelT(); cancelT = null; }
     };
     show(); ctx.complete();
     ctx.stage.onclick = e => { if (e.isTrusted && !e.target.closest('button')) $('#prim').click(); };

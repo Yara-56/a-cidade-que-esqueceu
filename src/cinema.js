@@ -67,7 +67,7 @@ function playCutscene(frames, { title = 'Lumiara', where = 'História', onDone }
     $('#skip').onclick = () => onDone();
     $('#nx').onclick = () => { Audio8.sfx('page'); if (i < frames.length - 1) { i++; show(); } else onDone(); };
     /* minifilme: passa sozinho; tocar na cena adianta */
-    if (cancelT) cancelT(); cancelT = autoNext($('#nx'), Math.max(2600, f.text.length * 65), () => $('#nx').click());
+    if (cancelT) { cancelT(); cancelT = null; } /* sem pressa: a criança lê e toca para seguir */
     $('#cut').onclick = () => $('#nx').click();
   };
   show();
